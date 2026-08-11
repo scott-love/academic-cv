@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# uv
+.venv/
+
+# Quarto
+.quarto/
+_site/
+
+# Generated CV outputs
+outputs/
+
+# OS
+.DS_Store
+

@@ -1,0 +1,34 @@
+---
+title: "Curriculum Vitae"
+format:
+  html: default
+  pdf: default
+---
+
+## Position
+
+Associate Professor  
+University of Tours
+
+## Research Interests
+
+- Neuroscience
+- Animal neuroimaging
+- Deep learning
+- Neuroengineering
+
+## Publications
+
+See the dedicated publications page.
+
+## Funding
+
+Coming soon.
+
+## Teaching
+
+Coming soon.
+
+## Supervision
+
+Coming soon.

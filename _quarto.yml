@@ -1,0 +1,13 @@
+project:
+  type: website
+
+website:
+  title: "Scott Love"
+
+format:
+  html:
+    toc: true
+    theme: cosmo
+
+execute:
+  freeze: auto
