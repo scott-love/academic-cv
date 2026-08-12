@@ -5,15 +5,13 @@ Generate a ModernCV LaTeX CV from YAML data files and HAL publications.
 This script:
 1. Loads profile, employment, education, grants, teaching, supervision data
 2. Loads publications from HAL (via publications.json)
-3. Generates a professional ModernCV LaTeX document
+3. Generates a professional ModernCV LaTeX document using the 'casual' style
 4. Handles author abbreviation, sorting, and formatting
 """
 
 import json
-import re
 from pathlib import Path
 from datetime import datetime
-from collections import Counter
 
 import yaml
 
@@ -26,6 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 CV_DIR = ROOT / "cv"
 OUTPUT_FILE = CV_DIR / "cv.tex"
+PHOTO_FILE = DATA / "photo.jpg"  # Placeholder path
 
 # Ensure output directory exists
 CV_DIR.mkdir(parents=True, exist_ok=True)
@@ -309,21 +308,21 @@ def format_journal_reference(pub):
     return ref
 
 
-def format_conference_reference(pub, presentation_type):
+def format_conference_reference(pub):
     """Format a conference presentation reference."""
     authors = format_author_list(pub.get("authors", []))
     title = escape_latex(pub.get("title", ""))
     year = pub.get("year", "")
     
-    ref = f"{authors} ({year}). \\textit{{{title}}}. {presentation_type}"
+    ref = f"{authors} ({year}). \\textit{{{title}}}."
     
     if pub.get("conference"):
         conference = escape_latex(pub["conference"])
-        ref += f", \\textit{{{conference}}}"
+        ref += f" \\textit{{{conference}}}."
     
     dates = format_conference_dates(pub)
     if dates:
-        ref += f", {dates}"
+        ref += f" {dates}."
     
     location_parts = []
     if pub.get("city"):
@@ -334,9 +333,7 @@ def format_conference_reference(pub, presentation_type):
             location_parts.append(country)
     
     if location_parts:
-        ref += ", " + ", ".join(location_parts)
-    
-    ref += "."
+        ref += f" {', '.join(location_parts)}."
     
     return ref
 
@@ -353,95 +350,57 @@ def add_line(text=""):
     latex_lines.append(text)
 
 
-def add_section(title):
-    """Add a section header."""
-    add_line(f"\\section{{{escape_latex(title)}}}")
-    add_line()
-
-
-def add_subsection(title):
-    """Add a subsection header."""
-    add_line(f"\\subsection{{{escape_latex(title)}}}")
-    add_line()
-
-
-# Document start
+# Document preamble
 add_line(r"\documentclass[11pt,a4paper,sans]{moderncv}")
-add_line(r"\moderncvstyle{banking}")
+add_line(r"\moderncvstyle{casual}")
 add_line(r"\moderncvcolor{blue}")
-add_line(r"\usepackage[scale=0.9]{geometry}")
+add_line(r"\usepackage[utf8]{inputenc}")
+add_line(r"\usepackage[T1]{fontenc}")
+add_line(r"\usepackage[scale=.84]{geometry}")
+add_line(r"\setlength{\hintscolumnwidth}{2.5cm}")
 add_line(r"\usepackage{hyperref}")
-add_line(r"\usepackage{microtype}")
 add_line()
 
-# Personal info
-name = escape_latex(profile.get("name", ""))
-title = escape_latex(profile.get("title", ""))
-institution = escape_latex(profile.get("institution", ""))
+# Personal information
+name_parts = profile.get("name", "").split()
+firstname = name_parts[0] if name_parts else ""
+lastname = " ".join(name_parts[1:]) if len(name_parts) > 1 else ""
 
-add_line(f"\\name{{{name}}}{{{title} — {institution}}}")
+add_line(f"\\firstname{{{escape_latex(firstname)}}}")
+add_line(f"\\familyname{{{escape_latex(lastname)}}}")
 
-if profile.get("email"):
-    add_line(f"\\email{{{profile['email']}}}")
-
-if profile.get("homepage"):
-    add_line(f"\\homepage{{{profile['homepage']}}}")
+# Optional: photo (placeholder)
+if PHOTO_FILE.exists():
+    add_line(f"\\photo[64pt][0.4pt]{{data/photo}}")
+else:
+    # Add placeholder comment
+    add_line("% \\photo[64pt][0.4pt]{data/photo}  % Uncomment and add photo when available")
 
 add_line()
 add_line(r"\begin{document}")
 add_line(r"\makecvtitle")
 add_line()
 
-# Summary
+# Profile/Summary
 if profile.get("summary"):
     add_line(r"\section{Profile}")
     add_line(escape_latex(profile["summary"]))
     add_line()
 
-# Research interests
+# Research Interests
 if profile.get("research_interests"):
     add_line(r"\section{Research Interests}")
     interests = ", ".join(profile["research_interests"])
     add_line(escape_latex(interests))
     add_line()
 
-# Employment
-if employment:
-    add_section("Employment")
-    
-    for pos in employment:
-        start = pos.get("start", "")
-        end = pos.get("end", "")
-        
-        if start and end:
-            dates = f"{start}–{end}"
-        else:
-            dates = start or end
-        
-        position = escape_latex(pos.get("position", ""))
-        institution = escape_latex(pos.get("institution", ""))
-        
-        if pos.get("country"):
-            institution += f", {pos['country']}"
-        
-        add_line(f"\\cventry{{{dates}}}{{{position}}}{{{institution}}}{{}}{{}}{{")
-        
-        if pos.get("supervisor"):
-            add_line(f"Supervisor: {escape_latex(pos['supervisor'])}")
-        
-        if pos.get("team"):
-            add_line(f"Team: {escape_latex(pos['team'])}")
-        
-        add_line("}")
-        add_line()
-
 # Education
 if education:
-    add_section("Education")
+    add_line(r"\section{Education}")
     
     for deg in education:
         if deg.get("start") and deg.get("end"):
-            dates = f"{deg['start']}–{deg['end']}"
+            dates = f"{deg['start']} -- {deg['end']}"
         else:
             dates = str(deg.get("year", ""))
         
@@ -454,32 +413,77 @@ if education:
         add_line(f"\\cventry{{{dates}}}{{{degree}}}{{{institution}}}{{}}{{}}{{")
         
         if deg.get("honours"):
-            add_line(f"{escape_latex(deg['honours'])}")
+            add_line(f"\\cvitem{{}}{{\\textbf{{Honors:}}}} {escape_latex(deg['honours'])}")
         
         if deg.get("supervisor"):
             add_line(f"Supervisor: {escape_latex(deg['supervisor'])}")
         
         if deg.get("thesis_title"):
-            add_line(f"Thesis: \\textit{{{escape_latex(deg['thesis_title'])}}}")
+            add_line(f"Title: \\textit{{{escape_latex(deg['thesis_title'])}}}")
         
         add_line("}")
-        add_line()
+    
+    add_line()
+
+# Professional Experience / Employment
+if employment:
+    add_line(r"\section{Professional Experience}")
+    
+    # Group by category if available
+    by_category = {}
+    for pos in employment:
+        cat = pos.get("category", "Research")
+        if cat not in by_category:
+            by_category[cat] = []
+        by_category[cat].append(pos)
+    
+    for category in sorted(by_category.keys()):
+        if category != "Research":
+            add_line(f"\\subsection{{{category}}}")
+        
+        for pos in by_category[category]:
+            start = pos.get("start", "")
+            end = pos.get("end", "")
+            
+            if start and end:
+                dates = f"{start} -- {end}"
+            else:
+                dates = start or end
+            
+            position = escape_latex(pos.get("position", ""))
+            institution = escape_latex(pos.get("institution", ""))
+            
+            if pos.get("country"):
+                institution += f", {pos['country']}"
+            
+            add_line(f"\\cventry{{{dates}}}{{{position}}}{{{institution}}}{{}}{{}}{{")
+            
+            if pos.get("supervisor"):
+                add_line(f"Supervisor: {escape_latex(pos['supervisor'])}")
+            
+            if pos.get("team"):
+                add_line(f"Team: {escape_latex(pos['team'])}")
+            
+            add_line("}")
+    
+    add_line()
 
 # Grants
 if grants:
-    add_section("Grants")
+    add_line(r"\section{Grants}")
     
     for grant in grants:
-        dates = f"{grant['start']}–{grant['end']}"
+        dates = f"{grant['start']} -- {grant['end']}"
+        funder = escape_latex(grant.get("funder", ""))
         title = escape_latex(grant.get("title", ""))
         
         if grant.get("acronym"):
             title += f" ({grant['acronym']})"
         
-        funder = escape_latex(grant.get("funder", ""))
-        amount = escape_latex(grant.get("amount", "")) if grant.get("amount") else ""
+        add_line(f"\\cventry{{{dates}}}{{{title}}}{{{funder}}}{{}}{{}}{{")
         
-        add_line(f"\\cventry{{{dates}}}{{{title}}}{{{funder}}}{{{amount}}}{{}}{{")
+        if grant.get("amount"):
+            add_line(f"Amount: {escape_latex(grant['amount'])}")
         
         if grant.get("description"):
             add_line(escape_latex(grant["description"]))
@@ -489,18 +493,19 @@ if grants:
             add_line(f"Partners: {escape_latex(partners)}")
         
         add_line("}")
-        add_line()
+    
+    add_line()
 
 # Teaching
 if teaching:
-    add_section("Teaching")
+    add_line(r"\section{Teaching}")
     
     for course in teaching:
         start = str(course.get("start", ""))
         end = str(course.get("end", ""))
         
         if start and end:
-            dates = start if start == end else f"{start}–{end}"
+            dates = start if start == end else f"{start} -- {end}"
         else:
             dates = start or end
         
@@ -517,115 +522,106 @@ if teaching:
             add_line(escape_latex(course["description"]))
         
         add_line("}")
-        add_line()
+    
+    add_line()
 
 # Supervision
 if supervision:
-    add_section("Supervision")
+    add_line(r"\section{Supervision}")
     
     for student in supervision:
         name = escape_latex(student.get("name", ""))
-        level = escape_latex(student.get("level", "")) if student.get("level") else ""
-        role = escape_latex(student.get("role", "")) if student.get("role") else ""
-        institution = escape_latex(student.get("institution", "")) if student.get("institution") else ""
         period = student.get("period", "")
-        
-        details = ", ".join(x for x in [level, role, institution] if x)
+        level = escape_latex(student.get("level", "")) if student.get("level") else ""
         
         add_line(f"\\cventry{{{period}}}{{{name}}}{{}}{{}}{{}}{{")
         
-        if details:
-            add_line(details)
+        if level:
+            add_line(level)
+        
+        if student.get("role"):
+            add_line(f"Role: {escape_latex(student['role'])}")
+        
+        if student.get("institution"):
+            add_line(f"Institution: {escape_latex(student['institution'])}")
         
         if student.get("topic"):
             add_line(f"Topic: {escape_latex(student['topic'])}")
         
         add_line("}")
-        add_line()
+    
+    add_line()
 
 # Publications
 pubs = categorize_publications(publications)
+total_pubs = sum(len(v) for v in pubs.values())
 
-# Journal Articles
-if pubs["journal_articles"]:
-    add_section("Publications")
-    add_subsection(f"Journal Articles ({len(pubs['journal_articles'])})")
+if total_pubs > 0:
+    add_line(r"\section{Publications}")
     
-    for pub in pubs["journal_articles"]:
-        ref = format_journal_reference(pub)
-        add_line(f"\\cvitem{{}}{{{ref}}}")
-    
-    add_line()
-
-# Book Chapters
-if pubs["book_chapters"]:
-    add_subsection(f"Book Chapters ({len(pubs['book_chapters'])})")
-    
-    for pub in pubs["book_chapters"]:
-        ref = format_journal_reference(pub)
-        add_line(f"\\cvitem{{}}{{{ref}}}")
-    
-    add_line()
-
-# Conference Presentations
-if (pubs["invited_talks"] or pubs["oral_presentations"] or pubs["posters"]):
-    add_subsection(f"Conference Presentations ({len(pubs['invited_talks']) + len(pubs['oral_presentations']) + len(pubs['posters'])})")
-    
-    if pubs["invited_talks"]:
-        add_line(f"\\textbf{{Invited Talks ({len(pubs['invited_talks'])})}}")
-        add_line()
-        
-        for pub in pubs["invited_talks"]:
-            ref = format_conference_reference(pub, "Invited talk")
+    # Journal Articles
+    if pubs["journal_articles"]:
+        add_line(f"\\subsection{{Journal Articles ({len(pubs['journal_articles'])})}}")
+        for pub in pubs["journal_articles"]:
+            ref = format_journal_reference(pub)
             add_line(f"\\cvitem{{}}{{{ref}}}")
-        
         add_line()
     
-    if pubs["oral_presentations"]:
-        add_line(f"\\textbf{{Oral Presentations ({len(pubs['oral_presentations'])})}}")
-        add_line()
-        
-        for pub in pubs["oral_presentations"]:
-            ref = format_conference_reference(pub, "Oral presentation")
+    # Book Chapters
+    if pubs["book_chapters"]:
+        add_line(f"\\subsection{{Book Chapters ({len(pubs['book_chapters'])})}}")
+        for pub in pubs["book_chapters"]:
+            ref = format_journal_reference(pub)
             add_line(f"\\cvitem{{}}{{{ref}}}")
-        
         add_line()
     
-    if pubs["posters"]:
-        add_line(f"\\textbf{{Posters ({len(pubs['posters'])})}}")
-        add_line()
+    # Conference Presentations
+    conf_total = len(pubs['invited_talks']) + len(pubs['oral_presentations']) + len(pubs['posters'])
+    if conf_total > 0:
+        add_line(f"\\subsection{{Conference Presentations ({conf_total})}}")
         
-        for pub in pubs["posters"]:
-            ref = format_conference_reference(pub, "Poster")
+        if pubs["invited_talks"]:
+            add_line(f"\\subsubsection{{Invited Talks ({len(pubs['invited_talks'])})}}")
+            for pub in pubs["invited_talks"]:
+                ref = format_conference_reference(pub)
+                add_line(f"\\cvitem{{}}{{{ref}}}")
+            add_line()
+        
+        if pubs["oral_presentations"]:
+            add_line(f"\\subsubsection{{Oral Presentations ({len(pubs['oral_presentations'])})}}")
+            for pub in pubs["oral_presentations"]:
+                ref = format_conference_reference(pub)
+                add_line(f"\\cvitem{{}}{{{ref}}}")
+            add_line()
+        
+        if pubs["posters"]:
+            add_line(f"\\subsubsection{{Posters ({len(pubs['posters'])})}}")
+            for pub in pubs["posters"]:
+                ref = format_conference_reference(pub)
+                add_line(f"\\cvitem{{}}{{{ref}}}")
+            add_line()
+    
+    # Reports
+    if pubs["reports"]:
+        add_line(f"\\subsection{{Reports ({len(pubs['reports'])})}}")
+        for pub in pubs["reports"]:
+            authors = format_author_list(pub.get("authors", []))
+            title = escape_latex(pub.get("title", ""))
+            year = pub.get("year", "")
+            ref = f"{authors} ({year}). \\textbf{{{title}}}."
             add_line(f"\\cvitem{{}}{{{ref}}}")
-        
         add_line()
-
-# Reports
-if pubs["reports"]:
-    add_subsection(f"Reports ({len(pubs['reports'])})")
     
-    for pub in pubs["reports"]:
-        authors = format_author_list(pub.get("authors", []))
-        title = escape_latex(pub.get("title", ""))
-        year = pub.get("year", "")
-        ref = f"{authors} ({year}). \\textbf{{{title}}}."
-        add_line(f"\\cvitem{{}}{{{ref}}}")
-    
-    add_line()
-
-# Other
-if pubs["other"]:
-    add_subsection(f"Other Scientific Contributions ({len(pubs['other'])})")
-    
-    for pub in pubs["other"]:
-        authors = format_author_list(pub.get("authors", []))
-        title = escape_latex(pub.get("title", ""))
-        year = pub.get("year", "")
-        ref = f"{authors} ({year}). \\textbf{{{title}}}."
-        add_line(f"\\cvitem{{}}{{{ref}}}")
-    
-    add_line()
+    # Other
+    if pubs["other"]:
+        add_line(f"\\subsection{{Other Scientific Contributions ({len(pubs['other'])})}}")
+        for pub in pubs["other"]:
+            authors = format_author_list(pub.get("authors", []))
+            title = escape_latex(pub.get("title", ""))
+            year = pub.get("year", "")
+            ref = f"{authors} ({year}). \\textbf{{{title}}}."
+            add_line(f"\\cvitem{{}}{{{ref}}}")
+        add_line()
 
 # Document end
 add_line(r"\end{document}")
@@ -635,13 +631,12 @@ with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
     f.write("\n".join(latex_lines))
 
 print(f"Generated {OUTPUT_FILE}")
+print(f"  - Style: casual (blue)")
 print(f"  - Profile: {profile.get('name')}")
-print(f"  - Publications: {len(publications)} total")
+print(f"  - Photo: {'Present' if PHOTO_FILE.exists() else 'Not found (placeholder commented out)'}")
+print(f"  - Publications: {total_pubs} total")
 print(f"    - Journal articles: {len(pubs['journal_articles'])}")
 print(f"    - Book chapters: {len(pubs['book_chapters'])}")
 print(f"    - Conference presentations: {len(pubs['invited_talks']) + len(pubs['oral_presentations']) + len(pubs['posters'])}")
-print(f"      - Invited talks: {len(pubs['invited_talks'])}")
-print(f"      - Oral presentations: {len(pubs['oral_presentations'])}")
-print(f"      - Posters: {len(pubs['posters'])}")
 print(f"    - Reports: {len(pubs['reports'])}")
 print(f"    - Other: {len(pubs['other'])}")
