@@ -8,10 +8,17 @@ __pycache__/
 # Quarto
 .quarto/
 _site/
+_freeze/
+_site/
 
 # Generated CV outputs
-outputs/
+cv/*.html
+cv/*.pdf
 
 # OS
 .DS_Store
+
+
+/.quarto/
+**/*.quarto_ipynb
 

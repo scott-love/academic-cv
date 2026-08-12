@@ -1,34 +1,558 @@
 ---
 title: "Curriculum Vitae"
+author: "Scott A. Love"
 format:
-  html: default
-  pdf: default
+  html:
+    toc: false
+    theme: cosmo
+  pdf:
+    toc: false
+    documentclass: scrartcl
+    papersize: a4
+jupyter: python3
 ---
 
-## Position
+```{python}
+#| echo: false
 
-Associate Professor  
-University of Tours
+import json
+import yaml
+from pathlib import Path
+from datetime import datetime
+
+# -------------------------------------------------------------------
+# Load data
+# -------------------------------------------------------------------
+
+ROOT = Path.cwd().parent
+DATA = ROOT / "data"
+
+with open(DATA / "profile.yml", encoding="utf-8") as f:
+    profile = yaml.safe_load(f)
+
+with open(DATA / "education.yml", encoding="utf-8") as f:
+    education = yaml.safe_load(f)
+
+with open(DATA / "employment.yml", encoding="utf-8") as f:
+    employment = yaml.safe_load(f)
+
+with open(DATA / "publications.json", encoding="utf-8") as f:
+    publications = json.load(f)
+
+
+# -------------------------------------------------------------------
+# Formatting functions
+# -------------------------------------------------------------------
+
+def format_country(code):
+    """Convert HAL country codes to readable country names."""
+
+    countries = {
+        "fr": "France",
+        "ca": "Canada",
+        "gb": "United Kingdom",
+        "uk": "United Kingdom",
+        "us": "United States",
+        "de": "Germany",
+        "es": "Spain",
+        "it": "Italy",
+        "be": "Belgium",
+        "nl": "Netherlands",
+        "ch": "Switzerland",
+        "gr": "Greece",
+        "cy": "Cyprus",
+        "au": "Australia",
+        "jp": "Japan",
+        "cn": "China",
+        "se": "Sweden",
+        "dk": "Denmark",
+        "fi": "Finland",
+        "no": "Norway",
+        "pt": "Portugal",
+    }
+
+    if not code:
+        return None
+
+    return countries.get(code.lower(), code.upper())
+
+
+def format_date(date_string):
+    """Format YYYY-MM-DD as '19 November 2025'."""
+
+    if not date_string:
+        return None
+
+    try:
+        date = datetime.strptime(date_string, "%Y-%m-%d")
+        return date.strftime("%-d %B %Y")
+    except ValueError:
+        return date_string
+
+
+def format_conference_dates(pub):
+    """Format conference start/end dates."""
+
+    start = pub.get("conference_start")
+    end = pub.get("conference_end")
+
+    if not start:
+        return None
+
+    if not end or start == end:
+        return format_date(start)
+
+    try:
+        start_date = datetime.strptime(start, "%Y-%m-%d")
+        end_date = datetime.strptime(end, "%Y-%m-%d")
+
+        if start_date.year == end_date.year:
+            if start_date.month == end_date.month:
+                return (
+                    f"{start_date.day}–{end_date.day} "
+                    f"{start_date.strftime('%B %Y')}"
+                )
+            else:
+                return (
+                    f"{start_date.day} {start_date.strftime('%B')}–"
+                    f"{end_date.day} {end_date.strftime('%B %Y')}"
+                )
+
+        return f"{format_date(start)}–{format_date(end)}"
+
+    except ValueError:
+        return f"{start}–{end}"
+
+
+def format_authors(authors):
+    """Format authors and highlight Scott A. Love."""
+
+    formatted = []
+
+    for author in authors:
+
+        if author.strip().lower() in {
+            "scott love",
+            "scott a. love",
+            "scott a love",
+        }:
+            formatted.append(f"**{author}**")
+        else:
+            formatted.append(author)
+
+    return ", ".join(formatted)
+
+
+def link(url, text):
+    """Create a Markdown link if a URL exists."""
+
+    if not url:
+        return ""
+
+    return f"[{text}]({url})"
+
+
+def publication_year(pub):
+    """Return publication year as an integer."""
+
+    return pub.get("year") or 0
+
+
+def sort_publications(items):
+    """Sort publications from newest to oldest."""
+
+    return sorted(
+        items,
+        key=publication_year,
+        reverse=True,
+    )
+```
+
+# Scott A. Love
+
+```{python}
+#| echo: false
+#| output: asis
+
+print(f"**{profile['title']}**, {profile['institution']}")
+print()
+
+contact = []
+
+if profile.get("email"):
+    contact.append(profile["email"])
+
+if profile.get("orcid"):
+    contact.append(
+        link(
+            f"https://orcid.org/{profile['orcid']}",
+            "ORCID"
+        )
+    )
+
+if profile.get("hal"):
+    contact.append(
+        link(
+            f"https://hal.science/{profile['hal']}",
+            "HAL"
+        )
+    )
+
+if profile.get("github"):
+    contact.append(
+        link(
+            f"https://github.com/{profile['github']}",
+            "GitHub"
+        )
+    )
+
+print(" · ".join(contact))
+```
+
+## Profile
+
+```{python}
+#| echo: false
+#| output: asis
+
+print(profile["summary"])
+```
 
 ## Research Interests
 
-- Neuroscience
-- Animal neuroimaging
-- Deep learning
-- Neuroengineering
+```{python}
+#| echo: false
+#| output: asis
 
-## Publications
+print(" · ".join(profile["research_interests"]))
+```
 
-See the dedicated publications page.
+## Employment
 
-## Funding
+```{python}
+#| echo: false
+#| output: asis
 
-Coming soon.
+for position in employment:
 
-## Teaching
+    start = position["start"]
+    end = position["end"]
 
-Coming soon.
+    if str(end).lower() == "present":
+        dates = f"{start}–present"
+    else:
+        dates = f"{start}–{end}"
 
-## Supervision
+    print(
+        f"**{dates}**  \n"
+        f"{position['title']}, {position['institution']}"
+    )
 
-Coming soon.
+    print()
+```
+
+## Education
+
+```{python}
+#| echo: false
+#| output: asis
+
+for degree in education:
+
+    print(
+        f"**{degree['year']}**  \n"
+        f"{degree['degree']}, {degree['institution']}"
+    )
+
+    print()
+```
+
+# Publications
+
+## Journal Articles
+
+```{python}
+#| echo: false
+#| output: asis
+
+journal_articles = sort_publications([
+    p for p in publications
+    if p.get("category") == "Journal article"
+])
+
+for pub in journal_articles:
+
+    authors = format_authors(pub["authors"])
+
+    text = (
+        f"- {authors} ({pub['year']}). "
+        f"**{pub['title']}**."
+    )
+
+    if pub.get("journal"):
+        text += f" *{pub['journal']}*."
+
+    if pub.get("doi"):
+        text += " " + link(
+            f"https://doi.org/{pub['doi']}",
+            f"doi:{pub['doi']}"
+        )
+
+    print(text)
+```
+
+## Book Chapters
+
+```{python}
+#| echo: false
+#| output: asis
+
+book_chapters = sort_publications([
+    p for p in publications
+    if p.get("category") == "Book chapter"
+])
+
+for pub in book_chapters:
+
+    authors = format_authors(pub["authors"])
+
+    text = (
+        f"- {authors} ({pub['year']}). "
+        f"**{pub['title']}**."
+    )
+
+    if pub.get("publisher"):
+        text += f" {pub['publisher']}."
+
+    if pub.get("doi"):
+        text += " " + link(
+            f"https://doi.org/{pub['doi']}",
+            f"doi:{pub['doi']}"
+        )
+
+    print(text)
+```
+
+# Conference Presentations
+
+## Invited Talks
+
+```{python}
+#| echo: false
+#| output: asis
+
+invited_talks = sort_publications([
+    p for p in publications
+    if (
+        p.get("category") == "Conference presentation"
+        and p.get("presentation_type") == "Invited talk"
+    )
+])
+
+for pub in invited_talks:
+
+    authors = format_authors(pub["authors"])
+
+    details = []
+
+    if pub.get("conference"):
+
+        conference = pub["conference"]
+
+        if pub.get("conference_url"):
+            conference = link(
+                pub["conference_url"],
+                conference
+            )
+
+        details.append(conference)
+
+    dates = format_conference_dates(pub)
+
+    if dates:
+        details.append(dates)
+
+    location = ", ".join(
+        x for x in [
+            pub.get("city"),
+            format_country(pub.get("country"))
+        ]
+        if x
+    )
+
+    if location:
+        details.append(location)
+
+    text = (
+        f"- {authors} ({pub['year']}). "
+        f"**{pub['title']}**. "
+        f"*Invited talk*"
+    )
+
+    if details:
+        text += f", {', '.join(details)}."
+
+    print(text)
+```
+
+## Oral Presentations
+
+```{python}
+#| echo: false
+#| output: asis
+
+oral_presentations = sort_publications([
+    p for p in publications
+    if (
+        p.get("category") == "Conference presentation"
+        and p.get("presentation_type") == "Oral presentation"
+    )
+])
+
+for pub in oral_presentations:
+
+    authors = format_authors(pub["authors"])
+
+    details = []
+
+    if pub.get("conference"):
+
+        conference = pub["conference"]
+
+        if pub.get("conference_url"):
+            conference = link(
+                pub["conference_url"],
+                conference
+            )
+
+        details.append(conference)
+
+    dates = format_conference_dates(pub)
+
+    if dates:
+        details.append(dates)
+
+    location = ", ".join(
+        x for x in [
+            pub.get("city"),
+            format_country(pub.get("country"))
+        ]
+        if x
+    )
+
+    if location:
+        details.append(location)
+
+    text = (
+        f"- {authors} ({pub['year']}). "
+        f"**{pub['title']}**. "
+        f"*Oral presentation*"
+    )
+
+    if details:
+        text += f", {', '.join(details)}."
+
+    print(text)
+```
+
+## Posters
+
+```{python}
+#| echo: false
+#| output: asis
+
+posters = sort_publications([
+    p for p in publications
+    if (
+        p.get("category") == "Conference presentation"
+        and p.get("presentation_type") == "Poster"
+    )
+])
+
+for pub in posters:
+
+    authors = format_authors(pub["authors"])
+
+    details = []
+
+    if pub.get("conference"):
+
+        conference = pub["conference"]
+
+        if pub.get("conference_url"):
+            conference = link(
+                pub["conference_url"],
+                conference
+            )
+
+        details.append(conference)
+
+    dates = format_conference_dates(pub)
+
+    if dates:
+        details.append(dates)
+
+    location = ", ".join(
+        x for x in [
+            pub.get("city"),
+            format_country(pub.get("country"))
+        ]
+        if x
+    )
+
+    if location:
+        details.append(location)
+
+    text = (
+        f"- {authors} ({pub['year']}). "
+        f"**{pub['title']}**. "
+        f"*Poster*"
+    )
+
+    if details:
+        text += f", {', '.join(details)}."
+
+    print(text)
+```
+
+## Reports
+
+```{python}
+#| echo: false
+#| output: asis
+
+reports = sort_publications([
+    p for p in publications
+    if p.get("category") == "Report"
+])
+
+for pub in reports:
+
+    authors = format_authors(pub["authors"])
+
+    print(
+        f"- {authors} ({pub['year']}). "
+        f"**{pub['title']}**."
+    )
+```
+
+## Other Scientific Contributions
+
+```{python}
+#| echo: false
+#| output: asis
+
+other = sort_publications([
+    p for p in publications
+    if p.get("category") == "Other scientific contribution"
+])
+
+for pub in other:
+
+    authors = format_authors(pub["authors"])
+
+    print(
+        f"- {authors} ({pub['year']}). "
+        f"**{pub['title']}**."
+    )
+```

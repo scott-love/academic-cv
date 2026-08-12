@@ -1,11 +1,21 @@
 name: Scott Love
-
-idhal: scott-love
-
-position: Associate Professor
-institution: University of Tours
-
-email: your.email@univ-tours.fr
+title: Research Engineer
+institution: INRAE
+email: your.email@inrae.fr
 orcid: 0000-0000-0000-0000
-
+hal: scott-love
 github: scott-love
+
+research_interests:
+  - Animal neuroimaging
+  - Functional MRI
+  - Comparative neuroscience
+  - Multisensory perception
+  - Animal welfare
+  - Neuroinformatics
+
+summary: >
+  Research engineer specialising in neuroimaging, animal
+  neuroscience and open scientific software. My work focuses on
+  functional MRI, structural MRI and computational approaches
+  for studying brain organisation and behaviour across species.
