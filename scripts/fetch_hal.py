@@ -22,7 +22,7 @@ API_URL = "https://api.archives-ouvertes.fr/search/"
 with open(PROFILE_FILE, encoding="utf-8") as f:
     profile = yaml.safe_load(f)
 
-IDHAL = profile["idhal"]
+IDHAL = profile["hal"]
 
 
 FIELDS = [
@@ -119,7 +119,7 @@ def classify_document(doc_type, invited):
         return {
             "category": "Conference presentation",
             "presentation_type": presentation_type,
-    }
+        }
 
     if doc_type == "POSTER":
         return {

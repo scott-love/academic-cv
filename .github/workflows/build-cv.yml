@@ -1,0 +1,63 @@
+name: Build CV
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'data/**'
+      - 'scripts/**'
+      - 'cv/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install uv
+      run: |
+        pip install uv
+    
+    - name: Install TeX Live
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y texlive-latex-base texlive-latex-extra
+    
+    - name: Install Python dependencies
+      run: |
+        uv sync
+    
+    - name: Fetch publications from HAL
+      run: |
+        uv run python scripts/fetch_hal.py
+    
+    - name: Generate LaTeX CV
+      run: |
+        uv run python scripts/generate_cv_latex.py
+    
+    - name: Compile LaTeX to PDF
+      run: |
+        cd cv
+        pdflatex -interaction=nonstopmode -output-directory=. cv.tex
+        cd ..
+    
+    - name: Upload CV artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: cv
+        path: cv/cv.pdf
+    
+    - name: Deploy to GitHub Pages
+      if: success()
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./cv

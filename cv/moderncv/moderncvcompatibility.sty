@@ -1,0 +1,47 @@
+%% start of file `moderncvcompatibility.sty'.
+%% Copyright 2006-2012 Xavier Danaux (xdanaux@gmail.com).
+%
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License version 1.3c,
+% available at http://www.latex-project.org/lppl/.
+
+
+%-------------------------------------------------------------------------------
+%                identification
+%-------------------------------------------------------------------------------
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{moderncvcompatibility}[2012/10/31 v1.2.0 modern curriculum vitae and letter compatibility patches]
+
+
+%-------------------------------------------------------------------------------
+%                package options
+%-------------------------------------------------------------------------------
+\DeclareOption*{}
+\ProcessOptions\relax
+
+%-------------------------------------------------------------------------------
+%                definitions
+%-------------------------------------------------------------------------------
+\newcommand*{\closesection}{}
+\newcommand*{\emptysection}{}
+\newcommand*{\sethintscolumnlength}[1]{
+  \setlength{\hintscolumnwidth}{#1}
+  \recomputelengths}
+\newcommand*{\sethintscolumntowidth}[1]{
+  \settowidth{\hintscolumnwidth}{#1}
+  \recomputelengths}
+
+\newcommand*{\cvline}[2]{\cvitem{#1}{#2}}
+\newcommand*{\cvlanguage}[3]{\cvitemwithcomment{#1}{#2}{#3}}
+\newcommand*{\cvcomputer}[4]{\cvdoubleitem{#1}{\small#2}{#3}{\small#4}}
+\newcommand*{\moderncvtheme}[2][blue]{
+  \moderncvcolor{#1}
+  \moderncvstyle{#2}}
+
+\newcommand*{\maketitle}{\makecvtitle}
+\title{}
+\newcommand*{\maketitlenamewidth}{\makecvtitlenamewidth}
+
+\endinput
+
+%% end of file `moderncvcompatibility.sty'.

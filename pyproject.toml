@@ -1,12 +1,59 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "academic-cv"
-version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
+version = "2.0.0"
+description = "Data-driven academic CV generator using ModernCV LaTeX template"
+readme = "README-MODERNCV.md"
 requires-python = ">=3.10"
-dependencies = [
-    "jupyter>=1.1.1",
-    "nbformat>=5.11.0",
-    "pyyaml>=6.0.3",
-    "requests>=2.34.2",
+authors = [
+    {name = "Scott Love", email = "scott.love@example.com"}
 ]
+license = "MIT"
+
+dependencies = [
+    "pyyaml>=6.0",
+    "requests>=2.28.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black>=22.0.0",
+    "ruff>=0.0.250",
+    "pytest>=7.0.0",
+]
+
+[tool.setuptools]
+packages = []
+
+[tool.black]
+line-length = 100
+target-version = ['py310']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+select = ["E", "F", "W"]
+ignore = ["E501"]  # Line too long (handled by black)
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
