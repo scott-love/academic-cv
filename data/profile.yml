@@ -1,10 +1,11 @@
 name: Scott Love
-title: Research Engineer
+title: Researcher
 institution: INRAE
-email: your.email@inrae.fr
-orcid: 0000-0000-0000-0000
+email: scott.love@inrae.fr
+orcid: 0000-0001-7416-9210
 hal: scott-love
 github: scott-love
+homepage: scott-love.github.io
 
 research_interests:
   - Animal neuroimaging
@@ -15,7 +16,7 @@ research_interests:
   - Neuroinformatics
 
 summary: >
-  Research engineer specialising in neuroimaging, animal
+  Researcher specialising in neuroimaging, animal
   neuroscience and open scientific software. My work focuses on
   functional MRI, structural MRI and computational approaches
   for studying brain organisation and behaviour across species.

@@ -1,0 +1,6 @@
+- name: "Student name"
+  level: "PhD"
+  role: "Co-supervisor"
+  institution: "University of Tours"
+  period: "2025–present"
+  topic: "..."

@@ -19,6 +19,8 @@ import json
 import yaml
 from pathlib import Path
 from datetime import datetime
+from collections import Counter
+from IPython.display import display, Markdown
 
 # -------------------------------------------------------------------
 # Load data
@@ -36,8 +38,62 @@ with open(DATA / "education.yml", encoding="utf-8") as f:
 with open(DATA / "employment.yml", encoding="utf-8") as f:
     employment = yaml.safe_load(f)
 
+with open(DATA / "grants.yml", encoding="utf-8") as f:
+    grants = yaml.safe_load(f)
+
+with open(DATA / "teaching.yml", encoding="utf-8") as f:
+    teaching = yaml.safe_load(f)
+
+with open(DATA / "supervision.yml", encoding="utf-8") as f:
+    supervision = yaml.safe_load(f)
+
 with open(DATA / "publications.json", encoding="utf-8") as f:
     publications = json.load(f)
+
+
+# -------------------------------------------------------------------
+# Publication categories
+# -------------------------------------------------------------------
+
+journal_articles = [
+    p for p in publications
+    if p.get("category") == "Journal article"
+]
+
+book_chapters = [
+    p for p in publications
+    if p.get("category") == "Book chapter"
+]
+
+conference_presentations = [
+    p for p in publications
+    if p.get("category") == "Conference presentation"
+]
+
+invited_talks = [
+    p for p in conference_presentations
+    if p.get("presentation_type") == "Invited talk"
+]
+
+oral_presentations = [
+    p for p in conference_presentations
+    if p.get("presentation_type") == "Oral presentation"
+]
+
+posters = [
+    p for p in conference_presentations
+    if p.get("presentation_type") == "Poster"
+]
+
+reports = [
+    p for p in publications
+    if p.get("category") == "Report"
+]
+
+other_contributions = [
+    p for p in publications
+    if p.get("category") == "Other scientific contribution"
+]
 
 
 # -------------------------------------------------------------------
@@ -124,21 +180,121 @@ def format_conference_dates(pub):
         return f"{start}–{end}"
 
 
+def is_scott(author):
+    """Return True if an author is Scott A. Love."""
+
+    return author.strip().lower() in {
+        "scott love",
+        "scott a. love",
+        "scott a love",
+    }
+
+
+def abbreviate_author(author):
+    """
+    Convert a full author name to surname + initials.
+
+    Examples:
+        Katherine L Bryant -> Bryant KL
+        Arnaud Le Troter -> Le Troter A
+        Scott A. Love -> Scott A. Love
+    """
+
+    author = author.strip()
+
+    if is_scott(author):
+        return author
+
+    parts = author.split()
+
+    if len(parts) < 2:
+        return author
+
+    # Handle common multi-word surnames such as:
+    # Le Troter, De Silva, Van der Meer, etc.
+    surname_particles = {
+        "de",
+        "da",
+        "del",
+        "della",
+        "di",
+        "du",
+        "des",
+        "le",
+        "la",
+        "van",
+        "von",
+        "der",
+        "den",
+        "ter",
+        "ten",
+    }
+
+    surname_start = len(parts) - 1
+
+    while (
+        surname_start > 0
+        and parts[surname_start - 1].lower() in surname_particles
+    ):
+        surname_start -= 1
+
+    surname = " ".join(parts[surname_start:])
+    given_names = parts[:surname_start]
+
+    initials = "".join(
+        p[0].upper()
+        for p in given_names
+        if p and p[0].isalpha()
+    )
+
+    return f"{surname} {initials}"
+
+
 def format_authors(authors):
-    """Format authors and highlight Scott A. Love."""
+    """Format authors with Scott A. Love highlighted."""
 
     formatted = []
 
     for author in authors:
 
-        if author.strip().lower() in {
-            "scott love",
-            "scott a. love",
-            "scott a love",
-        }:
+        if is_scott(author):
             formatted.append(f"**{author}**")
         else:
             formatted.append(author)
+
+    return ", ".join(formatted)
+
+
+def format_author_list(authors, max_authors=6):
+    """
+    Format authors for publications.
+
+    Authors are abbreviated except for Scott A. Love.
+    Long author lists are shortened with 'et al.'.
+    """
+
+    formatted = []
+
+    for author in authors:
+
+        if is_scott(author):
+            formatted.append(f"**{author}**")
+        else:
+            formatted.append(
+                abbreviate_author(author)
+            )
+
+    if len(formatted) > max_authors:
+
+        visible = formatted[:max_authors]
+
+        # Make sure Scott remains visible if he is not
+        # among the first max_authors.
+        if any("**Scott" in author for author in formatted):
+            if not any("**Scott" in author for author in visible):
+                visible[-1] = "**Scott A. Love**"
+
+        return ", ".join(visible) + ", et al."
 
     return ", ".join(formatted)
 
@@ -166,6 +322,94 @@ def sort_publications(items):
         key=publication_year,
         reverse=True,
     )
+
+
+def format_reference(pub):
+    """Create a formatted journal/book reference."""
+
+    authors = format_author_list(pub["authors"])
+
+    reference = (
+        f"{authors} "
+        f"({pub['year']}). "
+        f"*{pub['title']}*."
+    )
+
+    if pub.get("journal"):
+        reference += (
+            f" **{pub['journal']}**."
+        )
+
+    if pub.get("publisher"):
+        reference += (
+            f" {pub['publisher']}."
+        )
+
+    if pub.get("doi"):
+        reference += (
+            f" [doi:{pub['doi']}]"
+            f"(https://doi.org/{pub['doi']})"
+        )
+
+    return reference
+
+
+def format_conference_reference(pub, presentation_type):
+    """
+    Format conference presentations.
+
+    Uses abbreviated author names and highlights Scott A. Love.
+
+    Example:
+    Bryant KL, Meunier D, Scott A. Love, et al. (2025).
+    Title. Invited talk, Conference name, date, location.
+    """
+
+    authors = format_author_list(pub["authors"])
+
+    text = (
+        f"- {authors} "
+        f"({pub['year']}). "
+        f"*{pub['title']}*. "
+        f"{presentation_type}, "
+    )
+
+    details = []
+
+    if pub.get("conference"):
+
+        conference = pub["conference"]
+
+        if pub.get("conference_url"):
+            conference = link(
+                pub["conference_url"],
+                conference
+            )
+
+        details.append(
+            f"*{conference}*"
+        )
+
+    dates = format_conference_dates(pub)
+
+    if dates:
+        details.append(dates)
+
+    location = ", ".join(
+        x for x in [
+            pub.get("city"),
+            format_country(pub.get("country"))
+        ]
+        if x
+    )
+
+    if location:
+        details.append(location)
+
+    text += ", ".join(details) + "."
+
+    return text
+    
 ```
 
 # Scott A. Love
@@ -233,20 +477,70 @@ print(" · ".join(profile["research_interests"]))
 #| echo: false
 #| output: asis
 
+def format_employment_date(value):
+    """Format employment dates for display."""
+
+    if not value:
+        return ""
+
+    value = str(value)
+
+    if value.lower() == "present":
+        return "present"
+
+    # Handle YYYY-MM
+    if len(value) == 7 and value[4] == "-":
+        year, month = value.split("-")
+
+        months = {
+            "01": "January",
+            "02": "February",
+            "03": "March",
+            "04": "April",
+            "05": "May",
+            "06": "June",
+            "07": "July",
+            "08": "August",
+            "09": "September",
+            "10": "October",
+            "11": "November",
+            "12": "December",
+        }
+
+        return f"{months.get(month, month)} {year}"
+
+    return value
+
+
 for position in employment:
 
-    start = position["start"]
-    end = position["end"]
+    start = format_employment_date(position.get("start"))
+    end = format_employment_date(position.get("end"))
 
-    if str(end).lower() == "present":
-        dates = f"{start}–present"
-    else:
+    if start and end:
         dates = f"{start}–{end}"
+    else:
+        dates = start or end
+
+    institution = position["institution"]
+
+    if position.get("country"):
+        institution += f", {position['country']}"
 
     print(
         f"**{dates}**  \n"
-        f"{position['title']}, {position['institution']}"
+        f"**{position['position']}**, {institution}  \n"
     )
+
+    if position.get("supervisor"):
+        print(
+            f"Supervisor: {position['supervisor']}  \n"
+        )
+
+    if position.get("team"):
+        print(
+            f"Team: {position['team']}  \n"
+        )
 
     print()
 ```
@@ -259,274 +553,330 @@ for position in employment:
 
 for degree in education:
 
+    # Date range
+    if degree.get("start") and degree.get("end"):
+        dates = f"{degree['start']}–{degree['end']}"
+    else:
+        dates = str(degree.get("year", ""))
+
+    institution = degree["institution"]
+
+    if degree.get("country"):
+        institution += f", {degree['country']}"
+
     print(
-        f"**{degree['year']}**  \n"
-        f"{degree['degree']}, {degree['institution']}"
+        f"**{dates}**  \n"
+        f"**{degree['degree']}**, {institution}  \n"
     )
+
+    if degree.get("honours"):
+        print(
+            f"{degree['honours']}  \n"
+        )
+
+    if degree.get("supervisor"):
+        print(
+            f"Supervisor: {degree['supervisor']}  \n"
+        )
+
+    if degree.get("thesis_title"):
+        print(
+            f"Thesis title: *{degree['thesis_title']}*  \n"
+        )
+
+    print()
+```
+
+## Honors and Awards
+
+```{python}
+#| echo: false
+#| output: asis
+
+with open(DATA / "honors_awards.yml", encoding="utf-8") as f:
+    honors_awards = yaml.safe_load(f)
+
+# newest first
+honors_awards = sorted(
+    honors_awards,
+    key=lambda x: x["year"],
+    reverse=True
+)
+
+for item in honors_awards:
+
+    print(
+        f"- **{item['year']}** {item['title']}"
+    )
+```
+
+## Languages
+
+```{python}
+#| echo: false
+#| output: asis
+
+with open(DATA / "languages.yml", encoding="utf-8") as f:
+    languages = yaml.safe_load(f)
+
+for lang in languages:
+
+    print(
+        f"**{lang['language']}** — {lang['proficiency']}"
+    )
+
+    print()
+```
+
+## Grants
+
+```{python}
+#| echo: false
+#| output: asis
+
+with open(DATA / "grants.yml", encoding="utf-8") as f:
+    grants = yaml.safe_load(f)
+
+for grant in grants:
+
+    # Date range
+    dates = f"{grant['start']}–{grant['end']}"
+
+    # Main entry
+    title = grant["title"]
+
+    if grant.get("acronym"):
+        title += f" ({grant['acronym']})"
+
+    print(
+        f"**{dates}**  \n"
+        f"**{grant['funder']}** — {title}"
+    )
+
+    print()
+
+    # Funding amount and role
+    details = []
+
+    if grant.get("amount"):
+        details.append(grant["amount"])
+
+    if grant.get("role"):
+        details.append(f"Role: {grant['role']}")
+
+    if details:
+        print(", ".join(details))
+
+    # Description
+    if grant.get("description"):
+        print(f"  \n{grant['description']}")
+
+    # Partners (optional)
+    if grant.get("partners"):
+        print(
+            "  \nPartners: " +
+            ", ".join(grant["partners"])
+        )
+
+    print()
+```
+
+## Supervision
+
+```{python}
+#| echo: false
+#| output: asis
+
+for student in supervision:
+
+    print(
+        f"**{student['name']}**  \n"
+    )
+
+    details = []
+
+    if student.get("level"):
+        details.append(student["level"])
+
+    if student.get("role"):
+        details.append(student["role"])
+
+    if student.get("institution"):
+        details.append(student["institution"])
+
+    if student.get("period"):
+        details.append(student["period"])
+
+    if details:
+        print(
+            ", ".join(details)
+        )
+
+    if student.get("topic"):
+        print(
+            f"Topic: {student['topic']}"
+        )
+
+    print()
+```
+
+## Teaching
+
+```{python}
+#| echo: false
+#| output: asis
+
+for course in teaching:
+
+    start = str(course.get("start", ""))
+    end = str(course.get("end", ""))
+
+    if start and end:
+        if start == end:
+            dates = start
+        else:
+            dates = f"{start}–{end}"
+    else:
+        dates = start or end
+
+    institution = course["institution"]
+
+    if course.get("country"):
+        institution += f", {course['country']}"
+
+    print(
+        f"**{dates}**  \n"
+        f"**{course['role']}**, {course['course']}, {institution}  \n"
+    )
+
+    if course.get("description"):
+        print(
+            f"{course['description']}  \n"
+        )
 
     print()
 ```
 
 # Publications
 
-## Journal Articles
+```{python}
+#| echo: false
+#| output: asis
+
+from IPython.display import Markdown, display
+
+display(
+    Markdown(
+        f"## Journal Articles ({len(journal_articles)})"
+    )
+)
+
+for pub in sort_publications(journal_articles):
+
+    print(
+        "- " + format_reference(pub)
+    )
+```
 
 ```{python}
 #| echo: false
 #| output: asis
 
-journal_articles = sort_publications([
-    p for p in publications
-    if p.get("category") == "Journal article"
-])
-
-for pub in journal_articles:
-
-    authors = format_authors(pub["authors"])
-
-    text = (
-        f"- {authors} ({pub['year']}). "
-        f"**{pub['title']}**."
+display(
+    Markdown(
+        f"## Book Chapters ({len(book_chapters)})"
     )
+)
 
-    if pub.get("journal"):
-        text += f" *{pub['journal']}*."
+for pub in sort_publications(book_chapters):
 
-    if pub.get("doi"):
-        text += " " + link(
-            f"https://doi.org/{pub['doi']}",
-            f"doi:{pub['doi']}"
+    print(
+        "- " + format_reference(pub)
+    )
+```
+
+```{python}
+#| echo: false
+#| output: asis
+
+display(
+    Markdown(
+        f"## Conference Presentations ({len(conference_presentations)})"
+    )
+)
+```
+
+```{python}
+#| echo: false
+#| output: asis
+
+display(
+    Markdown(
+        f"### Invited Talks ({len(invited_talks)})"
+    )
+)
+
+for pub in sort_publications(invited_talks):
+
+    print(
+        format_conference_reference(
+            pub,
+            "Invited talk"
         )
-
-    print(text)
+    )
 ```
-
-## Book Chapters
 
 ```{python}
 #| echo: false
 #| output: asis
 
-book_chapters = sort_publications([
-    p for p in publications
-    if p.get("category") == "Book chapter"
-])
-
-for pub in book_chapters:
-
-    authors = format_authors(pub["authors"])
-
-    text = (
-        f"- {authors} ({pub['year']}). "
-        f"**{pub['title']}**."
+display(
+    Markdown(
+        f"### Oral Presentations ({len(oral_presentations)})"
     )
+)
 
-    if pub.get("publisher"):
-        text += f" {pub['publisher']}."
+for pub in sort_publications(oral_presentations):
 
-    if pub.get("doi"):
-        text += " " + link(
-            f"https://doi.org/{pub['doi']}",
-            f"doi:{pub['doi']}"
+    print(
+        format_conference_reference(
+            pub,
+            "Oral presentation"
         )
-
-    print(text)
+    )
 ```
-
-# Conference Presentations
-
-## Invited Talks
 
 ```{python}
 #| echo: false
 #| output: asis
 
-invited_talks = sort_publications([
-    p for p in publications
-    if (
-        p.get("category") == "Conference presentation"
-        and p.get("presentation_type") == "Invited talk"
+display(
+    Markdown(
+        f"### Posters ({len(posters)})"
     )
-])
+)
 
-for pub in invited_talks:
+for pub in sort_publications(posters):
 
-    authors = format_authors(pub["authors"])
-
-    details = []
-
-    if pub.get("conference"):
-
-        conference = pub["conference"]
-
-        if pub.get("conference_url"):
-            conference = link(
-                pub["conference_url"],
-                conference
-            )
-
-        details.append(conference)
-
-    dates = format_conference_dates(pub)
-
-    if dates:
-        details.append(dates)
-
-    location = ", ".join(
-        x for x in [
-            pub.get("city"),
-            format_country(pub.get("country"))
-        ]
-        if x
+    print(
+        format_conference_reference(
+            pub,
+            "Poster"
+        )
     )
-
-    if location:
-        details.append(location)
-
-    text = (
-        f"- {authors} ({pub['year']}). "
-        f"**{pub['title']}**. "
-        f"*Invited talk*"
-    )
-
-    if details:
-        text += f", {', '.join(details)}."
-
-    print(text)
 ```
-
-## Oral Presentations
 
 ```{python}
 #| echo: false
 #| output: asis
 
-oral_presentations = sort_publications([
-    p for p in publications
-    if (
-        p.get("category") == "Conference presentation"
-        and p.get("presentation_type") == "Oral presentation"
+display(
+    Markdown(
+        f"## Reports ({len(reports)})"
     )
-])
+)
 
-for pub in oral_presentations:
-
-    authors = format_authors(pub["authors"])
-
-    details = []
-
-    if pub.get("conference"):
-
-        conference = pub["conference"]
-
-        if pub.get("conference_url"):
-            conference = link(
-                pub["conference_url"],
-                conference
-            )
-
-        details.append(conference)
-
-    dates = format_conference_dates(pub)
-
-    if dates:
-        details.append(dates)
-
-    location = ", ".join(
-        x for x in [
-            pub.get("city"),
-            format_country(pub.get("country"))
-        ]
-        if x
-    )
-
-    if location:
-        details.append(location)
-
-    text = (
-        f"- {authors} ({pub['year']}). "
-        f"**{pub['title']}**. "
-        f"*Oral presentation*"
-    )
-
-    if details:
-        text += f", {', '.join(details)}."
-
-    print(text)
-```
-
-## Posters
-
-```{python}
-#| echo: false
-#| output: asis
-
-posters = sort_publications([
-    p for p in publications
-    if (
-        p.get("category") == "Conference presentation"
-        and p.get("presentation_type") == "Poster"
-    )
-])
-
-for pub in posters:
-
-    authors = format_authors(pub["authors"])
-
-    details = []
-
-    if pub.get("conference"):
-
-        conference = pub["conference"]
-
-        if pub.get("conference_url"):
-            conference = link(
-                pub["conference_url"],
-                conference
-            )
-
-        details.append(conference)
-
-    dates = format_conference_dates(pub)
-
-    if dates:
-        details.append(dates)
-
-    location = ", ".join(
-        x for x in [
-            pub.get("city"),
-            format_country(pub.get("country"))
-        ]
-        if x
-    )
-
-    if location:
-        details.append(location)
-
-    text = (
-        f"- {authors} ({pub['year']}). "
-        f"**{pub['title']}**. "
-        f"*Poster*"
-    )
-
-    if details:
-        text += f", {', '.join(details)}."
-
-    print(text)
-```
-
-## Reports
-
-```{python}
-#| echo: false
-#| output: asis
-
-reports = sort_publications([
-    p for p in publications
-    if p.get("category") == "Report"
-])
-
-for pub in reports:
+for pub in sort_publications(reports):
 
     authors = format_authors(pub["authors"])
 
@@ -536,18 +886,17 @@ for pub in reports:
     )
 ```
 
-## Other Scientific Contributions
-
 ```{python}
 #| echo: false
 #| output: asis
 
-other = sort_publications([
-    p for p in publications
-    if p.get("category") == "Other scientific contribution"
-])
+display(
+    Markdown(
+        f"## Other Scientific Contributions ({len(other_contributions)})"
+    )
+)
 
-for pub in other:
+for pub in sort_publications(other_contributions):
 
     authors = format_authors(pub["authors"])
 

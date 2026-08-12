@@ -1,0 +1,74 @@
+- title: Towards High-Resolution Neuro-Behavioral Quantification of Sheep in the Field to Study Complex Social Behaviors
+  acronym: null
+  funder: American NIH
+  start: 2024
+  end: 2026
+  amount: 685k USD
+  role: Local coordinator
+  coordinator: C. Kemere
+  partners:
+    - Rice University
+    - Georgia Tech
+    - Centre de Recherches sur la Cognition Animale
+    - Baylor College of Medicine
+  description: Development of high-resolution neuro-behavioral approaches to study complex social behaviours in sheep.
+
+- title: Connaitre le cerveau des animaux pour mieux comprendre leurs comportements
+  acronym: CoCerACoCo
+  funder: ANR SAPS-RA-AI
+  start: 2024
+  end: 2026
+  amount: 150k€
+  role: Partner
+  coordinator: E. Chaillou
+  partners:
+    - Université d’Angers (LARIS)
+    - Université d’Orléans (ERCAE)
+    - Université de Tours (LIFAT)
+    - Université Savoie Mont-Blanc (LISTIC)
+    - INSERM (iBrain)
+    - CEA (NeuroSpin)
+    - ZooParc de Beauval
+    - Beauval Nature
+  description: Collaborative project investigating animal cognition and behaviour.
+
+- title: Neuroimagerie fonctionnelle des mécanismes de la perception des voix chez le mouton
+  acronym: SheepVoicefMRI
+  funder: ANR JCJC
+  start: 2021
+  end: 2024
+  amount: 200k€
+  role: Coordinator
+  coordinator: Scott A. Love
+  partners:
+    - UMR PRC
+  description: Functional neuroimaging investigation of voice perception mechanisms in sheep.
+
+- title: Functional MRI of the sheep auditory cortex
+  acronym: null
+  funder: Crédits Incitatifs PHASE-INRAE
+  start: 2020
+  end: 2021
+  amount: 20k€
+  role: Coordinator
+  coordinator: Scott A. Love
+  partners:
+    - UMR PRC
+  description: Development of functional MRI approaches for studying auditory processing in sheep.
+
+- title: Neurobiologie des comportements des animaux, démarche de sciences participatives au collège
+  acronym: Neuro2Co
+  funder: Projet d’intérêt regional
+  start: 2018
+  end: 2022
+  amount: 210k€
+  role: Partner
+  coordinator: E. Chaillou
+  partners:
+    - UMR PRC
+    - iBrain (INSERM)
+    - LIFAT (Université de Tours)
+    - NeuroSpin (CEA)
+    - ZooParc de Beauval
+    - Beauval Nature
+  description: Research programme combining animal neuroscience and participatory science education.

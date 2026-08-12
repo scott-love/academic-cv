@@ -1,14 +1,44 @@
-- title: Research Engineer
-  institution: INRAE
-  start: 2022
+- position: Chargé de Recherche
+  institution: UMR Physiologie de la Reproduction et des Comportements, INRAE, CNRS, Université de Tours
+  country: France
+  start: 2017-11
   end: present
+  supervisor: null
+  team: Neuroethology and Social Cognition
+  description: null
 
-- title: Postdoctoral Researcher
-  institution: Aix-Marseille University
-  start: 2017
-  end: 2022
+- position: Research Engineer
+  institution: Université de Tours, Inserm, Imagerie et Cerveau UMR U930
+  country: France
+  start: 2015-11
+  end: 2017-08
+  supervisor: Professor Christophe Destrieux
+  team: null
+  description: null
 
-- title: Postdoctoral Researcher
-  institution: University of Glasgow
+- position: Researcher
+  institution: Laboratoire de Psychologie Cognitive UMR7290, Aix-Marseille Université / CNRS
+  country: France
+  start: 2015-04
+  end: 2015-10
+  supervisor: Adrien Meguerditchian
+  team: Comparative Cognition
+  description: null
+
+- position: Researcher
+  institution: Institut de Neurosciences de la Timone UMR7289, Aix-Marseille Université / CNRS
+  country: France
+  start: 2013
+  end: 2015
+  supervisor: Professor Pascal Belin
+  team: Neural Basis of Communication Lab
+  description: null
+
+- position: Post-doctoral Fellow
+  institution: Indiana University, Bloomington
+  country: USA
   start: 2011
-  end: 2017
+  end: 2013
+  supervisor: Professor Aina Puce
+  team: IU Social Neuroscience Lab
+  description: null
