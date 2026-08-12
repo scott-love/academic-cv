@@ -47,9 +47,7 @@ The CV is built from structured data files (YAML and JSON) and automatically gen
     │
     ├── scripts/
     │   └── fetch_hal.py
-    │
-    ├── outputs/
-    │
+    │    │
     ├── _quarto.yml
     ├── pyproject.toml
     └── uv.lock
