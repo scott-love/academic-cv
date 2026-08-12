@@ -9,6 +9,22 @@ format:
     toc: false
     documentclass: scrartcl
     papersize: a4
+    fontsize: 10.5pt
+    geometry:
+      - margin=0.8in
+    include-in-header:
+      text: |
+        \usepackage{enumitem}
+        \setlist{nosep}
+        \KOMAoptions{parskip=half}
+        \RedeclareSectionCommand[
+          beforeskip=12pt,
+          afterskip=6pt
+        ]{section}
+        \RedeclareSectionCommand[
+          beforeskip=8pt,
+          afterskip=4pt
+        ]{subsection}
 jupyter: python3
 ---
 
