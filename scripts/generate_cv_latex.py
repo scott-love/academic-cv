@@ -416,16 +416,16 @@ if education:
         details = []
         
         if deg.get("honours"):
-            details.append(f"Honors: {escape_latex(deg['honours'])}.")
+            details.append(f"\\textbf{{Honors:}} {escape_latex(deg['honours'])}")
         
         if deg.get("supervisor"):
-            details.append(f"Supervisor: {escape_latex(deg['supervisor'])}.")
+            details.append(f"\\textbf{{Supervisor:}} {escape_latex(deg['supervisor'])}")
         
         if deg.get("thesis_title"):
-            details.append(f"Title: \\textit{{{escape_latex(deg['thesis_title'])}}}.")
+            details.append(f"\\textbf{{Title:}} \\textit{{{escape_latex(deg['thesis_title'])}}}")
         
-        for detail in details:
-            add_line(detail)
+        if details:
+            add_line(" \\textbf{{·}} ".join(details))
         
         add_line("}")
     
@@ -464,7 +464,7 @@ if employment:
             
             add_line(f"\\cventry{{{dates}}}{{{position}}}{{{institution}}}{{}}{{}}{{")
             
-            # Supervisor and Team on same line with clear formatting
+            # Supervisor and Team on same line with bold labels and bullet separator
             details = []
             
             if pos.get("supervisor"):
