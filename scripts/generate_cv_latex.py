@@ -412,14 +412,20 @@ if education:
         
         add_line(f"\\cventry{{{dates}}}{{{degree}}}{{{institution}}}{{}}{{}}{{")
         
-        if deg.get("supervisor"):
-            add_line(f"Supervisor: {escape_latex(deg['supervisor'])}")
+        # Order: Honors, Supervisor, Title (each with period)
+        details = []
         
         if deg.get("honours"):
-            add_line(f"Honors: {escape_latex(deg['honours'])}")
+            details.append(f"Honors: {escape_latex(deg['honours'])}.")
+        
+        if deg.get("supervisor"):
+            details.append(f"Supervisor: {escape_latex(deg['supervisor'])}.")
         
         if deg.get("thesis_title"):
-            add_line(f"Title: \\textit{{{escape_latex(deg['thesis_title'])}}}")
+            details.append(f"Title: \\textit{{{escape_latex(deg['thesis_title'])}}}.")
+        
+        for detail in details:
+            add_line(detail)
         
         add_line("}")
     
@@ -458,11 +464,17 @@ if employment:
             
             add_line(f"\\cventry{{{dates}}}{{{position}}}{{{institution}}}{{}}{{}}{{")
             
+            # Supervisor and Team on same line with clear formatting
+            details = []
+            
             if pos.get("supervisor"):
-                add_line(f"Supervisor: {escape_latex(pos['supervisor'])}")
+                details.append(f"\\textbf{{Supervisor:}} {escape_latex(pos['supervisor'])}")
             
             if pos.get("team"):
-                add_line(f"Team: {escape_latex(pos['team'])}")
+                details.append(f"\\textbf{{Team:}} {escape_latex(pos['team'])}")
+            
+            if details:
+                add_line(" \\textbf{{·}} ".join(details))
             
             add_line("}")
     
