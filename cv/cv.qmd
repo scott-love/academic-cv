@@ -1,6 +1,6 @@
 ---
-title: "Curriculum Vitae"
-author: "Scott A. Love"
+title: ""
+author: ""
 format:
   html:
     toc: false
@@ -11,19 +11,29 @@ format:
     papersize: a4
     fontsize: 10.5pt
     geometry:
-      - margin=0.8in
+      - margin=0.75in
     include-in-header:
       text: |
+        \usepackage{microtype}
+        \usepackage{newtxtext}
         \usepackage{enumitem}
-        \setlist{nosep}
+
+        % Compact lists
+        \setlist[itemize]{nosep,leftmargin=*}
+
+        % Paragraph spacing
         \KOMAoptions{parskip=half}
+
+        % Major section spacing
         \RedeclareSectionCommand[
-          beforeskip=12pt,
+          beforeskip=14pt,
           afterskip=6pt
         ]{section}
+
+        % Subsection spacing
         \RedeclareSectionCommand[
           beforeskip=8pt,
-          afterskip=4pt
+          afterskip=3pt
         ]{subsection}
 jupyter: python3
 ---
@@ -463,6 +473,14 @@ if profile.get("github"):
         link(
             f"https://github.com/{profile['github']}",
             "GitHub"
+        )
+    )
+
+if profile.get("homepage"):
+    contact.append(
+        link(
+            f"https://{profile['homepage']}",
+            "Website"
         )
     )
 
