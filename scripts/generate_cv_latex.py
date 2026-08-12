@@ -412,11 +412,11 @@ if education:
         
         add_line(f"\\cventry{{{dates}}}{{{degree}}}{{{institution}}}{{}}{{}}{{")
         
-        if deg.get("honours"):
-            add_line(f"\\cvitem{{}}{{\\textbf{{Honors:}}}} {escape_latex(deg['honours'])}")
-        
         if deg.get("supervisor"):
             add_line(f"Supervisor: {escape_latex(deg['supervisor'])}")
+        
+        if deg.get("honours"):
+            add_line(f"Honors: {escape_latex(deg['honours'])}")
         
         if deg.get("thesis_title"):
             add_line(f"Title: \\textit{{{escape_latex(deg['thesis_title'])}}}")
@@ -552,75 +552,88 @@ if supervision:
     
     add_line()
 
-# Publications
+# Publications - NO TWO-COLUMN FORMAT, use simple list
 pubs = categorize_publications(publications)
 total_pubs = sum(len(v) for v in pubs.values())
 
 if total_pubs > 0:
     add_line(r"\section{Publications}")
+    add_line()
     
     # Journal Articles
     if pubs["journal_articles"]:
         add_line(f"\\subsection{{Journal Articles ({len(pubs['journal_articles'])})}}")
+        add_line()
         for pub in pubs["journal_articles"]:
             ref = format_journal_reference(pub)
-            add_line(f"\\cvitem{{}}{{{ref}}}")
+            add_line(f"\\item {ref}")
         add_line()
     
     # Book Chapters
     if pubs["book_chapters"]:
         add_line(f"\\subsection{{Book Chapters ({len(pubs['book_chapters'])})}}")
+        add_line()
         for pub in pubs["book_chapters"]:
             ref = format_journal_reference(pub)
-            add_line(f"\\cvitem{{}}{{{ref}}}")
+            add_line(f"\\item {ref}")
         add_line()
     
     # Conference Presentations
     conf_total = len(pubs['invited_talks']) + len(pubs['oral_presentations']) + len(pubs['posters'])
     if conf_total > 0:
         add_line(f"\\subsection{{Conference Presentations ({conf_total})}}")
+        add_line()
         
         if pubs["invited_talks"]:
-            add_line(f"\\subsubsection{{Invited Talks ({len(pubs['invited_talks'])})}}")
+            add_line()
+            add_line(f"\\textbf{{Invited Talks ({len(pubs['invited_talks'])})}}")
+            add_line()
             for pub in pubs["invited_talks"]:
                 ref = format_conference_reference(pub)
-                add_line(f"\\cvitem{{}}{{{ref}}}")
-            add_line()
+                add_line(f"\\item {ref}")
         
         if pubs["oral_presentations"]:
-            add_line(f"\\subsubsection{{Oral Presentations ({len(pubs['oral_presentations'])})}}")
+            add_line()
+            add_line(f"\\textbf{{Oral Presentations ({len(pubs['oral_presentations'])})}}")
+            add_line()
             for pub in pubs["oral_presentations"]:
                 ref = format_conference_reference(pub)
-                add_line(f"\\cvitem{{}}{{{ref}}}")
-            add_line()
+                add_line(f"\\item {ref}")
         
         if pubs["posters"]:
-            add_line(f"\\subsubsection{{Posters ({len(pubs['posters'])})}}")
+            add_line()
+            add_line(f"\\textbf{{Posters ({len(pubs['posters'])})}}")
+            add_line()
             for pub in pubs["posters"]:
                 ref = format_conference_reference(pub)
-                add_line(f"\\cvitem{{}}{{{ref}}}")
-            add_line()
+                add_line(f"\\item {ref}")
+        
+        add_line()
     
     # Reports
     if pubs["reports"]:
+        add_line()
         add_line(f"\\subsection{{Reports ({len(pubs['reports'])})}}")
+        add_line()
         for pub in pubs["reports"]:
             authors = format_author_list(pub.get("authors", []))
             title = escape_latex(pub.get("title", ""))
             year = pub.get("year", "")
             ref = f"{authors} ({year}). \\textbf{{{title}}}."
-            add_line(f"\\cvitem{{}}{{{ref}}}")
+            add_line(f"\\item {ref}")
         add_line()
     
     # Other
     if pubs["other"]:
+        add_line()
         add_line(f"\\subsection{{Other Scientific Contributions ({len(pubs['other'])})}}")
+        add_line()
         for pub in pubs["other"]:
             authors = format_author_list(pub.get("authors", []))
             title = escape_latex(pub.get("title", ""))
             year = pub.get("year", "")
             ref = f"{authors} ({year}). \\textbf{{{title}}}."
-            add_line(f"\\cvitem{{}}{{{ref}}}")
+            add_line(f"\\item {ref}")
         add_line()
 
 # Document end
