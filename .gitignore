@@ -8,11 +8,6 @@ build/
 # uv
 .venv/
 
-# Quarto
-.quarto/
-_site/
-_freeze/
-
 # LaTeX auxiliary files
 *.aux
 *.log
@@ -22,14 +17,8 @@ _freeze/
 *.fdb_latexmk
 *.synctex.gz
 
-# Generated CV outputs
-cv/*.html
-cv/*.pdf
-
 # OS
 .DS_Store
-
-**/*.quarto_ipynb
 
 # Generated CV build artifacts
 cv/cv.tex
@@ -41,4 +30,3 @@ cv/*.toc
 cv/*.fls
 cv/*.fdb_latexmk
 cv/*.synctex.gz
-

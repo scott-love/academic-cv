@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "academic-cv"
 version = "2.0.0"
 description = "Data-driven academic CV generator using ModernCV LaTeX template"
-readme = "README-MODERNCV.md"
+readme = "README.md"
 requires-python = ">=3.10"
 authors = [
     {name = "Scott Love", email = "scott.love@example.com"}
