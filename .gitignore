@@ -31,3 +31,14 @@ cv/*.pdf
 
 **/*.quarto_ipynb
 
+# Generated CV build artifacts
+cv/cv.tex
+cv/*.pdf
+cv/cv.log
+cv/*.aux
+cv/*.out
+cv/*.toc
+cv/*.fls
+cv/*.fdb_latexmk
+cv/*.synctex.gz
+
