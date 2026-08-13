@@ -7,6 +7,12 @@ on:
       - 'data/**'
       - 'scripts/**'
       - 'cv/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'data/**'
+      - 'scripts/**'
+      - 'cv/**'
   workflow_dispatch:
 
 jobs:
