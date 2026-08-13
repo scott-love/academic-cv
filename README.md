@@ -10,7 +10,7 @@ Publications are refreshed from HAL, the CV content is assembled into ModernCV-f
 
 - `data/` stores structured CV content in YAML and JSON.
 - `scripts/fetch_hal.py` refreshes publications from HAL into `data/publications.json`.
-- `scripts/generate_cv_latex.py` reads the data files and generates `cv/cv.tex`.
+- `scripts/generate_cv_latex.py` reads the data files and generates `cv/cv.tex` (build artifact, not tracked in git).
 - `cv/moderncv/` provides the ModernCV LaTeX class assets used to compile `cv/cv.pdf`.
 
 ## Prerequisites
@@ -132,8 +132,9 @@ whether a tag was pushed.
 │   └── workflows/
 │       └── build-cv.yml
 ├── cv/
-│   ├── cv.tex
-│   └── moderncv/
+│   ├── moderncv/
+│   └── pictures/
+│       └── scott.jpg
 ├── data/
 │   ├── education.yml
 │   ├── employment.yml
