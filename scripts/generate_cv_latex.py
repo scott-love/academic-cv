@@ -303,7 +303,8 @@ def format_journal_reference(pub):
         ref += f" \\textbf{{{journal}}}."
     
     if pub.get("doi"):
-        ref += f" \\href{{https://doi.org/{pub['doi']}}}{{doi:{pub['doi']}}}"
+        doi_raw = pub["doi"]
+        ref += f" \\href{{https://doi.org/{doi_raw}}}{{doi:\\nolinkurl{{{doi_raw}}}}}"
     
     return ref
 
