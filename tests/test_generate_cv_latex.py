@@ -31,12 +31,12 @@ def escape_latex(text):
 def escape_latex_url(url):
     return (
         str(url)
+        .replace("\\", "%5C")
+        .replace(" ", "%20")
         .replace("%", r"\%")
-        .replace("\\", r"\%5C")
         .replace("#", r"\#")
         .replace("{", r"\{")
         .replace("}", r"\}")
-        .replace(" ", "%20")
     )
 
 
@@ -56,17 +56,17 @@ def test_generator_emits_clickable_profile_links_in_extrainfo():
     orcid = str(profile.get("orcid", "")).strip()
     if orcid:
         url = escape_latex_url(f"https://orcid.org/{orcid}")
-        expected_parts.append(f"\\href{{{url}}}{{ORCID: {orcid}}}")
+        expected_parts.append(f"\\href{{{url}}}{{{escape_latex(f'ORCID: {orcid}')}}}")
 
     hal = str(profile.get("hal", "")).strip()
     if hal:
         url = escape_latex_url(f"https://hal.science/{hal}")
-        expected_parts.append(f"\\href{{{url}}}{{HAL: {hal}}}")
+        expected_parts.append(f"\\href{{{url}}}{{{escape_latex(f'HAL: {hal}')}}}")
 
     github = str(profile.get("github", "")).strip()
     if github:
         url = escape_latex_url(f"https://github.com/{github}")
-        expected_parts.append(f"\\href{{{url}}}{{GitHub: {github}}}")
+        expected_parts.append(f"\\href{{{url}}}{{{escape_latex(f'GitHub: {github}')}}}")
 
     homepage = str(profile.get("homepage", "")).strip()
     if homepage:
