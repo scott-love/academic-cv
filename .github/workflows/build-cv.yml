@@ -7,6 +7,13 @@ on:
       - 'data/**'
       - 'scripts/**'
       - 'cv/**'
+    # Date-based release tags: YYYY-MM-DD with optional same-day suffix
+    # e.g. 2026-08-13  2026-08-13.1  2026-08-13-a
+    # Note: glob cannot enforce strict date validity; use the convention above.
+    tags:
+      - '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'
+      - '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].*'
+      - '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-*'
   pull_request:
     branches: [ main ]
     paths:
@@ -14,6 +21,9 @@ on:
       - 'scripts/**'
       - 'cv/**'
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -71,3 +81,21 @@ jobs:
       with:
         name: cv-log
         path: cv/cv.log
+
+  release:
+    # Only run when the workflow was triggered by a tag push
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download CV artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: cv
+        path: cv
+
+    - name: Create GitHub Release and upload CV asset
+      uses: softprops/action-gh-release@v2
+      with:
+        files: cv/cv.pdf
+        generate_release_notes: true

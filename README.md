@@ -92,6 +92,38 @@ The workflow:
 
 If LaTeX compilation fails, the workflow also uploads `cv/cv.log` for debugging.
 
+### Publishing a GitHub Release
+
+The workflow also creates a GitHub Release and attaches `cv/cv.pdf` as a release
+asset whenever you push a date-based tag.
+
+**Supported tag format:** `YYYY-MM-DD` with an optional same-day suffix.
+
+| Tag | When to use |
+|-----|-------------|
+| `2026-08-13` | First release on a given day |
+| `2026-08-13.1` | Second release on the same day |
+| `2026-08-13.2` | Third release on the same day |
+| `2026-08-13-a` | Alternative suffix style |
+
+**Create a release:**
+
+```bash
+git tag 2026-08-13
+git push origin 2026-08-13
+```
+
+**Create a second release on the same day:**
+
+```bash
+git tag 2026-08-13.1
+git push origin 2026-08-13.1
+```
+
+Each tag produces its own independent GitHub Release entry with `cv.pdf` attached.
+The artifact upload (for CI inspection) is preserved for every build regardless of
+whether a tag was pushed.
+
 ## Repository structure
 
 ```text
