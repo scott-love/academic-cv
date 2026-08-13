@@ -1,6 +1,6 @@
 # academic-cv
 
-A data-driven academic CV generator built around a single supported pipeline:
+A data-driven academic CV generator built around:
 
 `data/` → Python scripts → `cv/cv.tex` → `cv/cv.pdf`
 
