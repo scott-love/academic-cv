@@ -7,13 +7,6 @@ on:
       - 'data/**'
       - 'scripts/**'
       - 'cv/**'
-    # Date-based release tags: YYYY-MM-DD with optional same-day suffix
-    # e.g. 2026-08-13  2026-08-13.1  2026-08-13-a
-    # Note: glob cannot enforce strict date validity; use the convention above.
-    tags:
-      - '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'
-      - '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].*'
-      - '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-*'
   pull_request:
     branches: [ main ]
     paths:
@@ -83,19 +76,55 @@ jobs:
         path: cv/cv.log
 
   release:
-    # Only run when the workflow was triggered by a tag push
-    if: startsWith(github.ref, 'refs/tags/')
+    # Run on successful non-PR builds (main push or manual dispatch)
+    if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout repository (full history for tags)
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
     - name: Download CV artifact
       uses: actions/download-artifact@v4
       with:
         name: cv
         path: cv
 
+    - name: Compute next date tag
+      id: tag
+      shell: bash
+      run: |
+        set -euo pipefail
+        DATE_TAG="$(date -u +%Y-%m-%d)"
+        git fetch --tags --force
+
+        if git rev-parse -q --verify "refs/tags/${DATE_TAG}" >/dev/null; then
+          n=1
+          while git rev-parse -q --verify "refs/tags/${DATE_TAG}.${n}" >/dev/null; do
+            n=$((n+1))
+          done
+          FINAL_TAG="${DATE_TAG}.${n}"
+        else
+          FINAL_TAG="${DATE_TAG}"
+        fi
+
+        echo "tag=${FINAL_TAG}" >> "$GITHUB_OUTPUT"
+
+    - name: Create and push tag
+      env:
+        TAG: ${{ steps.tag.outputs.tag }}
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git tag "${TAG}" "${GITHUB_SHA}"
+        git push origin "refs/tags/${TAG}"
+
     - name: Create GitHub Release and upload CV asset
       uses: softprops/action-gh-release@v2
       with:
+        tag_name: ${{ steps.tag.outputs.tag }}
+        name: CV ${{ steps.tag.outputs.tag }}
         files: cv/cv.pdf
         generate_release_notes: true
