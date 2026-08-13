@@ -13,17 +13,34 @@ jobs:
   cleanup:
     runs-on: ubuntu-latest
     steps:
-      - name: Delete releases older than 30 days
+      - name: Delete releases older than 30 days (keep latest)
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
-          CUTOFF_EPOCH: ${{ github.run_id }}
         shell: bash
         run: |
           set -euo pipefail
 
           # 30 days ago (UTC) as epoch seconds
           cutoff_epoch="$(date -u -d '30 days ago' +%s)"
+
+          # Determine latest non-draft, non-prerelease release ID to always keep
+          latest_release_id="$(
+            gh api "/repos/${REPO}/releases?per_page=100&page=1" \
+              | jq -r '
+                  map(select((.draft | not) and (.prerelease | not)))
+                  | sort_by(.published_at // .created_at)
+                  | last
+                  | .id // empty
+                '
+          )"
+
+          if [ -z "${latest_release_id}" ]; then
+            echo "No eligible releases found. Nothing to clean."
+            exit 0
+          fi
+
+          echo "Keeping latest release id=${latest_release_id} regardless of age."
 
           page=1
           per_page=100
@@ -43,8 +60,14 @@ jobs:
               draft="$(echo "$rel" | jq -r '.draft')"
               prerelease="$(echo "$rel" | jq -r '.prerelease')"
 
-              # Skip drafts/prereleases; remove this if you want to prune them too
+              # Skip drafts/prereleases; remove this guard if you want to prune them too
               if [ "$draft" = "true" ] || [ "$prerelease" = "true" ]; then
+                continue
+              fi
+
+              # Always keep latest release
+              if [ "$id" = "$latest_release_id" ]; then
+                echo "Keeping latest release id=${id} tag=${tag}"
                 continue
               fi
 
