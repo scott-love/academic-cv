@@ -1,6 +1,7 @@
 import subprocess
 import sys
 from pathlib import Path
+from urllib.parse import quote
 
 import yaml
 
@@ -10,7 +11,6 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def escape_latex(text):
     replacements = {
-        "\\": r"\textbackslash{}",
         "&": r"\&",
         "%": r"\%",
         "$": r"\$",
@@ -24,8 +24,6 @@ def escape_latex(text):
 
     result = str(text).replace("\\", r"\textbackslash{}")
     for char, replacement in replacements.items():
-        if char == "\\":
-            continue
         result = result.replace(char, replacement)
     return result
 
@@ -57,17 +55,17 @@ def test_generator_emits_clickable_profile_links_in_extrainfo():
 
         orcid = str(profile.get("orcid", "")).strip()
         if orcid:
-            url = escape_latex_url(f"https://orcid.org/{orcid}")
+            url = escape_latex_url(f"https://orcid.org/{quote(orcid, safe='')}")
             expected_parts.append(f"\\href{{{url}}}{{{escape_latex(f'ORCID: {orcid}')}}}")
 
         hal = str(profile.get("hal", "")).strip()
         if hal:
-            url = escape_latex_url(f"https://hal.science/{hal}")
+            url = escape_latex_url(f"https://hal.science/{quote(hal, safe='')}")
             expected_parts.append(f"\\href{{{url}}}{{{escape_latex(f'HAL: {hal}')}}}")
 
         github = str(profile.get("github", "")).strip()
         if github:
-            url = escape_latex_url(f"https://github.com/{github}")
+            url = escape_latex_url(f"https://github.com/{quote(github, safe='')}")
             expected_parts.append(f"\\href{{{url}}}{{{escape_latex(f'GitHub: {github}')}}}")
 
         homepage = str(profile.get("homepage", "")).strip()

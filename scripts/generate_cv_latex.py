@@ -12,6 +12,7 @@ This script:
 import json
 from pathlib import Path
 from datetime import datetime
+from urllib.parse import quote
 
 import yaml
 
@@ -115,19 +116,19 @@ def build_profile_links(profile_data):
 
     orcid = str(profile_data.get("orcid", "")).strip()
     if orcid:
-        url = escape_latex_url(f"https://orcid.org/{orcid}")
+        url = escape_latex_url(f"https://orcid.org/{quote(orcid, safe='')}")
         label = escape_latex(f"ORCID: {orcid}")
         links.append(f"\\href{{{url}}}{{{label}}}")
 
     hal = str(profile_data.get("hal", "")).strip()
     if hal:
-        url = escape_latex_url(f"https://hal.science/{hal}")
+        url = escape_latex_url(f"https://hal.science/{quote(hal, safe='')}")
         label = escape_latex(f"HAL: {hal}")
         links.append(f"\\href{{{url}}}{{{label}}}")
 
     github = str(profile_data.get("github", "")).strip()
     if github:
-        url = escape_latex_url(f"https://github.com/{github}")
+        url = escape_latex_url(f"https://github.com/{quote(github, safe='')}")
         label = escape_latex(f"GitHub: {github}")
         links.append(f"\\href{{{url}}}{{{label}}}")
 
