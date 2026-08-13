@@ -1,6 +1,9 @@
 # Python
 __pycache__/
 *.py[cod]
+dist/
+build/
+*.egg-info/
 
 # uv
 .venv/
@@ -9,7 +12,15 @@ __pycache__/
 .quarto/
 _site/
 _freeze/
-_site/
+
+# LaTeX auxiliary files
+*.aux
+*.log
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
 
 # Generated CV outputs
 cv/*.html
@@ -18,7 +29,5 @@ cv/*.pdf
 # OS
 .DS_Store
 
-
-/.quarto/
 **/*.quarto_ipynb
 
