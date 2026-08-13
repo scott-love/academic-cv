@@ -91,8 +91,8 @@ def escape_latex_url(url):
 
     return (
         str(url)
-        .replace("\\", "%5C")
         .replace("%", r"\%")
+        .replace("\\", r"\%5C")
         .replace("#", r"\#")
         .replace("{", r"\{")
         .replace("}", r"\}")

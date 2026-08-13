@@ -28,6 +28,18 @@ def escape_latex(text):
     return result
 
 
+def escape_latex_url(url):
+    return (
+        str(url)
+        .replace("%", r"\%")
+        .replace("\\", r"\%5C")
+        .replace("#", r"\#")
+        .replace("{", r"\{")
+        .replace("}", r"\}")
+        .replace(" ", "%20")
+    )
+
+
 def test_generator_emits_clickable_profile_links_in_extrainfo():
     subprocess.run(
         [sys.executable, str(ROOT / "scripts" / "generate_cv_latex.py")],
@@ -43,20 +55,25 @@ def test_generator_emits_clickable_profile_links_in_extrainfo():
 
     orcid = str(profile.get("orcid", "")).strip()
     if orcid:
-        expected_parts.append(f"\\href{{https://orcid.org/{orcid}}}{{ORCID: {orcid}}}")
+        url = escape_latex_url(f"https://orcid.org/{orcid}")
+        expected_parts.append(f"\\href{{{url}}}{{ORCID: {orcid}}}")
 
     hal = str(profile.get("hal", "")).strip()
     if hal:
-        expected_parts.append(f"\\href{{https://hal.science/{hal}}}{{HAL: {hal}}}")
+        url = escape_latex_url(f"https://hal.science/{hal}")
+        expected_parts.append(f"\\href{{{url}}}{{HAL: {hal}}}")
 
     github = str(profile.get("github", "")).strip()
     if github:
-        expected_parts.append(f"\\href{{https://github.com/{github}}}{{GitHub: {github}}}")
+        url = escape_latex_url(f"https://github.com/{github}")
+        expected_parts.append(f"\\href{{{url}}}{{GitHub: {github}}}")
 
     homepage = str(profile.get("homepage", "")).strip()
     if homepage:
         homepage_url = homepage if homepage.startswith(("http://", "https://")) else f"https://{homepage}"
-        expected_parts.append(f"\\href{{{homepage_url}}}{{{escape_latex(homepage)}}}")
+        expected_parts.append(
+            f"\\href{{{escape_latex_url(homepage_url)}}}{{{escape_latex(homepage)}}}"
+        )
 
     if expected_parts:
         assert "\\extrainfo{" in latex
