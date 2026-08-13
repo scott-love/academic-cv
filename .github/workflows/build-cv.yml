@@ -67,6 +67,7 @@ jobs:
       with:
         name: cv
         path: cv/cv.pdf
+        retention-days: 2
 
     - name: Upload LaTeX log on failure
       if: failure()
@@ -74,6 +75,7 @@ jobs:
       with:
         name: cv-log
         path: cv/cv.log
+        retention-days: 10
 
   release:
     # Run on successful non-PR builds (main push or manual dispatch)
