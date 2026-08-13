@@ -358,7 +358,6 @@ add_line(r"\usepackage[utf8]{inputenc}")
 add_line(r"\usepackage[T1]{fontenc}")
 add_line(r"\usepackage[scale=.84]{geometry}")
 add_line(r"\setlength{\hintscolumnwidth}{2.5cm}")
-add_line(r"\usepackage{hyperref}")
 add_line()
 
 # Personal information
