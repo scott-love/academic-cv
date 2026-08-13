@@ -24,7 +24,8 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 CV_DIR = ROOT / "cv"
 OUTPUT_FILE = CV_DIR / "cv.tex"
-PHOTO_FILE = DATA / "photo.jpg"  # Placeholder path
+PHOTO_FILE = CV_DIR / "pictures" / "scott.jpg"
+PHOTO_LATEX_PATH = "pictures/scott"
 
 # Ensure output directory exists
 CV_DIR.mkdir(parents=True, exist_ok=True)
@@ -369,12 +370,11 @@ lastname = " ".join(name_parts[1:]) if len(name_parts) > 1 else ""
 add_line(f"\\firstname{{{escape_latex(firstname)}}}")
 add_line(f"\\familyname{{{escape_latex(lastname)}}}")
 
-# Optional: photo (placeholder)
+# Optional: photo
 if PHOTO_FILE.exists():
-    add_line(f"\\photo[64pt][0.4pt]{{data/photo}}")
+    add_line(f"\\photo[64pt][0.4pt]{{{PHOTO_LATEX_PATH}}}")
 else:
-    # Add placeholder comment
-    add_line("% \\photo[64pt][0.4pt]{data/photo}  % Uncomment and add photo when available")
+    add_line(f"% \\photo[64pt][0.4pt]{{{PHOTO_LATEX_PATH}}}")
 
 add_line()
 add_line(r"\begin{document}")
