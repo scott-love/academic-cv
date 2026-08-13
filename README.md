@@ -1,175 +1,145 @@
 # academic-cv
 
-A data-driven academic CV generator using **Quarto**, **Python**, and **HAL**.
+A data-driven academic CV generator built around a single supported pipeline:
 
-The CV is built from structured data files (YAML and JSON) and automatically generates formatted PDF and HTML versions. Publications are retrieved from HAL and formatted automatically.
+`data/` → Python scripts → `cv/cv.tex` → `cv/cv.pdf`
 
-## Features
+Publications are refreshed from HAL, the CV content is assembled into ModernCV-flavored LaTeX, and the final output is a PDF.
 
-- Automatic retrieval of publications from HAL
-- Structured CV sections stored separately from formatting:
-  - Profile
-  - Employment
-  - Education
-  - Teaching
-  - Grants and funding
-  - Languages
-  - Honors and awards
-  - Supervision
-  - Publications
-- Automatic formatting of:
-  - Journal articles
-  - Book chapters
-  - Conference presentations
-  - Reports
-  - Other scientific contributions
-- Highlighting of Scott A. Love in publication author lists
-- Automatic sorting of publications by year
-- Automatic counts for publication categories
-- PDF and HTML rendering using Quarto
+## Architecture
+
+- `data/` stores structured CV content in YAML and JSON.
+- `scripts/fetch_hal.py` refreshes publications from HAL into `data/publications.json`.
+- `scripts/generate_cv_latex.py` reads the data files and generates `cv/cv.tex`.
+- `cv/moderncv/` provides the ModernCV LaTeX class assets used to compile `cv/cv.pdf`.
+
+## Prerequisites
+
+- Python 3.10+
+- [`uv`](https://docs.astral.sh/uv/)
+- TeX Live with `pdflatex` available on `PATH`
+  - On Debian/Ubuntu, the GitHub workflow installs:
+    - `texlive-latex-base`
+    - `texlive-latex-extra`
+    - `texlive-fonts-extra`
+
+## Local build
+
+Install Python dependencies:
+
+```bash
+make sync
+```
+
+Run the full supported pipeline:
+
+```bash
+make build
+```
+
+Available Makefile targets:
+
+- `make sync` — install Python dependencies with `uv sync`
+- `make fetch-publications` — refresh `data/publications.json` from HAL
+- `make generate-latex` — regenerate `cv/cv.tex`
+- `make render` — compile `cv/cv.tex` to `cv/cv.pdf`
+- `make build` — run the full pipeline
+- `make clean` — remove generated LaTeX build artifacts and PDF output
+
+Optional helper wrappers are also available in `scripts/build_cv.sh` and `scripts/update_cv.sh`.
+
+## Refresh HAL publications
+
+The HAL identifier is read from `data/profile.yml`.
+
+To refresh publications only:
+
+```bash
+make fetch-publications
+```
+
+Or run the underlying command directly:
+
+```bash
+uv run python scripts/fetch_hal.py
+```
+
+## GitHub Actions
+
+The only supported CI workflow is:
+
+```text
+.github/workflows/build-cv.yml
+```
+
+It runs on manual dispatch and on pushes to `main` that change files under:
+
+- `data/**`
+- `scripts/**`
+- `cv/**`
+
+The workflow:
+
+1. Checks out the repository
+2. Sets up Python 3.10
+3. Installs `uv`
+4. Installs TeX Live / `pdflatex`
+5. Runs `uv sync`
+6. Refreshes HAL publications
+7. Regenerates `cv/cv.tex`
+8. Compiles `cv/cv.pdf`
+9. Uploads `cv/cv.pdf` as an artifact
+
+If LaTeX compilation fails, the workflow also uploads `cv/cv.log` for debugging.
 
 ## Repository structure
 
-    .
-    ├── cv/
-    │   └── cv.qmd
-    │
-    ├── data/
-    │   ├── profile.yml
-    │   ├── education.yml
-    │   ├── employment.yml
-    │   ├── teaching.yml
-    │   ├── grants.yml
-    │   ├── supervision.yml
-    │   ├── languages.yml
-    │   ├── honors_awards.yml
-    │   └── publications.json
-    │
-    ├── scripts/
-    │   └── fetch_hal.py
-    │    │
-    ├── _quarto.yml
-    ├── pyproject.toml
-    └── uv.lock
+```text
+.
+├── .github/
+│   └── workflows/
+│       └── build-cv.yml
+├── cv/
+│   ├── cv.tex
+│   └── moderncv/
+├── data/
+│   ├── education.yml
+│   ├── employment.yml
+│   ├── grants.yml
+│   ├── honors_awards.yml
+│   ├── languages.yml
+│   ├── profile.yml
+│   ├── publications.json
+│   ├── supervision.yml
+│   └── teaching.yml
+├── scripts/
+│   ├── build_cv.sh
+│   ├── fetch_hal.py
+│   ├── generate_cv_latex.py
+│   └── update_cv.sh
+├── Makefile
+├── pyproject.toml
+└── uv.lock
+```
 
-## Requirements
+## Troubleshooting
 
-- Python 3.10+
-- Quarto
-- uv
+Regenerate the LaTeX source before compiling if you have changed data:
 
-## Setup
+```bash
+make generate-latex
+```
 
-Install the Python dependencies:
+Compile locally and inspect the log:
 
-    uv sync
+```bash
+cd cv
+pdflatex -interaction=nonstopmode -halt-on-error -output-directory=. cv.tex
+```
 
-## Update publications from HAL
+Common checks:
 
-Publications are retrieved using the HAL identifier configured in:
-
-    scripts/fetch_hal.py
-
-Run:
-
-    uv run python scripts/fetch_hal.py
-
-This updates:
-
-    data/publications.json
-
-## Render the CV
-
-Render the complete Quarto project:
-
-    quarto render
-
-Render only the CV:
-
-    quarto render cv/cv.qmd
-
-Generated files are placed in:
-
-    _site/
-
-The CV is currently generated in both HTML and PDF formats.
-
-## Preview locally
-
-Preview the CV locally:
-
-    quarto preview
-
-## Editing the CV
-
-Most CV content should be edited in:
-
-    data/
-
-The main data files are:
-
-- `profile.yml` — personal information and research interests
-- `education.yml` — education history
-- `employment.yml` — employment history
-- `teaching.yml` — teaching activities
-- `grants.yml` — research funding
-- `supervision.yml` — supervision activities
-- `languages.yml` — languages
-- `honors_awards.yml` — honors and awards
-- `publications.json` — publications retrieved from HAL
-
-The file:
-
-    cv/cv.qmd
-
-contains the rendering and formatting logic.
-
-This separation means that CV information can generally be updated without changing the formatting code.
-
-## Publications
-
-Publications are retrieved from HAL and automatically divided into:
-
-- Journal Articles
-- Book Chapters
-- Conference Presentations
-  - Invited Talks
-  - Oral Presentations
-  - Posters
-- Reports
-- Other Scientific Contributions
-
-Publications are sorted from newest to oldest, and the number of entries in each category is calculated automatically.
-
-Conference presentations include:
-
-- Conference name
-- Dates
-- Location
-- Presentation type
-
-when these details are available from HAL.
-
-## Automated builds
-
-A GitHub Actions workflow is included:
-
-    .github/workflows/build.yml
-
-The workflow can automatically:
-
-1. Check out the repository
-2. Set up Python
-3. Install Quarto
-4. Install dependencies
-5. Retrieve publications from HAL
-6. Render the CV
-7. Deploy generated output
-
-## Project philosophy
-
-The CV content is kept separate from the presentation logic.
-
-Structured data belongs in `data/`, publication retrieval is handled by `scripts/`, and formatting and rendering are handled by `cv/cv.qmd`.
-
-This makes the CV easier to maintain and allows changes to individual sections without rewriting the document.
+- Review `cv/cv.log` for the first LaTeX error.
+- Confirm `pdflatex` is installed and on `PATH`.
+- Re-run `make fetch-publications` if `data/publications.json` is stale.
+- Verify edits in `data/` remain valid YAML/JSON before regenerating the LaTeX file.
