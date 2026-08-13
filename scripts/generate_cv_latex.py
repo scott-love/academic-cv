@@ -84,6 +84,64 @@ def escape_latex(text):
     return result
 
 
+def escape_latex_url(url):
+    """Escape URL characters that can break LaTeX command arguments."""
+    if not url:
+        return ""
+
+    return (
+        str(url)
+        .replace("\\", r"\textbackslash{}")
+        .replace("%", r"\%")
+        .replace("#", r"\#")
+        .replace("{", r"\{")
+        .replace("}", r"\}")
+        .replace(" ", "%20")
+    )
+
+
+def normalize_homepage_url(homepage):
+    """Normalize homepage to an absolute URL."""
+    if not homepage:
+        return ""
+
+    homepage = str(homepage).strip()
+    if homepage.startswith(("http://", "https://")):
+        return homepage
+    return f"https://{homepage}"
+
+
+def build_profile_links(profile_data):
+    """Build clickable profile links for the ModernCV header."""
+    links = []
+
+    orcid = str(profile_data.get("orcid", "")).strip()
+    if orcid:
+        url = escape_latex_url(f"https://orcid.org/{orcid}")
+        label = escape_latex(f"ORCID: {orcid}")
+        links.append(f"\\href{{{url}}}{{{label}}}")
+
+    hal = str(profile_data.get("hal", "")).strip()
+    if hal:
+        url = escape_latex_url(f"https://hal.science/{hal}")
+        label = escape_latex(f"HAL: {hal}")
+        links.append(f"\\href{{{url}}}{{{label}}}")
+
+    github = str(profile_data.get("github", "")).strip()
+    if github:
+        url = escape_latex_url(f"https://github.com/{github}")
+        label = escape_latex(f"GitHub: {github}")
+        links.append(f"\\href{{{url}}}{{{label}}}")
+
+    homepage_raw = str(profile_data.get("homepage", "")).strip()
+    if homepage_raw:
+        url = escape_latex_url(normalize_homepage_url(homepage_raw))
+        label = escape_latex(homepage_raw)
+        links.append(f"\\href{{{url}}}{{{label}}}")
+
+    return links
+
+
 def is_scott(author):
     """Check if author is Scott A. Love."""
     return author.strip().lower() in {
@@ -369,6 +427,9 @@ lastname = " ".join(name_parts[1:]) if len(name_parts) > 1 else ""
 
 add_line(f"\\firstname{{{escape_latex(firstname)}}}")
 add_line(f"\\familyname{{{escape_latex(lastname)}}}")
+profile_links = build_profile_links(profile)
+if profile_links:
+    add_line(f"\\extrainfo{{{r'\enspace\textbar\enspace'.join(profile_links)}}}")
 
 # Optional: photo
 if PHOTO_FILE.exists():
