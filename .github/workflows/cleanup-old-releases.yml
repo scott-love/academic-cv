@@ -1,0 +1,70 @@
+name: Cleanup old CV releases
+
+on:
+  schedule:
+    # Every Sunday at 03:15 UTC
+    - cron: "15 3 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete releases older than 30 days
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          CUTOFF_EPOCH: ${{ github.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # 30 days ago (UTC) as epoch seconds
+          cutoff_epoch="$(date -u -d '30 days ago' +%s)"
+
+          page=1
+          per_page=100
+
+          while true; do
+            releases="$(gh api "/repos/${REPO}/releases?per_page=${per_page}&page=${page}")"
+            count="$(echo "$releases" | jq 'length')"
+
+            if [ "$count" -eq 0 ]; then
+              break
+            fi
+
+            echo "$releases" | jq -c '.[]' | while read -r rel; do
+              id="$(echo "$rel" | jq -r '.id')"
+              tag="$(echo "$rel" | jq -r '.tag_name')"
+              published_at="$(echo "$rel" | jq -r '.published_at')"
+              draft="$(echo "$rel" | jq -r '.draft')"
+              prerelease="$(echo "$rel" | jq -r '.prerelease')"
+
+              # Skip drafts/prereleases; remove this if you want to prune them too
+              if [ "$draft" = "true" ] || [ "$prerelease" = "true" ]; then
+                continue
+              fi
+
+              # If published_at is null, fallback to created_at
+              if [ "$published_at" = "null" ]; then
+                published_at="$(echo "$rel" | jq -r '.created_at')"
+              fi
+
+              rel_epoch="$(date -u -d "$published_at" +%s)"
+
+              if [ "$rel_epoch" -lt "$cutoff_epoch" ]; then
+                echo "Deleting release id=${id} tag=${tag} published_at=${published_at}"
+
+                # Delete release
+                gh api -X DELETE "/repos/${REPO}/releases/${id}"
+
+                # Delete associated tag ref (ignore if already missing)
+                gh api -X DELETE "/repos/${REPO}/git/refs/tags/${tag}" || true
+              fi
+            done
+
+            page=$((page + 1))
+          done
