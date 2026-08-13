@@ -577,7 +577,7 @@ if total_pubs > 0:
         add_line()
         for pub in pubs["journal_articles"]:
             ref = format_journal_reference(pub)
-            add_line(f"\\item {ref}")
+            add_line(f"\\cvitem{{}}{{{ref}}}")
         add_line()
     
     # Book Chapters
@@ -586,7 +586,7 @@ if total_pubs > 0:
         add_line()
         for pub in pubs["book_chapters"]:
             ref = format_journal_reference(pub)
-            add_line(f"\\item {ref}")
+            add_line(f"\\cvitem{{}}{{{ref}}}")
         add_line()
     
     # Conference Presentations
@@ -601,7 +601,7 @@ if total_pubs > 0:
             add_line()
             for pub in pubs["invited_talks"]:
                 ref = format_conference_reference(pub)
-                add_line(f"\\item {ref}")
+                add_line(f"\\cvitem{{}}{{{ref}}}")
         
         if pubs["oral_presentations"]:
             add_line()
@@ -609,7 +609,7 @@ if total_pubs > 0:
             add_line()
             for pub in pubs["oral_presentations"]:
                 ref = format_conference_reference(pub)
-                add_line(f"\\item {ref}")
+                add_line(f"\\cvitem{{}}{{{ref}}}")
         
         if pubs["posters"]:
             add_line()
@@ -617,7 +617,7 @@ if total_pubs > 0:
             add_line()
             for pub in pubs["posters"]:
                 ref = format_conference_reference(pub)
-                add_line(f"\\item {ref}")
+                add_line(f"\\cvitem{{}}{{{ref}}}")
         
         add_line()
     
@@ -631,7 +631,7 @@ if total_pubs > 0:
             title = escape_latex(pub.get("title", ""))
             year = pub.get("year", "")
             ref = f"{authors} ({year}). \\textbf{{{title}}}."
-            add_line(f"\\item {ref}")
+            add_line(f"\\cvitem{{}}{{{ref}}}")
         add_line()
     
     # Other
@@ -644,7 +644,7 @@ if total_pubs > 0:
             title = escape_latex(pub.get("title", ""))
             year = pub.get("year", "")
             ref = f"{authors} ({year}). \\textbf{{{title}}}."
-            add_line(f"\\item {ref}")
+            add_line(f"\\cvitem{{}}{{{ref}}}")
         add_line()
 
 # Document end
