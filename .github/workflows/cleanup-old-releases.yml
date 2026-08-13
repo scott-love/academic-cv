@@ -13,7 +13,7 @@ jobs:
   cleanup:
     runs-on: ubuntu-latest
     steps:
-      - name: Delete releases older than 30 days (keep latest)
+      - name: Delete releases older than 7 days (keep latest)
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
@@ -22,7 +22,7 @@ jobs:
           set -euo pipefail
 
           # 30 days ago (UTC) as epoch seconds
-          cutoff_epoch="$(date -u -d '30 days ago' +%s)"
+          cutoff_epoch="$(date -u -d '7 days ago' +%s)"
 
           # Determine latest non-draft, non-prerelease release ID to always keep
           latest_release_id="$(
