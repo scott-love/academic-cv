@@ -31,7 +31,6 @@ def escape_latex(text):
 def escape_latex_url(url):
     return (
         str(url)
-        .replace("\\", "%5C")
         .replace(" ", "%20")
         .replace("%", r"\%")
         .replace("#", r"\#")
@@ -41,13 +40,20 @@ def escape_latex_url(url):
 
 
 def test_generator_emits_clickable_profile_links_in_extrainfo():
-    subprocess.run(
-        [sys.executable, str(ROOT / "scripts" / "generate_cv_latex.py")],
-        check=True,
-        cwd=ROOT,
-    )
-
-    latex = (ROOT / "cv" / "cv.tex").read_text(encoding="utf-8")
+    output_file = ROOT / "cv" / "cv.tex"
+    original_content = output_file.read_text(encoding="utf-8") if output_file.exists() else None
+    try:
+        subprocess.run(
+            [sys.executable, str(ROOT / "scripts" / "generate_cv_latex.py")],
+            check=True,
+            cwd=ROOT,
+        )
+        latex = output_file.read_text(encoding="utf-8")
+    finally:
+        if original_content is None:
+            output_file.unlink(missing_ok=True)
+        else:
+            output_file.write_text(original_content, encoding="utf-8")
 
     profile = yaml.safe_load((ROOT / "data" / "profile.yml").read_text(encoding="utf-8")) or {}
 

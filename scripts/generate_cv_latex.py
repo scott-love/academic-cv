@@ -89,7 +89,7 @@ def escape_latex_url(url):
     if not url:
         return ""
 
-    normalized = str(url).replace("\\", "%5C").replace(" ", "%20")
+    normalized = str(url).replace(" ", "%20")
     return (
         normalized.replace("%", r"\%")
         .replace("#", r"\#")
