@@ -8,6 +8,26 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def escape_latex(text):
+    replacements = {
+        "\\": r"\textbackslash{}",
+        "&": r"\&",
+        "%": r"\%",
+        "$": r"\$",
+        "#": r"\#",
+        "_": r"\_",
+        "{": r"\{",
+        "}": r"\}",
+        "~": r"\textasciitilde{}",
+        "^": r"\textasciicircum{}",
+    }
+
+    result = str(text).replace("\\", r"\textbackslash{}")
+    for char, replacement in list(replacements.items())[1:]:
+        result = result.replace(char, replacement)
+    return result
+
+
 def test_generator_emits_clickable_profile_links_in_extrainfo():
     subprocess.run(
         [sys.executable, str(ROOT / "scripts" / "generate_cv_latex.py")],
@@ -36,7 +56,7 @@ def test_generator_emits_clickable_profile_links_in_extrainfo():
     homepage = str(profile.get("homepage", "")).strip()
     if homepage:
         homepage_url = homepage if homepage.startswith(("http://", "https://")) else f"https://{homepage}"
-        expected_parts.append(f"\\href{{{homepage_url}}}{{{homepage}}}")
+        expected_parts.append(f"\\href{{{homepage_url}}}{{{escape_latex(homepage)}}}")
 
     if expected_parts:
         assert "\\extrainfo{" in latex
