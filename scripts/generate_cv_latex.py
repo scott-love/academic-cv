@@ -229,6 +229,35 @@ def format_country(code):
     return countries.get(code.lower(), code.upper())
 
 
+def normalize_pages(value):
+    """Return normalized pages or None for placeholders/missing values."""
+    if value is None:
+        return None
+
+    pages = str(value).strip()
+    if not pages:
+        return None
+
+    normalized = pages.lower().replace(" ", "")
+    missing_tokens = {
+        "np",
+        "n.p.",
+        "n.p",
+        "na",
+        "n/a",
+        "none",
+        "null",
+        "-",
+        "--",
+        "?",
+    }
+
+    if normalized in missing_tokens:
+        return None
+
+    return pages
+
+
 def sort_publications(items):
     """Sort publications by year (newest first), then by HAL ID."""
     return sorted(
@@ -335,8 +364,9 @@ def format_book_chapter_reference(pub):
     if in_parts:
         ref += f" In: {', '.join(in_parts)}."
 
-    if pub.get("pages"):
-        ref += f" pp. {escape_latex(str(pub['pages']))}."
+    pages = normalize_pages(pub.get("pages"))
+    if pages:
+        ref += f" pp. {escape_latex(pages)}."
 
     if pub.get("publisher"):
         ref += f" {escape_latex(pub['publisher'])}."
