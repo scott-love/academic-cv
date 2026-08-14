@@ -310,6 +310,44 @@ def format_journal_reference(pub):
     return ref
 
 
+def format_book_chapter_reference(pub):
+    """Format a book chapter reference with container metadata."""
+    authors = format_author_list(pub.get("authors", []))
+    title = escape_latex(pub.get("title", ""))
+    year = pub.get("year", "")
+
+    ref = f"{authors} ({year}). \\textit{{{title}}}."
+
+    editors = pub.get("editors") or []
+    source = pub.get("source") or ""
+    book_title = pub.get("book_title") or source
+
+    in_parts = []
+
+    if editors:
+        editors_fmt = format_author_list(editors, max_authors=10)
+        label = "Ed." if len(editors) == 1 else "Eds."
+        in_parts.append(f"{editors_fmt} ({label})")
+
+    if book_title:
+        in_parts.append(f"\\textit{{{escape_latex(book_title)}}}")
+
+    if in_parts:
+        ref += f" In: {', '.join(in_parts)}."
+
+    if pub.get("pages"):
+        ref += f" pp. {escape_latex(str(pub['pages']))}."
+
+    if pub.get("publisher"):
+        ref += f" {escape_latex(pub['publisher'])}."
+
+    if pub.get("doi"):
+        doi_raw = pub["doi"]
+        ref += f" \\href{{https://doi.org/{doi_raw}}}{{doi:\\nolinkurl{{{doi_raw}}}}}"
+
+    return ref
+
+
 def format_conference_reference(pub):
     """Format a conference presentation reference."""
     authors = format_author_list(pub.get("authors", []))
@@ -586,7 +624,7 @@ if total_pubs > 0:
         add_line(f"\\subsection{{Book Chapters ({len(pubs['book_chapters'])})}}")
         add_line()
         for pub in pubs["book_chapters"]:
-            ref = format_journal_reference(pub)
+            ref = format_book_chapter_reference(pub)
             add_line(f"{ref}\\par\\medskip")
         add_line()
     
