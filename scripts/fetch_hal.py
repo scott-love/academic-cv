@@ -63,6 +63,10 @@ FIELDS = [
     "page_s",
     "publisher_s",
     "serie_s",
+
+    # Book chapter/container metadata (if available)
+    "bookTitle_s",
+    "editorFullName_s",
 ]
 
 
@@ -295,6 +299,17 @@ for doc in docs:
         ),
         "series": first_value(
             doc.get("serie_s")
+        ),
+
+        # ---------------------------------------------------------------
+        # Book chapter metadata
+        # ---------------------------------------------------------------
+
+        "book_title": first_value(
+            doc.get("bookTitle_s")
+        ),
+        "editors": clean_authors(
+            doc.get("editorFullName_s")
         ),
     }
 
