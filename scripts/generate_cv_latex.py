@@ -110,6 +110,17 @@ def normalize_homepage_url(homepage):
     return f"https://{homepage}"
 
 
+def normalize_spaces(text):
+    """Collapse repeated whitespace into single spaces."""
+    return " ".join(str(text).split()).strip()
+
+
+def role_implies_coordinator(role):
+    """Return True when role indicates the person is the coordinator."""
+    normalized_role = normalize_spaces(str(role).replace("-", " ").replace("_", " ")).casefold()
+    return normalized_role in {"coordinator", "local coordinator"}
+
+
 def build_profile_links(profile_data):
     """Build clickable profile links for the ModernCV header."""
     links = []
@@ -627,13 +638,14 @@ if grants:
 
         detail_lines = []
 
-        role = grant.get("role", "")
-        coordinator = grant.get("coordinator", "")
+        role = normalize_spaces(grant.get("role", ""))
+        coordinator = normalize_spaces(grant.get("coordinator", ""))
+        show_coordinator = bool(coordinator) and not role_implies_coordinator(role)
         if role or coordinator:
             parts = []
             if role:
                 parts.append(f"\\textbf{{Role:}} {escape_latex(role)}")
-            if coordinator:
+            if show_coordinator:
                 parts.append(f"\\textbf{{Coordinator:}} {escape_latex(coordinator)}")
             detail_lines.append(" \\quad ".join(parts))
 
@@ -710,22 +722,32 @@ if supervision:
     
     for student in supervision:
         name = escape_latex(student.get("name", ""))
-        period = student.get("period", "")
+        start = str(student.get("start", "")).strip()
+        end = str(student.get("end", "")).strip()
+        period = str(student.get("period", "")).strip()
+        if start and end:
+            period = start if start == end else f"{start} -- {end}"
+        elif start or end:
+            period = start or end
+
         level = escape_latex(student.get("level", "")) if student.get("level") else ""
+        institution = escape_latex(student.get("institution", "")) if student.get("institution") else ""
+        role = normalize_spaces(student.get("role", ""))
+        topic = student.get("topic", "")
         
-        add_line(f"\\cventry{{{period}}}{{{name}}}{{}}{{}}{{}}{{")
-        
-        if level:
-            add_line(level)
-        
-        if student.get("role"):
-            add_line(f"Role: {escape_latex(student['role'])}")
-        
-        if student.get("institution"):
-            add_line(f"Institution: {escape_latex(student['institution'])}")
-        
-        if student.get("topic"):
-            add_line(f"Topic: {escape_latex(student['topic'])}")
+        add_line(f"\\cventry{{{period}}}{{{name}}}{{{level}}}{{{institution}}}{{}}{{")
+
+        detail_lines = []
+        if role:
+            detail_lines.append(f"\\textbf{{Role:}} {escape_latex(role)}")
+        if topic:
+            detail_lines.append(f"\\textbf{{Topic:}} {escape_latex(topic)}")
+
+        if detail_lines:
+            add_line(r"\begin{itemize}")
+            for line in detail_lines:
+                add_line(f"\\item {line}")
+            add_line(r"\end{itemize}")
         
         add_line("}")
     
