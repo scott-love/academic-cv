@@ -613,25 +613,46 @@ if grants:
     add_line(r"\section{Grants}")
     
     for grant in grants:
-        dates = f"{grant['start']} -- {grant['end']}"
+        start = str(grant.get("start", ""))
+        end = str(grant.get("end", ""))
+        dates = f"{start} -- {end}" if start and end else start or end
+
         funder = escape_latex(grant.get("funder", ""))
         title = escape_latex(grant.get("title", ""))
-        
+
         if grant.get("acronym"):
-            title += f" ({grant['acronym']})"
-        
+            title += f" ({escape_latex(grant['acronym'])})"
+
         add_line(f"\\cventry{{{dates}}}{{{title}}}{{{funder}}}{{}}{{}}{{")
-        
+
+        detail_lines = []
+
+        role = grant.get("role", "")
+        coordinator = grant.get("coordinator", "")
+        if role or coordinator:
+            parts = []
+            if role:
+                parts.append(f"\\textbf{{Role:}} {escape_latex(role)}")
+            if coordinator:
+                parts.append(f"\\textbf{{Coordinator:}} {escape_latex(coordinator)}")
+            detail_lines.append(" \\quad ".join(parts))
+
         if grant.get("amount"):
-            add_line(f"Amount: {escape_latex(grant['amount'])}")
-        
-        if grant.get("description"):
-            add_line(escape_latex(grant["description"]))
-        
+            detail_lines.append(f"\\textbf{{Amount:}} {escape_latex(grant['amount'])}")
+
         if grant.get("partners"):
-            partners = ", ".join(grant["partners"])
-            add_line(f"Partners: {escape_latex(partners)}")
-        
+            partners_str = escape_latex(", ".join(grant["partners"]))
+            detail_lines.append(f"\\textbf{{Partners:}} {partners_str}")
+
+        if grant.get("description"):
+            detail_lines.append(f"\\textbf{{Description:}} {escape_latex(grant['description'])}")
+
+        if detail_lines:
+            add_line(r"\begin{itemize}")
+            for line in detail_lines:
+                add_line(f"\\item {line}")
+            add_line(r"\end{itemize}")
+
         add_line("}")
     
     add_line()
