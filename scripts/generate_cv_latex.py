@@ -661,6 +661,24 @@ if teaching:
         if course.get("description"):
             add_line(escape_latex(course["description"]))
         
+        classes = course.get("classes", [])
+        if classes:
+            add_line(r"\begin{itemize}")
+            for cls in classes:
+                cls_start = str(cls.get("start", ""))
+                cls_end = str(cls.get("end", ""))
+                if cls_start and cls_end:
+                    cls_dates = cls_start if cls_start == cls_end else f"{cls_start} -- {cls_end}"
+                else:
+                    cls_dates = cls_start or cls_end
+                cls_title = escape_latex(cls.get("title", ""))
+                cls_type = escape_latex(cls.get("type", ""))
+                detail = f"{cls_dates}: {cls_title}"
+                if cls_type:
+                    detail += f" ({cls_type})"
+                add_line(f"\\item {detail}")
+            add_line(r"\end{itemize}")
+        
         add_line("}")
     
     add_line()
