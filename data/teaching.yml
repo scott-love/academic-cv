@@ -4,7 +4,20 @@
   role: Lecturer
   start: 2022
   end: present
-  description: Groups of approximately 20 students each year
+  description: Teaching to groups of approximately 20 students each year
+  classes:
+    - title: Anglais et communication scientifique
+      start: 2022
+      end: 2025
+
+    - title: Comportements sociaux, apprentissages et émotions chez les animaux
+      start: 2022
+      end: present
+
+    - title: Ethics as a bridge between cultures and disciplines
+      start: 2026
+      end: present
+      type: Online international course
 
 - course: P335 Cognitive Psychology
   institution: Indiana University
