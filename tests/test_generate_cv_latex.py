@@ -90,6 +90,57 @@ def test_generator_emits_clickable_profile_links_in_extrainfo():
             output_file.write_text(original_content, encoding="utf-8")
 
 
+def test_profile_and_research_interests_render_as_single_heading_free_block():
+    output_file = ROOT / "cv" / "cv.tex"
+    profile_file = ROOT / "data" / "profile.yml"
+
+    original_output = output_file.read_text(encoding="utf-8") if output_file.exists() else None
+    original_profile = profile_file.read_text(encoding="utf-8")
+    test_profile = yaml.safe_load(original_profile)
+
+    test_profile["summary"] = "Summary with R&D, 50% focus on C# and {MRI}."
+    test_profile["research_interests"] = [
+        "Social & affective neuroscience",
+        "50% methods",
+        "C# pipelines",
+        "{MRI}",
+    ]
+
+    try:
+        profile_file.write_text(
+            yaml.safe_dump(test_profile, allow_unicode=True, sort_keys=False),
+            encoding="utf-8",
+        )
+        subprocess.run(
+            [sys.executable, str(ROOT / "scripts" / "generate_cv_latex.py")],
+            check=True,
+            cwd=ROOT,
+        )
+        latex = output_file.read_text(encoding="utf-8")
+        profile_block = latex.split("\\section{Education}", 1)[0]
+
+        escaped_summary = escape_latex(test_profile["summary"])
+        escaped_interests = (
+            r"{\small Social \& affective neuroscience \textperiodcentered{} "
+            r"50\% methods \textperiodcentered{} C\# pipelines "
+            r"\textperiodcentered{} \{MRI\}}"
+        )
+
+        assert "\\section{Profile}" not in latex
+        assert "\\section{Research Interests}" not in latex
+        assert f"{escaped_summary}\\\\" in profile_block
+        assert escaped_interests in profile_block
+        assert profile_block.index(escaped_summary) < profile_block.index(escaped_interests)
+        assert "·" not in profile_block
+        assert "��" not in latex
+    finally:
+        profile_file.write_text(original_profile, encoding="utf-8")
+        if original_output is None:
+            output_file.unlink(missing_ok=True)
+        else:
+            output_file.write_text(original_output, encoding="utf-8")
+
+
 def test_grants_omit_coordinator_line_when_role_is_coordinator():
     output_file = ROOT / "cv" / "cv.tex"
     grants_file = ROOT / "data" / "grants.yml"

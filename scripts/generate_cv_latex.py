@@ -115,6 +115,26 @@ def normalize_spaces(text):
     return " ".join(str(text).split()).strip()
 
 
+LATEX_MIDPOINT = r"\textperiodcentered{}"
+LATEX_BOLD_MIDPOINT = rf"\textbf{{{LATEX_MIDPOINT}}}"
+
+
+def join_latex_fragments(parts, separator=LATEX_MIDPOINT):
+    """Join pre-escaped LaTeX fragments with a LaTeX-safe separator."""
+    fragments = [part for part in parts if part]
+    return f" {separator} ".join(fragments)
+
+
+def format_research_interests(interests):
+    """Format research interests as an escaped midpoint-separated line."""
+    escaped_interests = [
+        escape_latex(normalize_spaces(interest))
+        for interest in (interests or [])
+        if normalize_spaces(interest)
+    ]
+    return join_latex_fragments(escaped_interests)
+
+
 def role_implies_coordinator(role):
     """Return True when role indicates the person is the coordinator."""
     normalized_role = normalize_spaces(str(role).replace("-", " ").replace("_", " ")).casefold()
@@ -521,15 +541,18 @@ add_line(r"\makecvtitle")
 add_line()
 
 # Combined summary and research interests (no heading)
-if profile.get("summary"):
-    add_line(escape_latex(profile["summary"]))
+summary = normalize_spaces(profile.get("summary", ""))
+interests = format_research_interests(profile.get("research_interests"))
 
-if profile.get("research_interests"):
-    interests = " · ".join(profile["research_interests"])
-    add_line()
-    add_line(f"{{\\small {escape_latex(interests)}}}")
+if summary and interests:
+    add_line(f"{escape_latex(summary)}\\\\")
+    add_line(f"{{\\small {interests}}}")
+elif summary:
+    add_line(escape_latex(summary))
+elif interests:
+    add_line(f"{{\\small {interests}}}")
 
-if profile.get("summary") or profile.get("research_interests"):
+if summary or interests:
     add_line()
 
 # Education
@@ -563,7 +586,7 @@ if education:
             details.append(f"\\textbf{{Title:}} \\textit{{{escape_latex(deg['thesis_title'])}}}")
 
         if details:
-            add_line(" \\textbf{{·}} ".join(details))
+            add_line(join_latex_fragments(details, LATEX_BOLD_MIDPOINT))
 
         add_line("}")
 
@@ -612,7 +635,7 @@ if employment:
                 details.append(f"\\textbf{{Team:}} {escape_latex(pos['team'])}")
 
             if details:
-                add_line(" \\textbf{{·}} ".join(details))
+                add_line(join_latex_fragments(details, LATEX_BOLD_MIDPOINT))
 
             add_line("}")
 
@@ -657,7 +680,7 @@ if grants:
             details.append(f"\\textbf{{Description:}} {escape_latex(grant['description'])}")
 
         if details:
-            add_line(" \\textbf{{��}} ".join(details))
+            add_line(join_latex_fragments(details, LATEX_BOLD_MIDPOINT))
 
         add_line("}")
 
@@ -738,7 +761,7 @@ if supervision:
             details.append(f"\\textbf{{Topic:}} {escape_latex(topic)}")
 
         if details:
-            add_line(" \\textbf{{·}} ".join(details))
+            add_line(join_latex_fragments(details, LATEX_BOLD_MIDPOINT))
 
         add_line("}")
 
