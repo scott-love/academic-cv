@@ -141,14 +141,36 @@ def test_profile_and_research_interests_render_as_single_heading_free_block():
             output_file.write_text(original_output, encoding="utf-8")
 
 
-def test_grants_omit_coordinator_line_when_role_is_coordinator():
+def test_publications_abbreviate_and_bold_scott_name():
     output_file = ROOT / "cv" / "cv.tex"
-    grants_file = ROOT / "data" / "grants.yml"
+    original_output = output_file.read_text(encoding="utf-8") if output_file.exists() else None
+
+    try:
+        subprocess.run(
+            [sys.executable, str(ROOT / "scripts" / "generate_cv_latex.py")],
+            check=True,
+            cwd=ROOT,
+        )
+        latex = output_file.read_text(encoding="utf-8")
+
+        assert "\\textbf{Love SA}" in latex
+        assert "\\textbf{Scott A. Love}" not in latex
+        assert "\\textbf{Scott A Love}" not in latex
+    finally:
+        if original_output is None:
+            output_file.unlink(missing_ok=True)
+        else:
+            output_file.write_text(original_output, encoding="utf-8")
+
+
+def test_funding_omit_coordinator_line_when_role_is_coordinator():
+    output_file = ROOT / "cv" / "cv.tex"
+    funding_file = ROOT / "data" / "funding.yml"
 
     original_output = output_file.read_text(encoding="utf-8") if output_file.exists() else None
-    original_grants = grants_file.read_text(encoding="utf-8")
+    original_funding = funding_file.read_text(encoding="utf-8")
 
-    test_grants = [
+    test_funding = [
         {
             "title": "Local Coordination Project",
             "funder": "Funder A",
@@ -176,8 +198,8 @@ def test_grants_omit_coordinator_line_when_role_is_coordinator():
     ]
 
     try:
-        grants_file.write_text(
-            yaml.safe_dump(test_grants, allow_unicode=True, sort_keys=False),
+        funding_file.write_text(
+            yaml.safe_dump(test_funding, allow_unicode=True, sort_keys=False),
             encoding="utf-8",
         )
         subprocess.run(
@@ -194,7 +216,7 @@ def test_grants_omit_coordinator_line_when_role_is_coordinator():
         assert "Coordinator: C. Kemere" not in latex
         assert "Coordinator: Scott A. Love" not in latex
     finally:
-        grants_file.write_text(original_grants, encoding="utf-8")
+        funding_file.write_text(original_funding, encoding="utf-8")
         if original_output is None:
             output_file.unlink(missing_ok=True)
         else:

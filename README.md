@@ -144,7 +144,7 @@ whether a tag was pushed.
 ├── data/
 │   ├── education.yml
 │   ├── employment.yml
-│   ├── grants.yml
+│   ├── funding.yml
 │   ├── honors_awards.yml
 │   ├── languages.yml
 │   ├── profile.yml
