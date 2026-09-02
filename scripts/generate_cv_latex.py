@@ -61,7 +61,7 @@ def escape_latex(text):
     """Escape special LaTeX characters."""
     if not text:
         return ""
-    
+
     replacements = {
         "\\": r"\textbackslash{}",
         "&": r"\&",
@@ -74,14 +74,14 @@ def escape_latex(text):
         "~": r"\textasciitilde{}",
         "^": r"\textasciicircum{}",
     }
-    
+
     # Handle backslash first
     result = text.replace("\\", r"\textbackslash{}")
-    
+
     # Handle others
     for char, replacement in list(replacements.items())[1:]:
         result = result.replace(char, replacement)
-    
+
     return result
 
 
@@ -164,74 +164,74 @@ def is_scott(author):
 def abbreviate_author(author):
     """
     Convert author name to surname + initials.
-    
+
     Examples:
         Katherine L Bryant -> Bryant KL
         Arnaud Le Troter -> Le Troter A
         Scott A. Love -> Scott A. Love
     """
     author = author.strip()
-    
+
     if is_scott(author):
         return author
-    
+
     parts = author.split()
-    
+
     if len(parts) < 2:
         return author
-    
+
     # Multi-word surname particles
     surname_particles = {
         "de", "da", "del", "della", "di", "du", "des",
         "le", "la", "van", "von", "der", "den", "ter", "ten",
     }
-    
+
     surname_start = len(parts) - 1
     while (
         surname_start > 0
         and parts[surname_start - 1].lower() in surname_particles
     ):
         surname_start -= 1
-    
+
     surname = " ".join(parts[surname_start:])
     given_names = parts[:surname_start]
-    
+
     initials = "".join(
         p[0].upper()
         for p in given_names
         if p and p[0].isalpha()
     )
-    
+
     return f"{surname} {initials}"
 
 
 def format_author_list(authors, max_authors=6):
     """
     Format author list with Scott highlighted.
-    
+
     Abbreviates authors except Scott A. Love.
     Uses 'et al.' for long lists.
     """
     formatted = []
-    
+
     for author in authors:
         if is_scott(author):
             formatted.append(f"\\textbf{{{author}}}")
         else:
             formatted.append(abbreviate_author(author))
-    
+
     if len(formatted) > max_authors:
         visible = formatted[:max_authors]
-        
+
         # Ensure Scott remains visible
         scott_found = any("\\textbf" in author for author in formatted)
         scott_visible = any("\\textbf" in author for author in visible)
-        
+
         if scott_found and not scott_visible:
             visible[-1] = "\\textbf{Scott A. Love}"
-        
+
         return ", ".join(visible) + ", \\textit{et al.}"
-    
+
     return ", ".join(formatted)
 
 
@@ -239,7 +239,7 @@ def format_date(date_string):
     """Format YYYY-MM-DD as '19 November 2025'."""
     if not date_string:
         return None
-    
+
     try:
         date = datetime.strptime(date_string, "%Y-%m-%d")
         return date.strftime("%-d %B %Y")
@@ -251,17 +251,17 @@ def format_conference_dates(pub):
     """Format conference start/end dates."""
     start = pub.get("conference_start")
     end = pub.get("conference_end")
-    
+
     if not start:
         return None
-    
+
     if not end or start == end:
         return format_date(start)
-    
+
     try:
         start_date = datetime.strptime(start, "%Y-%m-%d")
         end_date = datetime.strptime(end, "%Y-%m-%d")
-        
+
         if start_date.year == end_date.year:
             if start_date.month == end_date.month:
                 return (
@@ -273,9 +273,9 @@ def format_conference_dates(pub):
                     f"{start_date.day} {start_date.strftime('%B')}–"
                     f"{end_date.day} {end_date.strftime('%B %Y')}"
                 )
-        
+
         return f"{format_date(start)}–{format_date(end)}"
-    
+
     except (ValueError, AttributeError):
         return f"{start}–{end}"
 
@@ -290,10 +290,10 @@ def format_country(code):
         "jp": "Japan", "cn": "China", "se": "Sweden", "dk": "Denmark",
         "fi": "Finland", "no": "Norway", "pt": "Portugal",
     }
-    
+
     if not code:
         return None
-    
+
     return countries.get(code.lower(), code.upper())
 
 
@@ -341,42 +341,42 @@ def categorize_publications(publications):
         p for p in publications
         if p.get("category") == "Journal article"
     ]
-    
+
     book_chapters = [
         p for p in publications
         if p.get("category") == "Book chapter"
     ]
-    
+
     conference_presentations = [
         p for p in publications
         if p.get("category") == "Conference presentation"
     ]
-    
+
     invited_talks = [
         p for p in conference_presentations
         if p.get("presentation_type") == "Invited talk"
     ]
-    
+
     oral_presentations = [
         p for p in conference_presentations
         if p.get("presentation_type") == "Oral presentation"
     ]
-    
+
     posters = [
         p for p in conference_presentations
         if p.get("presentation_type") == "Poster"
     ]
-    
+
     reports = [
         p for p in publications
         if p.get("category") == "Report"
     ]
-    
+
     other = [
         p for p in publications
         if p.get("category") == "Other scientific contribution"
     ]
-    
+
     return {
         "journal_articles": sort_publications(journal_articles),
         "book_chapters": sort_publications(book_chapters),
@@ -394,16 +394,16 @@ def format_journal_reference(pub):
     title = escape_latex(pub.get("title", ""))
     journal = escape_latex(pub.get("journal", ""))
     year = pub.get("year", "")
-    
+
     ref = f"{authors} ({year}). \\textit{{{title}}}."
-    
+
     if journal:
         ref += f" \\textbf{{{journal}}}."
-    
+
     if pub.get("doi"):
         doi_raw = pub["doi"]
         ref += f" \\href{{https://doi.org/{doi_raw}}}{{doi:\\nolinkurl{{{doi_raw}}}}}"
-    
+
     return ref
 
 
@@ -451,17 +451,17 @@ def format_conference_reference(pub):
     authors = format_author_list(pub.get("authors", []))
     title = escape_latex(pub.get("title", ""))
     year = pub.get("year", "")
-    
+
     ref = f"{authors} ({year}). \\textit{{{title}}}."
-    
+
     if pub.get("conference"):
         conference = escape_latex(pub["conference"])
         ref += f" \\textit{{{conference}}}."
-    
+
     dates = format_conference_dates(pub)
     if dates:
         ref += f" {dates}."
-    
+
     location_parts = []
     if pub.get("city"):
         location_parts.append(escape_latex(pub["city"]))
@@ -469,10 +469,10 @@ def format_conference_reference(pub):
         country = format_country(pub["country"])
         if country:
             location_parts.append(country)
-    
+
     if location_parts:
         ref += f" {', '.join(location_parts)}."
-    
+
     return ref
 
 
@@ -525,8 +525,8 @@ if profile.get("summary"):
     add_line(escape_latex(profile["summary"]))
 
 if profile.get("research_interests"):
-    interests = " \\textbullet{} ".join(profile["research_interests"])
-    add_line(r"\\")
+    interests = " · ".join(profile["research_interests"])
+    add_line()
     add_line(f"{{\\small {escape_latex(interests)}}}")
 
 if profile.get("summary") or profile.get("research_interests"):
@@ -535,44 +535,44 @@ if profile.get("summary") or profile.get("research_interests"):
 # Education
 if education:
     add_line(r"\section{Education}")
-    
+
     for deg in education:
         if deg.get("start") and deg.get("end"):
             dates = f"{deg['start']} -- {deg['end']}"
         else:
             dates = str(deg.get("year", ""))
-        
+
         degree = escape_latex(deg.get("degree", ""))
         institution = escape_latex(deg.get("institution", ""))
-        
+
         if deg.get("country"):
             institution += f", {deg['country']}"
-        
+
         add_line(f"\\cventry{{{dates}}}{{{degree}}}{{{institution}}}{{}}{{}}{{")
-        
+
         # Order: Honors, Supervisor, Title (each with period)
         details = []
-        
+
         if deg.get("honours"):
             details.append(f"\\textbf{{Honors:}} {escape_latex(deg['honours'])}")
-        
+
         if deg.get("supervisor"):
             details.append(f"\\textbf{{Supervisor:}} {escape_latex(deg['supervisor'])}")
-        
+
         if deg.get("thesis_title"):
             details.append(f"\\textbf{{Title:}} \\textit{{{escape_latex(deg['thesis_title'])}}}")
-        
+
         if details:
             add_line(" \\textbf{{·}} ".join(details))
-        
+
         add_line("}")
-    
+
     add_line()
 
 # Professional Experience / Employment
 if employment:
     add_line(r"\section{Professional Experience}")
-    
+
     # Group by category if available
     by_category = {}
     for pos in employment:
@@ -580,48 +580,48 @@ if employment:
         if cat not in by_category:
             by_category[cat] = []
         by_category[cat].append(pos)
-    
+
     for category in sorted(by_category.keys()):
         if category != "Research":
             add_line(f"\\subsection{{{category}}}")
-        
+
         for pos in by_category[category]:
             start = pos.get("start", "")
             end = pos.get("end", "")
-            
+
             if start and end:
                 dates = f"{start} -- {end}"
             else:
                 dates = start or end
-            
+
             position = escape_latex(pos.get("position", ""))
             institution = escape_latex(pos.get("institution", ""))
-            
+
             if pos.get("country"):
                 institution += f", {pos['country']}"
-            
+
             add_line(f"\\cventry{{{dates}}}{{{position}}}{{{institution}}}{{}}{{}}{{")
-            
+
             # Supervisor and Team on same line with bold labels and bullet separator
             details = []
-            
+
             if pos.get("supervisor"):
                 details.append(f"\\textbf{{Supervisor:}} {escape_latex(pos['supervisor'])}")
-            
+
             if pos.get("team"):
                 details.append(f"\\textbf{{Team:}} {escape_latex(pos['team'])}")
-            
+
             if details:
                 add_line(" \\textbf{{·}} ".join(details))
-            
+
             add_line("}")
-    
+
     add_line()
 
 # Funding
 if grants:
     add_line(r"\section{Funding}")
-    
+
     for grant in grants:
         start = str(grant.get("start", ""))
         end = str(grant.get("end", ""))
@@ -657,37 +657,37 @@ if grants:
             details.append(f"\\textbf{{Description:}} {escape_latex(grant['description'])}")
 
         if details:
-            add_line(" \\textbf{{·}} ".join(details))
+            add_line(" \\textbf{{��}} ".join(details))
 
         add_line("}")
-    
+
     add_line()
 
 # Teaching
 if teaching:
     add_line(r"\section{Teaching}")
-    
+
     for course in teaching:
         start = str(course.get("start", ""))
         end = str(course.get("end", ""))
-        
+
         if start and end:
             dates = start if start == end else f"{start} -- {end}"
         else:
             dates = start or end
-        
+
         role = escape_latex(course.get("role", ""))
         course_name = escape_latex(course.get("course", ""))
         institution = escape_latex(course.get("institution", ""))
-        
+
         if course.get("country"):
             institution += f", {course['country']}"
-        
+
         add_line(f"\\cventry{{{dates}}}{{{role}}}{{{course_name}}}{{{institution}}}{{}}{{")
-        
+
         if course.get("description"):
             add_line(escape_latex(course["description"]))
-        
+
         classes = course.get("classes", [])
         if classes:
             add_line(r"\begin{itemize}")
@@ -705,15 +705,15 @@ if teaching:
                     detail += f" ({cls_type})"
                 add_line(f"\\item {detail}")
             add_line(r"\end{itemize}")
-        
+
         add_line("}")
-    
+
     add_line()
 
 # Supervision
 if supervision:
     add_line(r"\section{Supervision}")
-    
+
     for student in supervision:
         name = escape_latex(student.get("name", ""))
         start = str(student.get("start", "")).strip()
@@ -728,7 +728,7 @@ if supervision:
         institution = escape_latex(student.get("institution", "")) if student.get("institution") else ""
         role = normalize_spaces(student.get("role", ""))
         topic = student.get("topic", "")
-        
+
         add_line(f"\\cventry{{{period}}}{{{name}}}{{{level}}}{{{institution}}}{{}}{{")
 
         details = []
@@ -741,7 +741,7 @@ if supervision:
             add_line(" \\textbf{{·}} ".join(details))
 
         add_line("}")
-    
+
     add_line()
 
 # Publications - plain paragraphs at full text width (no ModernCV hint column, no bullet)
@@ -751,7 +751,7 @@ total_pubs = sum(len(v) for v in pubs.values())
 if total_pubs > 0:
     add_line(r"\section{Publications}")
     add_line()
-    
+
     # Journal Articles
     if pubs["journal_articles"]:
         add_line(f"\\subsection{{Journal Articles ({len(pubs['journal_articles'])})}}")
@@ -760,7 +760,7 @@ if total_pubs > 0:
             ref = format_journal_reference(pub)
             add_line(f"{ref}\\par\\medskip")
         add_line()
-    
+
     # Book Chapters
     if pubs["book_chapters"]:
         add_line(f"\\subsection{{Book Chapters ({len(pubs['book_chapters'])})}}")
@@ -769,13 +769,13 @@ if total_pubs > 0:
             ref = format_book_chapter_reference(pub)
             add_line(f"{ref}\\par\\medskip")
         add_line()
-    
+
     # Conference Presentations
     conf_total = len(pubs['invited_talks']) + len(pubs['oral_presentations']) + len(pubs['posters'])
     if conf_total > 0:
         add_line(f"\\subsection{{Conference Presentations ({conf_total})}}")
         add_line()
-        
+
         if pubs["invited_talks"]:
             add_line()
             add_line(f"\\textbf{{Invited Talks ({len(pubs['invited_talks'])})}}")
@@ -783,7 +783,7 @@ if total_pubs > 0:
             for pub in pubs["invited_talks"]:
                 ref = format_conference_reference(pub)
                 add_line(f"{ref}\\par\\medskip")
-        
+
         if pubs["oral_presentations"]:
             add_line()
             add_line(f"\\textbf{{Oral Presentations ({len(pubs['oral_presentations'])})}}")
@@ -791,7 +791,7 @@ if total_pubs > 0:
             for pub in pubs["oral_presentations"]:
                 ref = format_conference_reference(pub)
                 add_line(f"{ref}\\par\\medskip")
-        
+
         if pubs["posters"]:
             add_line()
             add_line(f"\\textbf{{Posters ({len(pubs['posters'])})}}")
@@ -799,9 +799,9 @@ if total_pubs > 0:
             for pub in pubs["posters"]:
                 ref = format_conference_reference(pub)
                 add_line(f"{ref}\\par\\medskip")
-        
+
         add_line()
-    
+
     # Reports
     if pubs["reports"]:
         add_line()
@@ -814,7 +814,7 @@ if total_pubs > 0:
             ref = f"{authors} ({year}). \\textbf{{{title}}}."
             add_line(f"{ref}\\par\\medskip")
         add_line()
-    
+
     # Other
     if pubs["other"]:
         add_line()
