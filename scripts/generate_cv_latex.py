@@ -45,7 +45,7 @@ def load_yaml(path):
 profile = load_yaml(DATA / "profile.yml")
 education = load_yaml(DATA / "education.yml") or []
 employment = load_yaml(DATA / "employment.yml") or []
-grants = load_yaml(DATA / "grants.yml") or []
+grants = load_yaml(DATA / "funding.yml") or []
 teaching = load_yaml(DATA / "teaching.yml") or []
 supervision = load_yaml(DATA / "supervision.yml") or []
 
@@ -188,12 +188,9 @@ def abbreviate_author(author):
     Examples:
         Katherine L Bryant -> Bryant KL
         Arnaud Le Troter -> Le Troter A
-        Scott A. Love -> Scott A. Love
+        Scott A. Love -> Love SA
     """
     author = author.strip()
-
-    if is_scott(author):
-        return author
 
     parts = author.split()
 
@@ -229,14 +226,14 @@ def format_author_list(authors, max_authors=6):
     """
     Format author list with Scott highlighted.
 
-    Abbreviates authors except Scott A. Love.
+    Abbreviates authors and keeps Scott A. Love bold.
     Uses 'et al.' for long lists.
     """
     formatted = []
 
     for author in authors:
         if is_scott(author):
-            formatted.append(f"\\textbf{{{author}}}")
+            formatted.append(f"\\textbf{{{abbreviate_author(author)}}}")
         else:
             formatted.append(abbreviate_author(author))
 
@@ -248,7 +245,7 @@ def format_author_list(authors, max_authors=6):
         scott_visible = any("\\textbf" in author for author in visible)
 
         if scott_found and not scott_visible:
-            visible[-1] = "\\textbf{Scott A. Love}"
+            visible[-1] = "\\textbf{Love SA}"
 
         return ", ".join(visible) + ", \\textit{et al.}"
 
