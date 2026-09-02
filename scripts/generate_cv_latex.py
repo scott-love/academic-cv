@@ -520,17 +520,16 @@ add_line(r"\begin{document}")
 add_line(r"\makecvtitle")
 add_line()
 
-# Profile/Summary
+# Combined summary and research interests (no heading)
 if profile.get("summary"):
-    add_line(r"\section{Profile}")
     add_line(escape_latex(profile["summary"]))
-    add_line()
 
-# Research Interests
 if profile.get("research_interests"):
-    add_line(r"\section{Research Interests}")
-    interests = ", ".join(profile["research_interests"])
-    add_line(escape_latex(interests))
+    interests = " \\textbullet{} ".join(profile["research_interests"])
+    add_line(r"\\")
+    add_line(f"{{\\small {escape_latex(interests)}}}")
+
+if profile.get("summary") or profile.get("research_interests"):
     add_line()
 
 # Education
