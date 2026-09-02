@@ -4,20 +4,20 @@
   role: Lecturer
   start: 2022
   end: present
-  description: Teaching to groups of approximately 20 students each year
+  description: Teaching to groups of approximately 20 students per year
   classes:
-    - title: Anglais et communication scientifique
-      start: 2022
-      end: 2025
-
-    - title: Comportements sociaux, apprentissages et émotions chez les animaux
-      start: 2022
-      end: present
-
     - title: Ethics as a bridge between cultures and disciplines
       start: 2026
       end: present
       type: Online international course
+    
+    - title: Comportements sociaux, apprentissages et émotions chez les animaux
+      start: 2022
+      end: present    
+    
+    - title: Anglais et communication scientifique
+      start: 2022
+      end: 2025
 
 - course: P335 Cognitive Psychology
   institution: Indiana University
@@ -27,10 +27,10 @@
   end: 2013
   description: Lecturing to approximately 200 students
 
-- course: Level 1 Psychology tutoring
+- course: Level 1 Psychology
   institution: University of Glasgow
   country: UK
   role: Tutor
   start: 2007
   end: 2010
-  description: Small-group teaching with approximately 15 students per year
+  description: Teaching to groups of approximately 15 students per year
