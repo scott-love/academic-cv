@@ -608,9 +608,9 @@ if employment:
     
     add_line()
 
-# Grants
+# Funding
 if grants:
-    add_line(r"\section{Grants}")
+    add_line(r"\section{Funding}")
     
     for grant in grants:
         start = str(grant.get("start", ""))
@@ -629,16 +629,18 @@ if grants:
 
         role = grant.get("role", "")
         coordinator = grant.get("coordinator", "")
-        if role or coordinator:
-            parts = []
-            if role:
-                parts.append(f"\\textbf{{Role:}} {escape_latex(role)}")
-            if coordinator:
-                parts.append(f"\\textbf{{Coordinator:}} {escape_latex(coordinator)}")
-            detail_lines.append(" \\quad ".join(parts))
+        amount = grant.get("amount", "")
 
-        if grant.get("amount"):
-            detail_lines.append(f"\\textbf{{Amount:}} {escape_latex(grant['amount'])}")
+        role_coordinator_amount = []
+        if role:
+            role_coordinator_amount.append(f"\\textbf{{Role:}} {escape_latex(role)}")
+        if coordinator:
+            role_coordinator_amount.append(f"\\textbf{{Coordinator:}} {escape_latex(coordinator)}")
+        if amount:
+            role_coordinator_amount.append(f"\\textbf{{Amount:}} {escape_latex(amount)}")
+
+        if role_coordinator_amount:
+            detail_lines.append(" \\textbf{{·}} ".join(role_coordinator_amount))
 
         if grant.get("partners"):
             partners_str = escape_latex(", ".join(grant["partners"]))
@@ -647,11 +649,8 @@ if grants:
         if grant.get("description"):
             detail_lines.append(f"\\textbf{{Description:}} {escape_latex(grant['description'])}")
 
-        if detail_lines:
-            add_line(r"\begin{itemize}")
-            for line in detail_lines:
-                add_line(f"\\item {line}")
-            add_line(r"\end{itemize}")
+        for line in detail_lines:
+            add_line(line)
 
         add_line("}")
     
