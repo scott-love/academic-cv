@@ -1,6 +1,6 @@
-- title: Towards High-Resolution Neuro-Behavioral Quantification of Sheep in the Field to Study Complex Social Behaviors
+- title: Towards high-resolution neuro-behavioral quantification of sheep in the field to study complex social behaviors
   acronym: null
-  funder: American NIH
+  funder: National Institute of Health
   start: 2024
   end: 2026
   amount: 685k USD
@@ -30,7 +30,7 @@
     - CEA (NeuroSpin)
     - ZooParc de Beauval
     - Beauval Nature
-  description: Collaborative project investigating animal cognition and behaviour.
+  description: Citizen science project investigating the link between brain and behaviour across species.
 
 - title: Neuroimagerie fonctionnelle des mécanismes de la perception des voix chez le mouton
   acronym: SheepVoicefMRI
@@ -40,8 +40,6 @@
   amount: 200k€
   role: Coordinator
   coordinator: Scott A. Love
-  partners:
-    - UMR PRC
   description: Functional neuroimaging investigation of voice perception mechanisms in sheep.
 
 - title: Functional MRI of the sheep auditory cortex
@@ -52,8 +50,6 @@
   amount: 20k€
   role: Coordinator
   coordinator: Scott A. Love
-  partners:
-    - UMR PRC
   description: Development of functional MRI approaches for studying auditory processing in sheep.
 
 - title: Neurobiologie des comportements des animaux, démarche de sciences participatives au collège
@@ -65,7 +61,6 @@
   role: Partner
   coordinator: E. Chaillou
   partners:
-    - UMR PRC
     - iBrain (INSERM)
     - LIFAT (Université de Tours)
     - NeuroSpin (CEA)
