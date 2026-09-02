@@ -39,7 +39,9 @@
     "issue": null,
     "pages": "IMAGa1316",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-05687484",
@@ -76,19 +78,21 @@
     "issue": null,
     "pages": "134240",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-05677734",
     "docid": "5677734",
     "hal_url": "https://hal.inrae.fr/hal-05677734v1",
-    "title": "De l'anesthésie à la participation volontaire : une démarche de raffinement en irmf chez le mouton",
+    "title": "De l'anesthésie à la participation volontaire : une démarche de raffinement en IRMf chez le mouton",
     "authors": [
       "Scott A. Love"
     ],
     "year": 2026,
     "hal_type": "ART",
-    "category": "Journal article",
+    "category": "Other scientific contribution",
     "presentation_type": null,
     "journal": "STAL Sciences et Techniques de l'Animal de Laboratoire",
     "doi": null,
@@ -104,11 +108,13 @@
     "audience": "3",
     "proceedings": null,
     "source": null,
-    "volume": null,
-    "issue": null,
-    "pages": null,
+    "volume": "55",
+    "issue": "2e trimestre 2026",
+    "pages": "61-66",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-05467759",
@@ -143,7 +149,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-05467624",
@@ -179,7 +187,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-05379169",
@@ -212,11 +222,13 @@
     "audience": "2",
     "proceedings": null,
     "source": null,
-    "volume": null,
-    "issue": null,
-    "pages": null,
+    "volume": "249",
+    "issue": "2",
+    "pages": "233-246",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-05264012",
@@ -265,7 +277,9 @@
     "issue": null,
     "pages": "10 p.",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-05214535",
@@ -306,7 +320,9 @@
     "issue": null,
     "pages": "123277",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-05203590",
@@ -344,7 +360,9 @@
     "issue": "10",
     "pages": "101611",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-05117475",
@@ -385,7 +403,9 @@
     "issue": null,
     "pages": "112",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-05092540",
@@ -419,7 +439,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-05084755",
@@ -434,7 +456,7 @@
     ],
     "year": 2025,
     "hal_type": "ART",
-    "category": "Journal article",
+    "category": "Other scientific contribution",
     "presentation_type": null,
     "journal": "NOV'AE - Numéros spéciaux",
     "doi": "10.20870/Revue-NOVAE.2025.9229",
@@ -454,7 +476,9 @@
     "issue": "Spécial 03",
     "pages": "178-182",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-05070782",
@@ -491,7 +515,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-05109056",
@@ -541,7 +567,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-04931540",
@@ -578,7 +606,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-04668790",
@@ -620,7 +650,9 @@
     "issue": "7",
     "pages": "e0306601",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-04659479",
@@ -660,7 +692,9 @@
     "issue": null,
     "pages": "106-106",
     "publisher": null,
-    "series": "ECBB 2024 Conference Booklet"
+    "series": "ECBB 2024 Conference Booklet",
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-04626332",
@@ -698,7 +732,9 @@
     "issue": null,
     "pages": "7761–7773",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-04621823",
@@ -735,7 +771,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-04616322",
@@ -777,7 +815,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-04574339",
@@ -822,7 +862,9 @@
     "issue": null,
     "pages": "106268",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-04559765",
@@ -858,7 +900,9 @@
     "issue": "5",
     "pages": "1041-1052",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-04353293",
@@ -898,7 +942,9 @@
     "issue": null,
     "pages": "388-392",
     "publisher": "ITAVI",
-    "series": "15èmes Journèes de la Recherche Avicole et des Palmipèdes à Foie Gras"
+    "series": "15èmes Journèes de la Recherche Avicole et des Palmipèdes à Foie Gras",
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-05263532",
@@ -938,7 +984,9 @@
     "issue": "3",
     "pages": "236-237",
     "publisher": null,
-    "series": "15èmes Journées de la Recherche Avicole et des Palmipèdes à Foie Gras"
+    "series": "15èmes Journées de la Recherche Avicole et des Palmipèdes à Foie Gras",
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-04627622",
@@ -976,7 +1024,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-04352743",
@@ -1016,7 +1066,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-04349878",
@@ -1058,7 +1110,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-04349805",
@@ -1098,7 +1152,9 @@
     "issue": null,
     "pages": "73-73",
     "publisher": null,
-    "series": "Livre des résumés du 52ème colloque de la Société Française pour l'Etude du Comportement Animal"
+    "series": "Livre des résumés du 52ème colloque de la Société Française pour l'Etude du Comportement Animal",
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-04316228",
@@ -1136,7 +1192,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-04216790",
@@ -1174,7 +1232,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-04205725",
@@ -1212,7 +1272,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-04191525",
@@ -1238,11 +1300,11 @@
     "presentation_type": "Poster",
     "journal": null,
     "doi": null,
-    "conference": "FENS (Federation of European Neuroscience Societies ) REGIONAL MEETING",
+    "conference": "FENS (Federation of European Neuroscience Societies ) Regional Meeting",
     "conference_start": "2023-05-03",
     "conference_end": "2023-05-05",
     "conference_organizer": null,
-    "city": "ALGARVE",
+    "city": "Algarve",
     "country": "pt",
     "conference_url": null,
     "invited": "0",
@@ -1254,7 +1316,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-04191419",
@@ -1296,7 +1360,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-04191335",
@@ -1338,7 +1404,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-04190964",
@@ -1380,7 +1448,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-04174018",
@@ -1422,7 +1492,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-04168459",
@@ -1462,7 +1534,9 @@
     "issue": null,
     "pages": "104833",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-04415276",
@@ -1505,7 +1579,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-04219767",
@@ -1539,47 +1615,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
-  },
-  {
-    "hal_id": "hal-04106607",
-    "docid": "4219978",
-    "hal_url": "https://hal.inrae.fr/hal-04106607v1",
-    "title": "Neurobiologie des comportements des animaux, démarche de sciences participatives au collège - Neuro2Co",
-    "authors": [
-      "Elodie Chaillou",
-      "Marine Siwiaszczyk",
-      "Jean-Yves Ramel",
-      "Frédéric Andersson",
-      "Christophe Destrieux",
-      "Gaetan Galisot",
-      "Hans Adriaensen",
-      "Poupon Cyril",
-      "Scott A. Love"
-    ],
-    "year": 2022,
-    "hal_type": "REPORT",
-    "category": "Report",
-    "presentation_type": null,
-    "journal": null,
-    "doi": null,
-    "conference": null,
-    "conference_start": null,
-    "conference_end": null,
-    "conference_organizer": null,
-    "city": null,
-    "country": null,
-    "conference_url": null,
-    "invited": null,
-    "peer_reviewed": null,
-    "audience": null,
-    "proceedings": null,
-    "source": null,
-    "volume": null,
-    "issue": null,
-    "pages": null,
-    "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-03830179",
@@ -1626,7 +1664,9 @@
     "issue": "2",
     "pages": "214-232",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-03761265",
@@ -1665,7 +1705,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": "Méthodes d’évaluation des effets de stimulations sensorielles sur le bien-être"
+    "series": "Méthodes d’évaluation des effets de stimulations sensorielles sur le bien-être",
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-03752752",
@@ -1700,7 +1742,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-03752742",
@@ -1750,7 +1794,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-03752710",
@@ -1787,7 +1833,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-03752658",
@@ -1829,7 +1877,9 @@
     "issue": null,
     "pages": "6262-6262",
     "publisher": null,
-    "series": "Welcome to FENS forum 2022. E-book of abstracts"
+    "series": "Welcome to FENS forum 2022. E-book of abstracts",
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-03752650",
@@ -1876,7 +1926,9 @@
     "issue": null,
     "pages": "6263-6263",
     "publisher": null,
-    "series": "Welcome to FENS forum 2022. E-book of abstracts"
+    "series": "Welcome to FENS forum 2022. E-book of abstracts",
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-03752401",
@@ -1910,7 +1962,9 @@
     "issue": null,
     "pages": "1-7",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-03627385",
@@ -1954,7 +2008,9 @@
     "issue": "5",
     "pages": "1577-1597",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-03627317",
@@ -1996,7 +2052,9 @@
     "issue": null,
     "pages": "1-13",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-03669586",
@@ -2044,7 +2102,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-03595598",
@@ -2091,7 +2151,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-03595578",
@@ -2133,7 +2195,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02956337",
@@ -2168,7 +2232,9 @@
     "issue": "10",
     "pages": "1105-1117",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02437641",
@@ -2209,7 +2275,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02788990",
@@ -2248,7 +2316,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02786134",
@@ -2289,7 +2359,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02786121",
@@ -2330,7 +2402,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02408051",
@@ -2370,7 +2444,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02400752",
@@ -2413,7 +2489,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02400696",
@@ -2454,7 +2532,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02282313",
@@ -2494,7 +2574,9 @@
     "issue": null,
     "pages": "np",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-03753010",
@@ -2535,7 +2617,9 @@
     "issue": "5",
     "pages": "1808-1815",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02791117",
@@ -2572,7 +2656,9 @@
     "issue": null,
     "pages": "1p.",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02789196",
@@ -2609,7 +2695,9 @@
     "issue": null,
     "pages": "1-40",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02786926",
@@ -2647,7 +2735,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-01832283",
@@ -2683,7 +2773,93 @@
     "issue": null,
     "pages": "np",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
+  },
+  {
+    "hal_id": "hal-05717391",
+    "docid": "5717391",
+    "hal_url": "https://hal.science/hal-05717391v1",
+    "title": "On the Origin of Hemispheric Specialization for Language: Hand and Brain Asymmetries using MRI in Baboons (Papio anubis)",
+    "authors": [
+      "Adrien Meguerditchian",
+      "Damien Marie",
+      "Konstantina Margiotoudi",
+      "Olivier A Coulon",
+      "Muriel Roth",
+      "Bruno Nazarian",
+      "Jean-Luc Anton",
+      "Alice Bertello",
+      "Scott A. Love",
+      "Romain Lacoste"
+    ],
+    "year": 2017,
+    "hal_type": "COMM",
+    "category": "Conference presentation",
+    "presentation_type": "Invited talk",
+    "journal": null,
+    "doi": null,
+    "conference": "7th European Federation for Primatology Meeting. 30e Colloque de la Société Francophone de Primatologie",
+    "conference_start": "2017-08-21",
+    "conference_end": "2017-08-25",
+    "conference_organizer": null,
+    "city": "Strasbourg",
+    "country": "fr",
+    "conference_url": "https://karger.com/fpr/article/88/2/77/143955/7th-European-Federation-for-Primatology-Meeting",
+    "invited": "1",
+    "peer_reviewed": "1",
+    "audience": "2",
+    "proceedings": "1",
+    "source": "Folia Primatologica",
+    "volume": "88",
+    "issue": "2",
+    "pages": null,
+    "publisher": null,
+    "series": null,
+    "book_title": null,
+    "editors": []
+  },
+  {
+    "hal_id": "hal-05717371",
+    "docid": "5717371",
+    "hal_url": "https://hal.inrae.fr/hal-05717371v1",
+    "title": "Robust supervised clustering analysis of 18F DPA-714 dynamic clinical PET data",
+    "authors": [
+      "Scott A. Love",
+      "Vincent Jaouen",
+      "Mariam Annan",
+      "Jean Philippe Cottier",
+      "Johnny Vercouillie",
+      "Denis Guilloteau",
+      "Maria-Joao Santiago-Ribeiro",
+      "Clovis Tauber"
+    ],
+    "year": 2017,
+    "hal_type": "COMM",
+    "category": "Conference presentation",
+    "presentation_type": "Oral presentation",
+    "journal": null,
+    "doi": null,
+    "conference": "Society of Nuclear Medicine and Molecular Imaging (SNMMI) 2017 Annual Meeting",
+    "conference_start": "2017-06-10",
+    "conference_end": "2017-06-14",
+    "conference_organizer": "Society of Nuclear Medicine",
+    "city": "Denver (CO)",
+    "country": "us",
+    "conference_url": "https://jnm.snmjournals.org/content/58/supplement_1/289.short",
+    "invited": "0",
+    "peer_reviewed": "1",
+    "audience": "2",
+    "proceedings": "1",
+    "source": "Journal of Nuclear Medicine",
+    "volume": "58",
+    "issue": "1",
+    "pages": "289",
+    "publisher": null,
+    "series": "SNMMI Annual Meeting Abstracts",
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02622444",
@@ -2717,7 +2893,9 @@
     "issue": null,
     "pages": "1-9",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-01854607",
@@ -2755,7 +2933,9 @@
     "issue": null,
     "pages": "1-2",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-01854601",
@@ -2796,7 +2976,9 @@
     "issue": null,
     "pages": "np",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-01827945",
@@ -2836,7 +3018,89 @@
     "issue": "4",
     "pages": "2001-2015",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
+  },
+  {
+    "hal_id": "hal-05717420",
+    "docid": "5717420",
+    "hal_url": "https://hal.science/hal-05717420v1",
+    "title": "Human-like brain specialization in baboons: an in vivo anatomical MRI study of language areas homologs in 96 subjects",
+    "authors": [
+      "Adrien Meguerditchian",
+      "Damien Marie",
+      "Scott A. Love",
+      "Konstantina Margiotoudi",
+      "Alice Bertello",
+      "Romain Lacoste",
+      "Muriel Roth",
+      "Bruno Nazarian",
+      "Jean-Luc Anton",
+      "Olivier A Coulon"
+    ],
+    "year": 2016,
+    "hal_type": "COMM",
+    "category": "Conference presentation",
+    "presentation_type": "Invited talk",
+    "journal": null,
+    "doi": null,
+    "conference": "11th International Conference on the Evolution of Language (EvoLang XI)",
+    "conference_start": "2016-03-21",
+    "conference_end": "2016-03-24",
+    "conference_organizer": null,
+    "city": "New Orleans",
+    "country": "us",
+    "conference_url": "https://pure.mpg.de/view/item_2248195",
+    "invited": "1",
+    "peer_reviewed": "0",
+    "audience": "2",
+    "proceedings": "1",
+    "source": "The Evolution of Language: Proceedings of the 11th International Conference (EVOLANG11)",
+    "volume": null,
+    "issue": null,
+    "pages": null,
+    "publisher": null,
+    "series": null,
+    "book_title": null,
+    "editors": []
+  },
+  {
+    "hal_id": "hal-05717400",
+    "docid": "5717400",
+    "hal_url": "https://hal.science/hal-05717400v1",
+    "title": "An fMRI Investigation of Audiovisual, Auditory and Visual Processing in Autism Spectrum Disorder",
+    "authors": [
+      "Paula Regener",
+      "Scott A. Love",
+      "Karin Petrini",
+      "Frank E. Pollick"
+    ],
+    "year": 2016,
+    "hal_type": "POSTER",
+    "category": "Conference presentation",
+    "presentation_type": "Poster",
+    "journal": null,
+    "doi": null,
+    "conference": "International Society for Autism Research Annual Meeting (INSAR) 2016",
+    "conference_start": "2016-05-11",
+    "conference_end": "2026-05-14",
+    "conference_organizer": null,
+    "city": "Baltimore (MD)",
+    "country": "us",
+    "conference_url": "https://insar.confex.com/insar/2016/webprogram/Paper22792.html",
+    "invited": "0",
+    "peer_reviewed": "1",
+    "audience": "2",
+    "proceedings": "1",
+    "source": "INSAR Annual Meeting Archives",
+    "volume": null,
+    "issue": null,
+    "pages": "22792",
+    "publisher": null,
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02801812",
@@ -2873,7 +3137,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02799220",
@@ -2914,7 +3180,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02793925",
@@ -2954,7 +3222,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-01604060",
@@ -2996,7 +3266,9 @@
     "issue": null,
     "pages": "np",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-01488231",
@@ -3036,7 +3308,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-01488228",
@@ -3078,7 +3352,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-01464145",
@@ -3118,7 +3394,9 @@
     "issue": null,
     "pages": "526 - 533",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-01944211",
@@ -3157,7 +3435,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-01827953",
@@ -3197,7 +3477,9 @@
     "issue": "11",
     "pages": "1557-1567",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-01827938",
@@ -3234,9 +3516,11 @@
     "source": null,
     "volume": null,
     "issue": "Chapter 4",
-    "pages": "np",
+    "pages": "93-127",
     "publisher": "Springer International Publishing",
-    "series": null
+    "series": null,
+    "book_title": "The Many Faces of Social Attention",
+    "editors": []
   },
   {
     "hal_id": "hal-01432430",
@@ -3281,7 +3565,58 @@
     "issue": "4",
     "pages": "321-322",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
+  },
+  {
+    "hal_id": "hal-05717474",
+    "docid": "5717474",
+    "hal_url": "https://hal.science/hal-05717474v1",
+    "title": "Aux sources de la spécialisation hémisphérique cérébrale du langage : l'intérêt de l'IRM anatomique chez le babouin",
+    "authors": [
+      "Adrien Meguerditchian",
+      "Damien Marie",
+      "Muriel Roth",
+      "Romain Lacoste",
+      "Bruno Nazarian",
+      "Ivan Balansard",
+      "Jean-Luc Anton",
+      "Olivier A Coulon",
+      "Alice Bertello",
+      "Jean-Noël Benoit",
+      "Scott A. Love",
+      "Thomas Brochier",
+      "Martine Meunier",
+      "Sandrine Melot-Dusseau",
+      "Jean-Christophe Marin",
+      "William D Hopkins"
+    ],
+    "year": 2014,
+    "hal_type": "COMM",
+    "category": "Conference presentation",
+    "presentation_type": "Invited talk",
+    "journal": null,
+    "doi": "10.4000/primatologie.2143",
+    "conference": "27e colloque de la Société Francophone De Primatologie (SFDP)",
+    "conference_start": "2014-11-04",
+    "conference_end": "2014-11-07",
+    "conference_organizer": null,
+    "city": "Poitiers",
+    "country": "fr",
+    "conference_url": null,
+    "invited": "1",
+    "peer_reviewed": "1",
+    "audience": "3",
+    "proceedings": "1",
+    "source": "Revue de primatologie",
+    "volume": "6",
+    "issue": null,
+    "pages": "30",
+    "publisher": null,
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02798279",
@@ -3315,7 +3650,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02795449",
@@ -3355,7 +3692,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02793615",
@@ -3390,7 +3729,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02792980",
@@ -3429,7 +3770,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-01829234",
@@ -3465,7 +3808,9 @@
     "issue": "1",
     "pages": "307-318",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02806760",
@@ -3500,7 +3845,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02806759",
@@ -3536,7 +3883,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02647342",
@@ -3573,7 +3922,9 @@
     "issue": "4",
     "pages": "265-284",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-01829230",
@@ -3608,7 +3959,9 @@
     "issue": "1",
     "pages": "e54798",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-01829229",
@@ -3641,7 +3994,9 @@
     "issue": null,
     "pages": "139-170",
     "publisher": "MIT Press",
-    "series": null
+    "series": null,
+    "book_title": "Social Perception",
+    "editors": []
   },
   {
     "hal_id": "hal-01829226",
@@ -3673,9 +4028,11 @@
     "source": null,
     "volume": null,
     "issue": "Chapter 14",
-    "pages": "np",
+    "pages": "271-298",
     "publisher": "Editions Springer",
-    "series": null
+    "series": null,
+    "book_title": "Integrating Face and Voice in Person Perception",
+    "editors": []
   },
   {
     "hal_id": "hal-01830319",
@@ -3707,9 +4064,11 @@
     "source": null,
     "volume": null,
     "issue": "Chapter 27",
-    "pages": "np",
+    "pages": "304-320",
     "publisher": "Springer Berlin Heidelberg",
-    "series": "Lecture Notes in Computer Science"
+    "series": "Lecture Notes in Computer Science",
+    "book_title": "Cognitive Behavioural Systems",
+    "editors": []
   },
   {
     "hal_id": "hal-02804707",
@@ -3746,7 +4105,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02804644",
@@ -3783,7 +4144,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02804407",
@@ -3817,7 +4180,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02804240",
@@ -3852,7 +4217,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02803690",
@@ -3890,7 +4257,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02644669",
@@ -3924,7 +4293,9 @@
     "issue": "4",
     "pages": "351-367",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-01830320",
@@ -3965,7 +4336,9 @@
     "issue": "3",
     "pages": "1480-1492",
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02822182",
@@ -4000,7 +4373,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02819395",
@@ -4036,7 +4411,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02817574",
@@ -4071,7 +4448,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02822903",
@@ -4105,7 +4484,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02820761",
@@ -4143,7 +4524,9 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   },
   {
     "hal_id": "hal-02814437",
@@ -4179,6 +4562,8 @@
     "issue": null,
     "pages": null,
     "publisher": null,
-    "series": null
+    "series": null,
+    "book_title": null,
+    "editors": []
   }
 ]
