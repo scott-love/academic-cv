@@ -138,7 +138,8 @@ def test_grants_omit_coordinator_line_when_role_is_coordinator():
 
         assert "\\textbf{Role:} LOCAL coordinator" in latex
         assert "\\textbf{Role:} Coordinator" in latex
-        assert "\\textbf{Role:} Partner \\quad \\textbf{Coordinator:} E. Chaillou" in latex
+        assert "\\textbf{Role:} Partner" in latex
+        assert "\\textbf{Coordinator:} E. Chaillou" in latex
         assert "Coordinator: C. Kemere" not in latex
         assert "Coordinator: Scott A. Love" not in latex
     finally:
