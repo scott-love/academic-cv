@@ -636,33 +636,29 @@ if grants:
 
         add_line(f"\\cventry{{{dates}}}{{{title}}}{{{funder}}}{{}}{{}}{{")
 
-        detail_lines = []
+        details = []
 
         role = normalize_spaces(grant.get("role", ""))
         coordinator = normalize_spaces(grant.get("coordinator", ""))
         amount = grant.get("amount", "")
         show_coordinator = bool(coordinator) and not role_implies_coordinator(role)
 
-        role_coordinator_amount = []
         if role:
-            role_coordinator_amount.append(f"\\textbf{{Role:}} {escape_latex(role)}")
+            details.append(f"\\textbf{{Role:}} {escape_latex(role)}")
         if show_coordinator:
-            role_coordinator_amount.append(f"\\textbf{{Coordinator:}} {escape_latex(coordinator)}")
+            details.append(f"\\textbf{{Coordinator:}} {escape_latex(coordinator)}")
         if amount:
-            role_coordinator_amount.append(f"\\textbf{{Amount:}} {escape_latex(amount)}")
-
-        if role_coordinator_amount:
-            detail_lines.append(" \\textbf{{·}} ".join(role_coordinator_amount))
+            details.append(f"\\textbf{{Amount:}} {escape_latex(amount)}")
 
         if grant.get("partners"):
             partners_str = escape_latex(", ".join(grant["partners"]))
-            detail_lines.append(f"\\textbf{{Partners:}} {partners_str}")
+            details.append(f"\\textbf{{Partners:}} {partners_str}")
 
         if grant.get("description"):
-            detail_lines.append(f"\\textbf{{Description:}} {escape_latex(grant['description'])}")
+            details.append(f"\\textbf{{Description:}} {escape_latex(grant['description'])}")
 
-        for line in detail_lines:
-            add_line(line)
+        if details:
+            add_line(" \\textbf{{·}} ".join(details))
 
         add_line("}")
     
@@ -736,18 +732,15 @@ if supervision:
         
         add_line(f"\\cventry{{{period}}}{{{name}}}{{{level}}}{{{institution}}}{{}}{{")
 
-        detail_lines = []
+        details = []
         if role:
-            detail_lines.append(f"\\textbf{{Role:}} {escape_latex(role)}")
+            details.append(f"\\textbf{{Role:}} {escape_latex(role)}")
         if topic:
-            detail_lines.append(f"\\textbf{{Topic:}} {escape_latex(topic)}")
+            details.append(f"\\textbf{{Topic:}} {escape_latex(topic)}")
 
-        if detail_lines:
-            add_line(r"\begin{itemize}")
-            for line in detail_lines:
-                add_line(f"\\item {line}")
-            add_line(r"\end{itemize}")
-        
+        if details:
+            add_line(" \\textbf{{·}} ".join(details))
+
         add_line("}")
     
     add_line()
