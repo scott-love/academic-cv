@@ -64,6 +64,12 @@ Or run the underlying command directly:
 uv run python scripts/fetch_hal.py
 ```
 
+For CI resilience, `scripts/fetch_hal.py` retries transient HAL request failures
+with exponential backoff. If HAL remains unavailable but an existing
+`data/publications.json` cache is readable, the script keeps that cache and exits
+successfully so CV generation can continue. It only exits non-zero when HAL
+fetching fails and no readable local cache is available.
+
 ## GitHub Actions
 
 The only supported CI workflow is:
