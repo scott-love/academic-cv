@@ -13,6 +13,8 @@ on:
       - 'data/**'
       - 'scripts/**'
       - 'cv/**'
+  schedule:
+    - cron: '0 0 1 * *'  
   workflow_dispatch:
 
 permissions:
