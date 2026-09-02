@@ -384,11 +384,6 @@ def categorize_publications(publications):
         if p.get("presentation_type") == "Poster"
     ]
 
-    reports = [
-        p for p in publications
-        if p.get("category") == "Report"
-    ]
-
     other = [
         p for p in publications
         if p.get("category") == "Other scientific contribution"
@@ -400,7 +395,6 @@ def categorize_publications(publications):
         "invited_talks": sort_publications(invited_talks),
         "oral_presentations": sort_publications(oral_presentations),
         "posters": sort_publications(posters),
-        "reports": sort_publications(reports),
         "other": sort_publications(other),
     }
 
@@ -822,19 +816,6 @@ if total_pubs > 0:
 
         add_line()
 
-    # Reports
-    if pubs["reports"]:
-        add_line()
-        add_line(f"\\subsection{{Reports ({len(pubs['reports'])})}}")
-        add_line()
-        for pub in pubs["reports"]:
-            authors = format_author_list(pub.get("authors", []))
-            title = escape_latex(pub.get("title", ""))
-            year = pub.get("year", "")
-            ref = f"{authors} ({year}). \\textbf{{{title}}}."
-            add_line(f"{ref}\\par\\medskip")
-        add_line()
-
     # Other
     if pubs["other"]:
         add_line()
@@ -863,5 +844,4 @@ print(f"  - Publications: {total_pubs} total")
 print(f"    - Journal articles: {len(pubs['journal_articles'])}")
 print(f"    - Book chapters: {len(pubs['book_chapters'])}")
 print(f"    - Conference presentations: {len(pubs['invited_talks']) + len(pubs['oral_presentations']) + len(pubs['posters'])}")
-print(f"    - Reports: {len(pubs['reports'])}")
 print(f"    - Other: {len(pubs['other'])}")

@@ -1,3 +1,4 @@
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -157,6 +158,65 @@ def test_publications_abbreviate_and_bold_scott_name():
         assert "\\textbf{Scott A. Love}" not in latex
         assert "\\textbf{Scott A Love}" not in latex
     finally:
+        if original_output is None:
+            output_file.unlink(missing_ok=True)
+        else:
+            output_file.write_text(original_output, encoding="utf-8")
+
+
+def test_publications_omit_reports_and_keep_other_categories():
+    output_file = ROOT / "cv" / "cv.tex"
+    publications_file = ROOT / "data" / "publications.json"
+    original_output = output_file.read_text(encoding="utf-8") if output_file.exists() else None
+    original_publications = publications_file.read_text(encoding="utf-8")
+
+    test_publications = [
+        {
+            "hal_id": "hal-journal",
+            "category": "Journal article",
+            "authors": ["Scott A. Love"],
+            "title": "Peer reviewed article",
+            "year": 2026,
+            "journal": "Test Journal",
+            "doi": None,
+        },
+        {
+            "hal_id": "hal-report",
+            "category": "Report",
+            "authors": ["Scott A. Love"],
+            "title": "Report entry",
+            "year": 2025,
+        },
+        {
+            "hal_id": "hal-other",
+            "category": "Other scientific contribution",
+            "authors": ["Scott A. Love"],
+            "title": "Other contribution",
+            "year": 2024,
+        },
+    ]
+
+    try:
+        publications_file.write_text(
+            json.dumps(test_publications, indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
+        result = subprocess.run(
+            [sys.executable, str(ROOT / "scripts" / "generate_cv_latex.py")],
+            check=True,
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+        latex = output_file.read_text(encoding="utf-8")
+
+        assert "\\subsection{Journal Articles (1)}" in latex
+        assert "\\subsection{Other Scientific Contributions (1)}" in latex
+        assert "\\subsection{Reports" not in latex
+        assert "Report entry" not in latex
+        assert "Reports:" not in result.stdout
+    finally:
+        publications_file.write_text(original_publications, encoding="utf-8")
         if original_output is None:
             output_file.unlink(missing_ok=True)
         else:

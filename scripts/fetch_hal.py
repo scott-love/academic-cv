@@ -80,7 +80,14 @@ def clean_authors(authors):
     return authors
 
 
-def classify_document(doc_type, invited):
+def is_peer_reviewed(value):
+    """Return True when HAL marks the record as peer-reviewed."""
+    if value is None:
+        return False
+    return str(value).strip().lower() in {"1", "true", "yes"}
+
+
+def classify_document(doc_type, invited, peer_reviewed):
     """
     Map HAL document types onto CV categories.
 
@@ -89,8 +96,9 @@ def classify_document(doc_type, invited):
     """
 
     if doc_type == "ART":
+        category = "Journal article" if is_peer_reviewed(peer_reviewed) else "Other scientific contribution"
         return {
-            "category": "Journal article",
+            "category": category,
             "presentation_type": None,
         }
 
@@ -120,10 +128,7 @@ def classify_document(doc_type, invited):
         }
 
     if doc_type == "REPORT":
-        return {
-            "category": "Report",
-            "presentation_type": None,
-        }
+        return None
 
     return {
         "category": "Other scientific contribution",
@@ -248,10 +253,14 @@ def main(
         hal_id = first_value(doc.get("halId_s"))
         doc_type = first_value(doc.get("docType_s"))
         invited = first_value(doc.get("invitedCommunication_s"))
+        peer_reviewed = first_value(doc.get("peerReviewing_s"))
         classification = classify_document(
             doc_type,
             invited,
+            peer_reviewed,
         )
+        if classification is None:
+            continue
         publication = {
             # ---------------------------------------------------------------
             # Identifiers
@@ -290,7 +299,7 @@ def main(
             # Conference characteristics
             # ---------------------------------------------------------------
             "invited": invited,
-            "peer_reviewed": first_value(doc.get("peerReviewing_s")),
+            "peer_reviewed": peer_reviewed,
             "audience": first_value(doc.get("audience_s")),
             "proceedings": first_value(doc.get("proceedings_s")),
             # ---------------------------------------------------------------
