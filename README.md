@@ -94,9 +94,12 @@ The workflow:
 6. Refreshes HAL publications
 7. Regenerates `cv/cv.tex`
 8. Compiles `cv/cv.pdf`
-9. Uploads `cv/cv.pdf` as an artifact
+9. Commits `data/publications.json` back to `main` if the HAL refresh changed it
+10. Uploads `cv/cv.pdf` as an artifact
 
 If LaTeX compilation fails, the workflow also uploads `cv/cv.log` for debugging.
+If the HAL API is unreachable, `scripts/fetch_hal.py` keeps the existing
+`data/publications.json` cache and no publication refresh commit is created.
 
 ### Publishing a GitHub Release
 
@@ -181,4 +184,8 @@ Common checks:
 - Review `cv/cv.log` for the first LaTeX error.
 - Confirm `pdflatex` is installed and on `PATH`.
 - Re-run `make fetch-publications` if `data/publications.json` is stale.
+- Check the GitHub Actions log for the `Fetch publications from HAL` step if the
+  cache is not refreshing; the build currently talks to the official HAL API at
+  `https://api.archives-ouvertes.fr/search/` and will reuse the existing cache on
+  repeated connection failures.
 - Verify edits in `data/` remain valid YAML/JSON before regenerating the LaTeX file.
