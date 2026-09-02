@@ -509,7 +509,7 @@ def add_line(text=""):
 
 
 # Document preamble
-add_line(r"\documentclass[11pt,a4paper,sans]{moderncv}")
+add_line(r"\documentclass[10pt,a4paper,sans]{moderncv}")
 add_line(r"\moderncvstyle{casual}")
 add_line(r"\moderncvcolor{blue}")
 add_line(r"\usepackage[utf8]{inputenc}")
