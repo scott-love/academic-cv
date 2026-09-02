@@ -64,7 +64,7 @@
   coordinator: Scott A. Love
   description: Development of functional MRI approaches for studying auditory processing in sheep.
 
-- title: Exploration de nouveaux biomarqueurs d’émotions chez la poule : le rougissement et les immunoglobulines A
+- title: "Exploration de nouveaux biomarqueurs d’émotions chez la poule : le rougissement et les immunoglobulines A"
   acronym: RED
   funder: Métaprogramme SANBA-INRAE
   start: 2020
@@ -77,29 +77,12 @@
     - UE EASM
   description: Investigate whether transiant changes in the facial skin colour chickens reflects their emotional state.
 
-- title: Phénotypage de la maturation hypophysaire : impact de l’allaitement artificiel
+- title: "Phénotypage de la maturation hypophysaire : impact de l’allaitement artificiel"
   acronym: PhénoMatHyp
   funder: Crédits Incitatifs PHASE-INRAE
   start: 2019
-  end: 2020
+  end: 2021
   amount: 20k€
   role: Coordinator
   coordinator: Scott A. Love
-  partners: null
-  description: Multimodal investigation of the impact of artificial rearing on the brain and pituitary gland.
-
-- title: Neurobiologie des comportements des animaux, démarche de sciences participatives au collège
-  acronym: Neuro2Co
-  funder: Projet d’intérêt regional
-  start: 2018
-  end: 2022
-  amount: 210k€
-  role: Partner
-  coordinator: E. Chaillou
-  partners:
-    - iBrain (INSERM)
-    - LIFAT (Université de Tours)
-    - NeuroSpin (CEA)
-    - ZooParc de Beauval
-    - Beauval Nature
-  description: Research programme combining animal neuroscience and participatory science education.
+  description: Characterization of pituitary maturation under artificial feeding.
