@@ -50,6 +50,7 @@ def test_fetch_hal_main_success_writes_publications(tmp_path):
                             "halId_s": ["hal-123"],
                             "uri_s": ["https://hal.science/hal-123"],
                             "docType_s": ["ART"],
+                            "peerReviewing_s": ["1"],
                             "title_s": ["A paper"],
                             "authFullName_s": ["Scott Love"],
                             "producedDateY_i": 2026,
@@ -74,6 +75,69 @@ def test_fetch_hal_main_success_writes_publications(tmp_path):
     assert len(saved) == 1
     assert saved[0]["hal_id"] == "hal-123"
     assert saved[0]["category"] == "Journal article"
+
+
+def test_fetch_hal_main_classifies_non_peer_reviewed_art_and_omits_reports(tmp_path):
+    fetch_hal = load_fetch_hal_module()
+
+    profile_file = tmp_path / "profile.yml"
+    output_file = tmp_path / "publications.json"
+    profile_file.write_text(yaml.safe_dump({"hal": "test-id"}), encoding="utf-8")
+
+    def fake_get(url, params, timeout):
+        return FakeResponse(
+            {
+                "response": {
+                    "numFound": 3,
+                    "docs": [
+                        {
+                            "docid": 100,
+                            "halId_s": ["hal-peer"],
+                            "uri_s": ["https://hal.science/hal-peer"],
+                            "docType_s": ["ART"],
+                            "peerReviewing_s": ["1"],
+                            "title_s": ["Peer reviewed paper"],
+                            "authFullName_s": ["Scott Love"],
+                            "producedDateY_i": 2026,
+                        },
+                        {
+                            "docid": 101,
+                            "halId_s": ["hal-non-peer"],
+                            "uri_s": ["https://hal.science/hal-non-peer"],
+                            "docType_s": ["ART"],
+                            "peerReviewing_s": ["0"],
+                            "title_s": ["Non peer reviewed paper"],
+                            "authFullName_s": ["Scott Love"],
+                            "producedDateY_i": 2025,
+                        },
+                        {
+                            "docid": 102,
+                            "halId_s": ["hal-report"],
+                            "uri_s": ["https://hal.science/hal-report"],
+                            "docType_s": ["REPORT"],
+                            "title_s": ["A report"],
+                            "authFullName_s": ["Scott Love"],
+                            "producedDateY_i": 2024,
+                        },
+                    ],
+                }
+            }
+        )
+
+    exit_code = fetch_hal.main(
+        get=fake_get,
+        sleep=lambda _: None,
+        output_file=output_file,
+        profile_file=profile_file,
+    )
+
+    assert exit_code == 0
+    saved = json.loads(output_file.read_text(encoding="utf-8"))
+    assert [pub["hal_id"] for pub in saved] == ["hal-peer", "hal-non-peer"]
+    assert [pub["category"] for pub in saved] == [
+        "Journal article",
+        "Other scientific contribution",
+    ]
 
 
 def test_fetch_hal_main_uses_cache_on_retryable_failure(tmp_path, capsys):
