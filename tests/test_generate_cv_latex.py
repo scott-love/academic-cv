@@ -164,7 +164,7 @@ def test_publications_abbreviate_and_bold_scott_name():
             output_file.write_text(original_output, encoding="utf-8")
 
 
-def test_publications_omit_reports_and_keep_other_categories():
+def test_publications_render_other_and_preprints_with_dedup_doi_and_italics():
     output_file = ROOT / "cv" / "cv.tex"
     publications_file = ROOT / "data" / "publications.json"
     original_output = output_file.read_text(encoding="utf-8") if output_file.exists() else None
@@ -190,9 +190,26 @@ def test_publications_omit_reports_and_keep_other_categories():
         {
             "hal_id": "hal-other",
             "category": "Other scientific contribution",
-            "authors": ["Scott A. Love"],
-            "title": "Other contribution",
+            "authors": ["Scott A. Love", "Marie Curie"],
+            "title": "Published contribution",
             "year": 2024,
+            "doi": "10.1000/other",
+        },
+        {
+            "hal_id": "hal-preprint-duplicate",
+            "category": "Preprint",
+            "authors": ["Scott A. Love", "Marie Curie"],
+            "title": "Published contribution",
+            "year": 2027,
+            "doi": "10.1000/preprint-duplicate",
+        },
+        {
+            "hal_id": "hal-preprint-unique",
+            "category": "Preprint",
+            "authors": ["Scott A. Love", "Jane Doe"],
+            "title": "Standalone preprint",
+            "year": 2027,
+            "doi": "10.1000/preprint-unique",
         },
     ]
 
@@ -212,8 +229,18 @@ def test_publications_omit_reports_and_keep_other_categories():
 
         assert "\\subsection{Journal Articles (1)}" in latex
         assert "\\subsection{Other Scientific Contributions (1)}" in latex
+        assert "\\subsection{Preprints (1)}" in latex
         assert "\\subsection{Reports" not in latex
         assert "Report entry" not in latex
+        assert "Published contribution" in latex
+        assert "\\textit{Published contribution}" in latex
+        assert "\\textbf{Published contribution}" not in latex
+        assert "10.1000/other" in latex
+        assert "Standalone preprint" in latex
+        assert "\\textit{Standalone preprint}" in latex
+        assert "\\textbf{Standalone preprint}" not in latex
+        assert "10.1000/preprint-unique" in latex
+        assert "10.1000/preprint-duplicate" not in latex
         assert "Reports:" not in result.stdout
     finally:
         publications_file.write_text(original_publications, encoding="utf-8")

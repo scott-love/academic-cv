@@ -77,7 +77,7 @@ def test_fetch_hal_main_success_writes_publications(tmp_path):
     assert saved[0]["category"] == "Journal article"
 
 
-def test_fetch_hal_main_classifies_non_peer_reviewed_art_and_omits_reports(tmp_path):
+def test_fetch_hal_main_classifies_non_peer_reviewed_art_preprints_and_omits_reports(tmp_path):
     fetch_hal = load_fetch_hal_module()
 
     profile_file = tmp_path / "profile.yml"
@@ -88,7 +88,7 @@ def test_fetch_hal_main_classifies_non_peer_reviewed_art_and_omits_reports(tmp_p
         return FakeResponse(
             {
                 "response": {
-                    "numFound": 3,
+                    "numFound": 4,
                     "docs": [
                         {
                             "docid": 100,
@@ -119,6 +119,15 @@ def test_fetch_hal_main_classifies_non_peer_reviewed_art_and_omits_reports(tmp_p
                             "authFullName_s": ["Scott Love"],
                             "producedDateY_i": 2024,
                         },
+                        {
+                            "docid": 103,
+                            "halId_s": ["hal-preprint"],
+                            "uri_s": ["https://hal.science/hal-preprint"],
+                            "docType_s": ["PREPRINT"],
+                            "title_s": ["A preprint"],
+                            "authFullName_s": ["Scott Love"],
+                            "producedDateY_i": 2023,
+                        },
                     ],
                 }
             }
@@ -133,10 +142,11 @@ def test_fetch_hal_main_classifies_non_peer_reviewed_art_and_omits_reports(tmp_p
 
     assert exit_code == 0
     saved = json.loads(output_file.read_text(encoding="utf-8"))
-    assert [pub["hal_id"] for pub in saved] == ["hal-peer", "hal-non-peer"]
+    assert [pub["hal_id"] for pub in saved] == ["hal-peer", "hal-non-peer", "hal-preprint"]
     assert [pub["category"] for pub in saved] == [
         "Journal article",
         "Other scientific contribution",
+        "Preprint",
     ]
 
 
