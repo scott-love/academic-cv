@@ -352,6 +352,25 @@ def sort_publications(items):
     )
 
 
+def publication_dedup_key(pub):
+    """Build deduplication key from title + ordered author list."""
+    title = normalize_spaces(pub.get("title", "")).casefold()
+    authors = tuple(
+        normalize_spaces(author).casefold()
+        for author in pub.get("authors", [])
+        if normalize_spaces(author)
+    )
+    return title, authors
+
+
+def append_doi(ref, pub):
+    """Append DOI hyperlink when a DOI is available."""
+    doi_raw = pub.get("doi")
+    if doi_raw:
+        return f"{ref} \\href{{https://doi.org/{doi_raw}}}{{doi:\\nolinkurl{{{doi_raw}}}}}"
+    return ref
+
+
 def categorize_publications(publications):
     """Categorize publications by type."""
     journal_articles = [
@@ -389,6 +408,17 @@ def categorize_publications(publications):
         if p.get("category") == "Other scientific contribution"
     ]
 
+    non_preprint_keys = {
+        publication_dedup_key(p)
+        for p in publications
+        if p.get("category") != "Preprint"
+    }
+    preprints = [
+        p for p in publications
+        if p.get("category") == "Preprint"
+        and publication_dedup_key(p) not in non_preprint_keys
+    ]
+
     return {
         "journal_articles": sort_publications(journal_articles),
         "book_chapters": sort_publications(book_chapters),
@@ -396,6 +426,7 @@ def categorize_publications(publications):
         "oral_presentations": sort_publications(oral_presentations),
         "posters": sort_publications(posters),
         "other": sort_publications(other),
+        "preprints": sort_publications(preprints),
     }
 
 
@@ -411,11 +442,7 @@ def format_journal_reference(pub):
     if journal:
         ref += f" \\textbf{{{journal}}}."
 
-    if pub.get("doi"):
-        doi_raw = pub["doi"]
-        ref += f" \\href{{https://doi.org/{doi_raw}}}{{doi:\\nolinkurl{{{doi_raw}}}}}"
-
-    return ref
+    return append_doi(ref, pub)
 
 
 def format_book_chapter_reference(pub):
@@ -450,11 +477,7 @@ def format_book_chapter_reference(pub):
     if pub.get("publisher"):
         ref += f" {escape_latex(pub['publisher'])}."
 
-    if pub.get("doi"):
-        doi_raw = pub["doi"]
-        ref += f" \\href{{https://doi.org/{doi_raw}}}{{doi:\\nolinkurl{{{doi_raw}}}}}"
-
-    return ref
+    return append_doi(ref, pub)
 
 
 def format_conference_reference(pub):
@@ -484,7 +507,7 @@ def format_conference_reference(pub):
     if location_parts:
         ref += f" {', '.join(location_parts)}."
 
-    return ref
+    return append_doi(ref, pub)
 
 
 # ---------------------------------------------------------------------------
@@ -825,7 +848,22 @@ if total_pubs > 0:
             authors = format_author_list(pub.get("authors", []))
             title = escape_latex(pub.get("title", ""))
             year = pub.get("year", "")
-            ref = f"{authors} ({year}). \\textbf{{{title}}}."
+            ref = f"{authors} ({year}). \\textit{{{title}}}."
+            ref = append_doi(ref, pub)
+            add_line(f"{ref}\\par\\medskip")
+        add_line()
+
+    # Preprints
+    if pubs["preprints"]:
+        add_line()
+        add_line(f"\\subsection{{Preprints ({len(pubs['preprints'])})}}")
+        add_line()
+        for pub in pubs["preprints"]:
+            authors = format_author_list(pub.get("authors", []))
+            title = escape_latex(pub.get("title", ""))
+            year = pub.get("year", "")
+            ref = f"{authors} ({year}). \\textit{{{title}}}."
+            ref = append_doi(ref, pub)
             add_line(f"{ref}\\par\\medskip")
         add_line()
 
@@ -845,3 +883,4 @@ print(f"    - Journal articles: {len(pubs['journal_articles'])}")
 print(f"    - Book chapters: {len(pubs['book_chapters'])}")
 print(f"    - Conference presentations: {len(pubs['invited_talks']) + len(pubs['oral_presentations']) + len(pubs['posters'])}")
 print(f"    - Other: {len(pubs['other'])}")
+print(f"    - Preprints: {len(pubs['preprints'])}")

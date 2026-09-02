@@ -130,6 +130,12 @@ def classify_document(doc_type, invited, peer_reviewed):
     if doc_type == "REPORT":
         return None
 
+    if doc_type == "PREPRINT":
+        return {
+            "category": "Preprint",
+            "presentation_type": None,
+        }
+
     return {
         "category": "Other scientific contribution",
         "presentation_type": None,
