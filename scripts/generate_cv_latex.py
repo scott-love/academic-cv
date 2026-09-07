@@ -330,7 +330,8 @@ def format_employment_period_endpoint(value):
         year, month = match.groups()
         month_abbreviation = MONTH_ABBREVIATIONS.get(month)
         if month_abbreviation:
-            return f"{month_abbreviation}~{year}"
+            year_suffix = year[-2:]
+            return f"{month_abbreviation}~’{year_suffix}"
 
     if re.fullmatch(r"\d{4}", normalized):
         return normalized
@@ -339,12 +340,12 @@ def format_employment_period_endpoint(value):
 
 
 def format_employment_period(start, end):
-    """Format employment date ranges with non-breaking separators."""
+    """Format employment date ranges with compact separators."""
     formatted_start = format_employment_period_endpoint(start)
     formatted_end = format_employment_period_endpoint(end)
 
     if formatted_start and formatted_end:
-        return f"{formatted_start}~--~{formatted_end}"
+        return f"{formatted_start}--{formatted_end}"
 
     return formatted_start or formatted_end
 
@@ -685,7 +686,7 @@ if employment:
             if pos.get("country"):
                 institution += f", {pos['country']}"
 
-            add_line(f"\\cventry{{{dates}}}{{{position}}}{{{institution}}}{{}}{{}}{{")
+            add_line(f"\\cventry{{{{\\small {dates}}}}}{{{position}}}{{{institution}}}{{}}{{}}{{")
 
             # Supervisor and Team on same line with bold labels and bullet separator
             details = []
