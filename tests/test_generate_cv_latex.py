@@ -310,6 +310,35 @@ def test_funding_omit_coordinator_line_when_role_is_coordinator():
             output_file.write_text(original_output, encoding="utf-8")
 
 
+def test_employment_dates_use_readable_mixed_precision_formatting():
+    output_file = ROOT / "cv" / "cv.tex"
+    original_output = output_file.read_text(encoding="utf-8") if output_file.exists() else None
+
+    try:
+        subprocess.run(
+            [sys.executable, str(ROOT / "scripts" / "generate_cv_latex.py")],
+            check=True,
+            cwd=ROOT,
+        )
+        latex = output_file.read_text(encoding="utf-8")
+        employment_start = latex.index("\\section{Professional Experience}")
+        funding_start = latex.index("\\section{Funding}")
+        employment_block = latex[employment_start:funding_start]
+
+        assert "\\cventry{Nov~2017~--~Present}" in employment_block
+        assert "\\cventry{Nov~2015~--~Aug~2017}" in employment_block
+        assert "\\cventry{Apr~2015~--~Oct~2015}" in employment_block
+        assert "\\cventry{2013~--~2015}" in employment_block
+        assert "\\cventry{2011~--~2013}" in employment_block
+        assert "2015-11 -- 2017-08" not in employment_block
+        assert "2017-11 -- present" not in employment_block
+    finally:
+        if original_output is None:
+            output_file.unlink(missing_ok=True)
+        else:
+            output_file.write_text(original_output, encoding="utf-8")
+
+
 def test_supervision_uses_structured_layout_and_optional_fields():
     output_file = ROOT / "cv" / "cv.tex"
     supervision_file = ROOT / "data" / "supervision.yml"
