@@ -686,7 +686,7 @@ if employment:
             if pos.get("country"):
                 institution += f", {pos['country']}"
 
-            add_line(f"\\cventry{{{{\\small {dates}}}}}{{{position}}}{{{institution}}}{{}}{{}}{{")
+            add_line(f"\\cventry{{{{\\{dates}}}}}{{{position}}}{{{institution}}}{{}}{{}}{{")
 
             # Supervisor and Team on same line with bold labels and bullet separator
             details = []
