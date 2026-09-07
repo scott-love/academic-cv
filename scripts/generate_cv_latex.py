@@ -10,6 +10,7 @@ This script:
 """
 
 import json
+import re
 from pathlib import Path
 from datetime import datetime
 from urllib.parse import quote
@@ -117,6 +118,20 @@ def normalize_spaces(text):
 
 LATEX_MIDPOINT = r"\textperiodcentered{}"
 LATEX_BOLD_MIDPOINT = rf"\textbf{{{LATEX_MIDPOINT}}}"
+MONTH_ABBREVIATIONS = {
+    "01": "Jan",
+    "02": "Feb",
+    "03": "Mar",
+    "04": "Apr",
+    "05": "May",
+    "06": "Jun",
+    "07": "Jul",
+    "08": "Aug",
+    "09": "Sep",
+    "10": "Oct",
+    "11": "Nov",
+    "12": "Dec",
+}
 
 
 def join_latex_fragments(parts, separator=LATEX_MIDPOINT):
@@ -295,6 +310,43 @@ def format_conference_dates(pub):
 
     except (ValueError, AttributeError):
         return f"{start}–{end}"
+
+
+def format_employment_period_endpoint(value):
+    """Format employment period endpoints for the ModernCV hint column."""
+    if value is None:
+        return ""
+
+    raw_value = str(value)
+    normalized = raw_value.strip()
+    if not normalized:
+        return ""
+
+    if normalized.casefold() == "present":
+        return "Present"
+
+    match = re.fullmatch(r"(\d{4})-(\d{2})", normalized)
+    if match:
+        year, month = match.groups()
+        month_abbreviation = MONTH_ABBREVIATIONS.get(month)
+        if month_abbreviation:
+            return f"{month_abbreviation}~{year}"
+
+    if re.fullmatch(r"\d{4}", normalized):
+        return normalized
+
+    return raw_value
+
+
+def format_employment_period(start, end):
+    """Format employment date ranges with non-breaking separators."""
+    formatted_start = format_employment_period_endpoint(start)
+    formatted_end = format_employment_period_endpoint(end)
+
+    if formatted_start and formatted_end:
+        return f"{formatted_start}~--~{formatted_end}"
+
+    return formatted_start or formatted_end
 
 
 def format_country(code):
@@ -625,11 +677,7 @@ if employment:
         for pos in by_category[category]:
             start = pos.get("start", "")
             end = pos.get("end", "")
-
-            if start and end:
-                dates = f"{start} -- {end}"
-            else:
-                dates = start or end
+            dates = format_employment_period(start, end)
 
             position = escape_latex(pos.get("position", ""))
             institution = escape_latex(pos.get("institution", ""))
