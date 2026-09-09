@@ -586,7 +586,7 @@ def format_book_chapter_reference(pub):
         in_parts.append(f"{editors_fmt} ({label})")
 
     if book_title:
-        in_parts.append(f"\\textit{{{escape_latex(book_title)}}}")
+        in_parts.append(f"\\textbf{{{escape_latex(book_title)}}}")
 
     if in_parts:
         ref += f" In: {', '.join(in_parts)}."
@@ -612,7 +612,7 @@ def format_conference_reference(pub):
 
     if pub.get("conference"):
         conference = escape_latex(pub["conference"])
-        ref += f" \\textit{{{conference}}}."
+        ref += f" {conference}."
 
     dates = format_conference_dates(pub)
     if dates:
