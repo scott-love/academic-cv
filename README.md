@@ -107,35 +107,29 @@ If the HAL API is unreachable, `scripts/fetch_hal.py` keeps the existing
 
 ### Publishing a GitHub Release
 
-The workflow also creates a GitHub Release and attaches the generated CV PDFs as release
-assets whenever you push a date-based tag.
+The workflow also creates a GitHub Release after each successful non-PR run on
+`main` and after each successful manual dispatch. The release job automatically
+creates a date-based tag for that run and attaches the generated CV PDFs as
+release assets.
 
-**Supported tag format:** `YYYY-MM-DD` with an optional same-day suffix.
+**Automatic tag format:** `YYYY-MM-DD` with an optional same-day suffix when
+multiple releases are created on the same day.
 
 | Tag | When to use |
 |-----|-------------|
-| `2026-08-13` | First release on a given day |
-| `2026-08-13.1` | Second release on the same day |
-| `2026-08-13.2` | Third release on the same day |
-| `2026-08-13-a` | Alternative suffix style |
+| `2026-08-13` | First release created on a given day |
+| `2026-08-13.1` | Second release created on the same day |
+| `2026-08-13.2` | Third release created on the same day |
 
-**Create a release:**
+**How to trigger a release:**
 
-```bash
-git tag 2026-08-13
-git push origin 2026-08-13
-```
+- Push a qualifying change to `main`, or
+- Run the `Build CV` workflow manually from GitHub Actions.
 
-**Create a second release on the same day:**
-
-```bash
-git tag 2026-08-13.1
-git push origin 2026-08-13.1
-```
-
-Each tag produces its own independent GitHub Release entry with `cv.pdf` and `cv_short.pdf` attached.
-The artifact upload (for CI inspection) is preserved for every build regardless of
-whether a tag was pushed.
+Each qualifying run produces its own independent GitHub Release entry with
+`cv.pdf` and `cv_short.pdf` attached. The artifact upload (for CI inspection) is
+preserved for every build, and the workflow manages the release tag creation
+automatically.
 
 ## Repository structure
 
