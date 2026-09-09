@@ -81,7 +81,11 @@ def test_generator_emits_expected_header_profile_links():
         if expected_parts:
             expected_extrainfo = r"\enspace\textbar\enspace".join(expected_parts)
             assert f"\\newcommand*{{\\cvheaderlinks}}{{{expected_extrainfo}}}" in latex
-            assert r"{\raggedleft\addressfont\color{color2}\cvheaderlinks\par}" in latex
+            makecvhead_start = latex.index(r"\renewcommand*{\makecvhead}{%")
+            rule_index = latex.index(r"  {\color{color2!50}\rule{\textwidth}{.25ex}}%", makecvhead_start)
+            header_links_index = latex.index(r"      {\addressfont\color{color2}\cvheaderlinks}}}%", makecvhead_start)
+            assert header_links_index < rule_index
+            assert r"{\raggedleft\addressfont\color{color2}\cvheaderlinks\par}" not in latex
             assert "\\extrainfo{" not in latex
             assert "github.com" not in expected_extrainfo
             assert r"\aiGoogleScholar" not in expected_extrainfo
