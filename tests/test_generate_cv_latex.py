@@ -84,7 +84,7 @@ def test_generator_emits_expected_header_profile_links():
             makecvhead_start = latex.index(r"\renewcommand*{\makecvhead}{%")
             rule_index = latex.index(r"  {\color{color2!50}\rule{\textwidth}{.25ex}}%", makecvhead_start)
             header_links_index = latex.index(r"      {\addressfont\color{color2}\cvheaderlinks}}}%", makecvhead_start)
-            assert r"      \\[-0.80em]%" in latex[makecvhead_start:rule_index]
+            assert r"      \\[0em]%" in latex[makecvhead_start:rule_index]
             assert header_links_index < rule_index
             assert r"{\raggedleft\addressfont\color{color2}\cvheaderlinks\par}" not in latex
             assert "\\extrainfo{" not in latex

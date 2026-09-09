@@ -772,7 +772,7 @@ if profile_links:
     add_line(r"        {\color{color2!50}\MakeLowercase\@firstname}{\color{color2}\MakeLowercase\@lastname}%")
     add_line(r"      \else%")
     add_line(r"        {\color{color2!50}\@firstname} {\color{color2}\@lastname}\fi}%")
-    add_line(r"      \\[-0.80em]%")
+    add_line(r"      \\[0em]%")
     add_line(r"      {\addressfont\color{color2}\cvheaderlinks}}}%")
     add_line(r"  \if@left%")
     add_line(r"    \usebox{\makecvheadnamebox}%")
