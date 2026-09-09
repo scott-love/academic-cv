@@ -2,16 +2,16 @@
 
 A data-driven academic CV generator built around:
 
-`data/` → Python scripts → `cv/cv.tex` → `cv/cv.pdf`
+`data/` → Python scripts → `cv/cv.tex` / `cv/cv_short.tex` → `cv/cv.pdf` / `cv/cv_short.pdf`
 
-Publications are refreshed from HAL, the CV content is assembled into ModernCV-flavored LaTeX, and the final output is a PDF.
+Publications are refreshed from HAL, the CV content is assembled into ModernCV-flavored LaTeX, and the final outputs are full and short CV PDFs.
 
 ## Architecture
 
 - `data/` stores structured CV content in YAML and JSON.
 - `scripts/fetch_hal.py` refreshes publications from HAL into `data/publications.json`.
-- `scripts/generate_cv_latex.py` reads the data files and generates `cv/cv.tex` (build artifact, not tracked in git).
-- `cv/moderncv/` provides the ModernCV LaTeX class assets used to compile `cv/cv.pdf`.
+- `scripts/generate_cv_latex.py` reads the data files and generates `cv/cv.tex` and `cv/cv_short.tex` (build artifacts, not tracked in git).
+- `cv/moderncv/` provides the ModernCV LaTeX class assets used to compile `cv/cv.pdf` and `cv/cv_short.pdf`.
 
 ## Prerequisites
 
@@ -41,12 +41,15 @@ Available Makefile targets:
 
 - `make sync` — install Python dependencies with `uv sync`
 - `make fetch-publications` — refresh `data/publications.json` from HAL
-- `make generate-latex` — regenerate `cv/cv.tex`
+- `make generate-latex` — regenerate `cv/cv.tex` and `cv/cv_short.tex`
 - `make render` — compile `cv/cv.tex` to `cv/cv.pdf`
+- `make render-short` — compile `cv/cv_short.tex` to `cv/cv_short.pdf`
+- `make render-all` — compile both LaTeX outputs to PDFs
 - `make build` — run the full pipeline
+- `make build-all` — run the full pipeline and compile both PDFs
 - `make clean` — remove generated LaTeX build artifacts and PDF output
 
-Optional helper wrappers are also available in `scripts/build_cv.sh` and `scripts/update_cv.sh`.
+Optional helper wrappers are also available in `scripts/build_cv.sh` and `scripts/update_cv.sh`; both now compile the full and short CV PDFs.
 
 ## Refresh HAL publications
 
@@ -92,10 +95,10 @@ The workflow:
 4. Installs TeX Live / `pdflatex`
 5. Runs `uv sync`
 6. Refreshes HAL publications
-7. Regenerates `cv/cv.tex`
-8. Compiles `cv/cv.pdf`
+7. Regenerates `cv/cv.tex` and `cv/cv_short.tex`
+8. Compiles the PDF outputs
 9. Commits `data/publications.json` back to `main` if the HAL refresh changed it
-10. Uploads `cv/cv.pdf` as an artifact
+10. Uploads the generated CV PDFs as artifacts
 
 If LaTeX compilation fails, the workflow also uploads `cv/cv.log` for debugging.
 If the HAL API is unreachable, `scripts/fetch_hal.py` keeps the existing
@@ -103,8 +106,8 @@ If the HAL API is unreachable, `scripts/fetch_hal.py` keeps the existing
 
 ### Publishing a GitHub Release
 
-The workflow also creates a GitHub Release and attaches `cv/cv.pdf` as a release
-asset whenever you push a date-based tag.
+The workflow also creates a GitHub Release and attaches the generated CV PDFs as release
+assets whenever you push a date-based tag.
 
 **Supported tag format:** `YYYY-MM-DD` with an optional same-day suffix.
 
@@ -129,7 +132,7 @@ git tag 2026-08-13.1
 git push origin 2026-08-13.1
 ```
 
-Each tag produces its own independent GitHub Release entry with `cv.pdf` attached.
+Each tag produces its own independent GitHub Release entry with `cv.pdf` and `cv_short.pdf` attached.
 The artifact upload (for CI inspection) is preserved for every build regardless of
 whether a tag was pushed.
 
@@ -166,17 +169,18 @@ whether a tag was pushed.
 
 ## Troubleshooting
 
-Regenerate the LaTeX source before compiling if you have changed data:
+Regenerate the LaTeX sources before compiling if you have changed data:
 
 ```bash
 make generate-latex
 ```
 
-Compile locally and inspect the log:
+Compile locally and inspect the logs:
 
 ```bash
 cd cv
 pdflatex -interaction=nonstopmode -halt-on-error -output-directory=. cv.tex
+pdflatex -interaction=nonstopmode -halt-on-error -output-directory=. cv_short.tex
 ```
 
 Common checks:

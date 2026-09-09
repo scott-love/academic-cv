@@ -22,6 +22,7 @@ build/
 
 # Generated CV build artifacts
 cv/cv.tex
+cv/cv_short.tex
 cv/*.pdf
 cv/cv.log
 cv/*.aux

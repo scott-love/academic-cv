@@ -25,16 +25,17 @@ echo "[3/4] Generating LaTeX CV from data..."
 uv run python scripts/generate_cv_latex.py
 
 echo ""
-echo "[4/4] Compiling LaTeX to PDF..."
+echo "[4/4] Compiling LaTeX to PDFs..."
 cd "$CD_DIR"
 
 # Run pdflatex with nonstopmode to compile even if there are errors
 pdflatex -interaction=nonstopmode -output-directory=. cv.tex
+pdflatex -interaction=nonstopmode -output-directory=. cv_short.tex
 
 echo ""
 echo "================================================"
 echo "✓ Build complete!"
 echo "================================================"
 echo ""
-echo "Output: cv/cv.pdf"
+echo "Outputs: cv/cv.pdf, cv/cv_short.pdf"
 echo ""
