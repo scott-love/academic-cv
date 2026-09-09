@@ -18,10 +18,11 @@ echo "[2/3] Generating LaTeX..."
 uv run python scripts/generate_cv_latex.py
 
 echo ""
-echo "[3/3] Compiling PDF..."
+echo "[3/3] Compiling PDFs..."
 cd "$CD_DIR"
-pdflatex -interaction=nonstopmode -output-directory=. cv.tex
+xelatex -interaction=nonstopmode -output-directory=. cv.tex
+xelatex -interaction=nonstopmode -output-directory=. cv_short.tex
 
 echo ""
-echo "✓ CV updated!"
+echo "✓ CVs updated!"
 echo ""

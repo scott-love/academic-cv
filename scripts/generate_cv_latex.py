@@ -18,7 +18,6 @@ from urllib.parse import quote
 
 import yaml
 
-
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
@@ -27,6 +26,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 CV_DIR = ROOT / "cv"
 OUTPUT_FILE = CV_DIR / "cv.tex"
+SHORT_OUTPUT_FILE = CV_DIR / "cv_short.tex"
 PHOTO_FILE = CV_DIR / "pictures" / "scott.jpg"
 PHOTO_LATEX_PATH = "pictures/scott"
 HAL_PROFILE_BASE_URL = "https://cv.hal.science/"
@@ -38,6 +38,7 @@ CV_DIR.mkdir(parents=True, exist_ok=True)
 # ---------------------------------------------------------------------------
 # Load Data
 # ---------------------------------------------------------------------------
+
 
 def load_yaml(path):
     """Load and parse a YAML file."""
@@ -59,6 +60,7 @@ with open(DATA / "publications.json", encoding="utf-8") as f:
 # ---------------------------------------------------------------------------
 # Helper Functions
 # ---------------------------------------------------------------------------
+
 
 def escape_latex(text):
     """Escape special LaTeX characters."""
@@ -88,7 +90,6 @@ def escape_latex(text):
     return result
 
 
-
 def escape_latex_url(url):
     """Escape URL characters that can break LaTeX command arguments."""
     if not url:
@@ -109,7 +110,6 @@ def escape_latex_url(url):
     )
 
 
-
 def normalize_homepage_url(homepage):
     """Normalize homepage to an absolute URL."""
     if not homepage:
@@ -121,11 +121,9 @@ def normalize_homepage_url(homepage):
     return f"https://{homepage}"
 
 
-
 def normalize_spaces(text):
     """Collapse repeated whitespace into single spaces."""
     return " ".join(str(text).split()).strip()
-
 
 
 def build_identifier_url(base_url, identifier):
@@ -134,7 +132,6 @@ def build_identifier_url(base_url, identifier):
         return ""
 
     return f"{base_url}{quote(str(identifier).strip(), safe='')}"
-
 
 
 def format_profile_link(url, icon_command, label=None):
@@ -147,7 +144,6 @@ def format_profile_link(url, icon_command, label=None):
         link_text = f"{link_text}\\enspace {escape_latex(label)}"
 
     return f"\\href{{{escape_latex_url(url)}}}{{{link_text}}}"
-
 
 
 LATEX_MIDPOINT = r"\textperiodcentered{}"
@@ -168,12 +164,10 @@ MONTH_ABBREVIATIONS = {
 }
 
 
-
 def join_latex_fragments(parts, separator=LATEX_MIDPOINT):
     """Join pre-escaped LaTeX fragments with a LaTeX-safe separator."""
     fragments = [part for part in parts if part]
     return f" {separator} ".join(fragments)
-
 
 
 def format_research_interests(interests):
@@ -186,12 +180,10 @@ def format_research_interests(interests):
     return join_latex_fragments(escaped_interests)
 
 
-
 def role_implies_coordinator(role):
     """Return True when role indicates the person is the coordinator."""
     normalized_role = normalize_spaces(str(role).replace("-", " ").replace("_", " ")).casefold()
     return normalized_role in {"coordinator", "local coordinator"}
-
 
 
 def build_profile_links(profile_data):
@@ -231,18 +223,21 @@ def build_profile_links(profile_data):
     return links
 
 
-
 def build_footer_links(profile_data):
     """Build clickable icon-only profile links for the ModernCV footer."""
     links = []
 
     orcid = str(profile_data.get("orcid", "")).strip()
     if orcid:
-        links.append(format_profile_link(build_identifier_url("https://orcid.org/", orcid), r"\aiOrcid"))
+        links.append(
+            format_profile_link(build_identifier_url("https://orcid.org/", orcid), r"\aiOrcid")
+        )
 
     hal = str(profile_data.get("hal", "")).strip()
     if hal:
-        links.append(format_profile_link(build_identifier_url(HAL_PROFILE_BASE_URL, hal), r"\aiHAL"))
+        links.append(
+            format_profile_link(build_identifier_url(HAL_PROFILE_BASE_URL, hal), r"\aiHAL")
+        )
 
     google_scholar = str(profile_data.get("google_scholar", "")).strip()
     if google_scholar:
@@ -261,7 +256,6 @@ def build_footer_links(profile_data):
     return links
 
 
-
 def is_scott(author):
     """Check if author is Scott A. Love."""
     return author.strip().lower() in {
@@ -269,7 +263,6 @@ def is_scott(author):
         "scott a. love",
         "scott a love",
     }
-
 
 
 def abbreviate_author(author):
@@ -290,28 +283,33 @@ def abbreviate_author(author):
 
     # Multi-word surname particles
     surname_particles = {
-        "de", "da", "del", "della", "di", "du", "des",
-        "le", "la", "van", "von", "der", "den", "ter", "ten",
+        "de",
+        "da",
+        "del",
+        "della",
+        "di",
+        "du",
+        "des",
+        "le",
+        "la",
+        "van",
+        "von",
+        "der",
+        "den",
+        "ter",
+        "ten",
     }
 
     surname_start = len(parts) - 1
-    while (
-        surname_start > 0
-        and parts[surname_start - 1].lower() in surname_particles
-    ):
+    while surname_start > 0 and parts[surname_start - 1].lower() in surname_particles:
         surname_start -= 1
 
     surname = " ".join(parts[surname_start:])
     given_names = parts[:surname_start]
 
-    initials = "".join(
-        p[0].upper()
-        for p in given_names
-        if p and p[0].isalpha()
-    )
+    initials = "".join(p[0].upper() for p in given_names if p and p[0].isalpha())
 
     return f"{surname} {initials}"
-
 
 
 def format_author_list(authors, max_authors=6):
@@ -344,7 +342,6 @@ def format_author_list(authors, max_authors=6):
     return ", ".join(formatted)
 
 
-
 def format_date(date_string):
     """Format YYYY-MM-DD as '19 November 2025'."""
     if not date_string:
@@ -355,7 +352,6 @@ def format_date(date_string):
         return date.strftime("%-d %B %Y")
     except (ValueError, AttributeError):
         return str(date_string)
-
 
 
 def format_conference_dates(pub):
@@ -375,10 +371,7 @@ def format_conference_dates(pub):
 
         if start_date.year == end_date.year:
             if start_date.month == end_date.month:
-                return (
-                    f"{start_date.day}–{end_date.day} "
-                    f"{start_date.strftime('%B %Y')}"
-                )
+                return f"{start_date.day}–{end_date.day} " f"{start_date.strftime('%B %Y')}"
             else:
                 return (
                     f"{start_date.day} {start_date.strftime('%B')}–"
@@ -389,7 +382,6 @@ def format_conference_dates(pub):
 
     except (ValueError, AttributeError):
         return f"{start}–{end}"
-
 
 
 def format_employment_period_endpoint(value):
@@ -419,7 +411,6 @@ def format_employment_period_endpoint(value):
     return raw_value
 
 
-
 def format_employment_period(start, end):
     """Format employment date ranges with compact separators."""
     formatted_start = format_employment_period_endpoint(start)
@@ -431,23 +422,36 @@ def format_employment_period(start, end):
     return formatted_start or formatted_end
 
 
-
 def format_country(code):
     """Convert HAL country codes to country names."""
     countries = {
-        "fr": "France", "ca": "Canada", "gb": "United Kingdom",
-        "uk": "United Kingdom", "us": "United States", "de": "Germany",
-        "es": "Spain", "it": "Italy", "be": "Belgium", "nl": "Netherlands",
-        "ch": "Switzerland", "gr": "Greece", "cy": "Cyprus", "au": "Australia",
-        "jp": "Japan", "cn": "China", "se": "Sweden", "dk": "Denmark",
-        "fi": "Finland", "no": "Norway", "pt": "Portugal",
+        "fr": "France",
+        "ca": "Canada",
+        "gb": "United Kingdom",
+        "uk": "United Kingdom",
+        "us": "United States",
+        "de": "Germany",
+        "es": "Spain",
+        "it": "Italy",
+        "be": "Belgium",
+        "nl": "Netherlands",
+        "ch": "Switzerland",
+        "gr": "Greece",
+        "cy": "Cyprus",
+        "au": "Australia",
+        "jp": "Japan",
+        "cn": "China",
+        "se": "Sweden",
+        "dk": "Denmark",
+        "fi": "Finland",
+        "no": "Norway",
+        "pt": "Portugal",
     }
 
     if not code:
         return None
 
     return countries.get(code.lower(), code.upper())
-
 
 
 def normalize_pages(value):
@@ -479,7 +483,6 @@ def normalize_pages(value):
     return pages
 
 
-
 def sort_publications(items):
     """Sort publications by year (newest first), then by HAL ID."""
     return sorted(
@@ -488,6 +491,53 @@ def sort_publications(items):
         reverse=True,
     )
 
+
+def parse_publication_date(value):
+    """Parse best-effort publication date strings for recency sorting."""
+    if value in (None, ""):
+        return None
+
+    normalized = str(value).strip()
+    if not normalized:
+        return None
+
+    for date_format, default_values in (
+        ("%Y-%m-%d", {}),
+        ("%Y-%m", {"day": 1}),
+        ("%Y", {"month": 1, "day": 1}),
+    ):
+        try:
+            return datetime.strptime(normalized, date_format).replace(**default_values)
+        except ValueError:
+            continue
+
+    return None
+
+
+def publication_recency_key(pub):
+    """Build a recency key that prefers the most precise available date metadata."""
+    candidate_dates = []
+
+    for field in ("publication_date", "date", "issued", "conference_end", "conference_start"):
+        parsed = parse_publication_date(pub.get(field))
+        if parsed is not None:
+            candidate_dates.append(parsed)
+
+    parsed_year = parse_publication_date(pub.get("year"))
+    if parsed_year is not None:
+        candidate_dates.append(parsed_year)
+
+    newest_date = max(candidate_dates) if candidate_dates else datetime.min
+    return newest_date, pub.get("year") or 0, pub.get("hal_id") or ""
+
+
+def select_recent_peer_reviewed_articles(publication_groups, count=5):
+    """Select the most recent peer-reviewed journal articles for the short CV."""
+    return sorted(
+        publication_groups["journal_articles"],
+        key=publication_recency_key,
+        reverse=True,
+    )[:count]
 
 
 def publication_dedup_key(pub):
@@ -501,7 +551,6 @@ def publication_dedup_key(pub):
     return title, authors
 
 
-
 def normalize_person_for_dedup(name):
     """Normalize author names for robust deduplication across HAL variants."""
     normalized_name = normalize_spaces(name)
@@ -513,7 +562,6 @@ def normalize_person_for_dedup(name):
     normalized_name = normalized_name.casefold()
     tokens = re.findall(r"[a-z0-9]+", normalized_name)
     return " ".join(sorted(tokens))
-
 
 
 def normalize_title_for_dedup(title):
@@ -530,7 +578,6 @@ def normalize_title_for_dedup(title):
     return normalize_spaces(normalized_title)
 
 
-
 def is_preprint_publication(pub):
     """Detect explicit and legacy preprint-like HAL records."""
     if pub.get("category") == "Preprint":
@@ -539,11 +586,11 @@ def is_preprint_publication(pub):
     hal_type = (pub.get("hal_type") or "").strip().upper()
     doi = normalize_spaces(pub.get("doi", "")).casefold()
     has_structured_venue = any(
-        normalize_spaces(pub.get(field) or "")
-        for field in ("journal", "conference", "book_title")
+        normalize_spaces(pub.get(field) or "") for field in ("journal", "conference", "book_title")
     )
-    return hal_type == "UNDEFINED" and doi.startswith("10.5281/zenodo.") and not has_structured_venue
-
+    return (
+        hal_type == "UNDEFINED" and doi.startswith("10.5281/zenodo.") and not has_structured_venue
+    )
 
 
 def append_doi(ref, pub):
@@ -554,38 +601,25 @@ def append_doi(ref, pub):
     return ref
 
 
-
 def categorize_publications(publications):
     """Categorize publications by type."""
-    journal_articles = [
-        p for p in publications
-        if p.get("category") == "Journal article"
-    ]
+    journal_articles = [p for p in publications if p.get("category") == "Journal article"]
 
-    book_chapters = [
-        p for p in publications
-        if p.get("category") == "Book chapter"
-    ]
+    book_chapters = [p for p in publications if p.get("category") == "Book chapter"]
 
     conference_presentations = [
-        p for p in publications
-        if p.get("category") == "Conference presentation"
+        p for p in publications if p.get("category") == "Conference presentation"
     ]
 
     invited_talks = [
-        p for p in conference_presentations
-        if p.get("presentation_type") == "Invited talk"
+        p for p in conference_presentations if p.get("presentation_type") == "Invited talk"
     ]
 
     oral_presentations = [
-        p for p in conference_presentations
-        if p.get("presentation_type") == "Oral presentation"
+        p for p in conference_presentations if p.get("presentation_type") == "Oral presentation"
     ]
 
-    posters = [
-        p for p in conference_presentations
-        if p.get("presentation_type") == "Poster"
-    ]
+    posters = [p for p in conference_presentations if p.get("presentation_type") == "Poster"]
 
     other = [
         p
@@ -594,14 +628,12 @@ def categorize_publications(publications):
     ]
 
     non_preprint_keys = {
-        publication_dedup_key(p)
-        for p in publications
-        if not is_preprint_publication(p)
+        publication_dedup_key(p) for p in publications if not is_preprint_publication(p)
     }
     preprints = [
-        p for p in publications
-        if is_preprint_publication(p)
-        and publication_dedup_key(p) not in non_preprint_keys
+        p
+        for p in publications
+        if is_preprint_publication(p) and publication_dedup_key(p) not in non_preprint_keys
     ]
 
     return {
@@ -613,7 +645,6 @@ def categorize_publications(publications):
         "other": sort_publications(other),
         "preprints": sort_publications(preprints),
     }
-
 
 
 def format_journal_reference(pub):
@@ -629,7 +660,6 @@ def format_journal_reference(pub):
         ref += f" \\textbf{{{journal}}}."
 
     return append_doi(ref, pub)
-
 
 
 def format_book_chapter_reference(pub):
@@ -667,7 +697,6 @@ def format_book_chapter_reference(pub):
     return append_doi(ref, pub)
 
 
-
 def format_conference_reference(pub):
     """Format a conference presentation reference."""
     authors = format_author_list(pub.get("authors", []))
@@ -698,7 +727,6 @@ def format_conference_reference(pub):
     return append_doi(ref, pub)
 
 
-
 def format_other_scientific_contribution_reference(pub):
     """Format an other scientific contribution reference."""
     authors = format_author_list(pub.get("authors", []))
@@ -714,139 +742,151 @@ def format_other_scientific_contribution_reference(pub):
     return append_doi(ref, pub)
 
 
-# ---------------------------------------------------------------------------
-# Generate LaTeX
-# ---------------------------------------------------------------------------
+def make_add_line(lines):
+    """Create a helper that appends lines to the provided list."""
 
-latex_lines = []
+    def add_line(text=""):
+        lines.append(text)
 
-
-def add_line(text=""):
-    """Add a line to the LaTeX output."""
-    latex_lines.append(text)
+    return add_line
 
 
-# Document preamble
-add_line(r"\documentclass[10pt,a4paper,sans]{moderncv}")
-add_line(r"\moderncvstyle{casual}")
-add_line(r"\moderncvcolor{blue}")
-add_line(r"\usepackage[utf8]{inputenc}")
-add_line(r"\usepackage[T1]{fontenc}")
-add_line(r"\usepackage{academicons}")
-add_line(r"\usepackage{fontawesome5}")
-add_line(r"\usepackage[scale=.84]{geometry}")
-add_line(r"\setlength{\hintscolumnwidth}{2.5cm}")
-add_line()
-
-# Personal information
-name_parts = profile.get("name", "").split()
-firstname = name_parts[0] if name_parts else ""
-lastname = " ".join(name_parts[1:]) if len(name_parts) > 1 else ""
-
-add_line(f"\\firstname{{{escape_latex(firstname)}}}")
-add_line(f"\\familyname{{{escape_latex(lastname)}}}")
-profile_links = build_profile_links(profile)
-if profile_links:
-    add_line(f"\\newcommand*{{\\cvheaderlinks}}{{{r'\enspace\textbar\enspace'.join(profile_links)}}}")
-    add_line(r"\makeatletter")
-    add_line(r"\renewcommand*{\makecvhead}{%")
-    add_line(r"  \recomputecvlengths%")
-    add_line(r"  \@initializebox{\makecvheadpicturebox}%")
-    add_line(r"  \savebox{\makecvheadpicturebox}{%")
-    add_line(r"    \ifthenelse{\isundefined{\@photo}}%")
-    add_line(r"      {}%")
-    add_line(r"      {%")
-    add_line(r"       \setlength\fboxrule{\@photoframewidth}%")
-    add_line(r"       \ifdim\@photoframewidth=0pt%")
-    add_line(r"         \setlength{\fboxsep}{0pt}\fi%")
-    add_line(r"       {\color{color1}\framebox{\includegraphics[width=\@photowidth]{\@photo}}}}}%")
-    add_line(r"  \@initializelength{\makecvheadpicturewidth}%")
-    add_line(r"  \settowidth{\makecvheadpicturewidth}{\usebox{\makecvheadpicturebox}}%")
-    add_line(r"  \@initializebox{\makecvheadnamebox}%")
-    add_line(r"  \savebox{\makecvheadnamebox}{%")
-    add_line(r"    \parbox[b]{\textwidth-\makecvheadpicturewidth}{%")
-    add_line(r"      \if@left\raggedright\fi%")
-    add_line(r"      \if@right\raggedleft\fi%")
-    add_line(r"      {\namefont%")
-    add_line(r"      \if@alternate%")
-    add_line(r"        {\color{color2!50}\MakeLowercase\@firstname}{\color{color2}\MakeLowercase\@lastname}%")
-    add_line(r"      \else%")
-    add_line(r"        {\color{color2!50}\@firstname} {\color{color2}\@lastname}\fi}%")
-    add_line(r"      \\[1em]%")
-    add_line(r"      {\addressfont\color{color2}\cvheaderlinks}}}%")
-    add_line(r"  \if@left%")
-    add_line(r"    \usebox{\makecvheadnamebox}%")
-    add_line(r"    \usebox{\makecvheadpicturebox}\fi")
-    add_line(r"  \if@right%")
-    add_line(r"    \usebox{\makecvheadpicturebox}%")
-    add_line(r"    \usebox{\makecvheadnamebox}\fi\\[-.35em]%")
-    add_line(r"  {\color{color2!50}\rule{\textwidth}{.25ex}}%")
-    add_line(r"  \ifthenelse{\equal{\@title}{}}{}{%")
-    add_line(r"    \\[1.25em]\null%")
-    add_line(r"    \if@right\hfill\fi%")
-    add_line(r"    \if@alternate%")
-    add_line(r"      \titlestyle{\MakeLowercase\@title}%")
-    add_line(r"    \else%")
-    add_line(r"      \titlestyle{\@title}\fi%")
-    add_line(r"    }\\[2.5em]%")
-    add_line(r"  \ifthenelse{\isundefined{\@quote}}%")
-    add_line(r"    {}%")
-    add_line(r"    {{\null\hfill%")
-    add_line(r"      \begin{minipage}{\quotewidth}%")
-    add_line(r"        \centering%")
-    add_line(r"        \quotestyle{\@quote}%")
-    add_line(r"      \end{minipage}\hfill\null\\[2.5em]}}%")
-    add_line(r"  \par}")
-    add_line(r"\makeatother")
-
-footer_links = build_footer_links(profile)
-if footer_links:
-    add_line(f"\\newcommand*{{\\cvfooterlinks}}{{{join_latex_fragments(footer_links, separator=r'\enspace')}}}")
-    add_line(r"\makeatletter")
-    add_line(r"\renewcommand*{\makecvfoot}{%")
-    add_line(r"  \recomputecvfootlengths{}%")
-    add_line(r"  \fancypagestyle{plain}{%")
-    add_line(r"    \fancyfoot[c]{%")
-    add_line(r"      \parbox[b]{\footwidth}{%")
-    add_line(r"        \centering%")
-    add_line(r"        \color{color2}\addressfont%")
-    add_line(r"        \vspace{\baselineskip}%")
-    add_line(r"        {\small \cvfooterlinks}%")
-    add_line(r"      }}}%")
-    add_line(r"  \pagestyle{plain}}")
-    add_line(r"\makeatother")
-
-# Optional: photo
-if PHOTO_FILE.exists():
-    add_line(f"\\photo[64pt][0.4pt]{{{PHOTO_LATEX_PATH}}}")
-else:
-    add_line(f"% \\photo[64pt][0.4pt]{{{PHOTO_LATEX_PATH}}}")
-
-add_line()
-add_line(r"\begin{document}")
-add_line(r"\makecvtitle")
-add_line()
-
-# Combined summary and research interests (no heading)
-summary = normalize_spaces(profile.get("summary", ""))
-interests = format_research_interests(profile.get("research_interests"))
-
-if summary and interests:
-    add_line(f"{escape_latex(summary)}\\\\")
-    add_line(f"{{\\small {interests}}}")
-elif summary:
-    add_line(escape_latex(summary))
-elif interests:
-    add_line(f"{{\\small {interests}}}")
-
-if summary or interests:
+def add_document_preamble(add_line):
+    """Add the shared ModernCV preamble and title block."""
+    add_line(r"\documentclass[10pt,a4paper,sans]{moderncv}")
+    add_line(r"\moderncvstyle{casual}")
+    add_line(r"\moderncvcolor{blue}")
+    add_line(r"\usepackage[utf8]{inputenc}")
+    add_line(r"\usepackage[T1]{fontenc}")
+    add_line(r"\usepackage{academicons}")
+    add_line(r"\usepackage{fontawesome5}")
+    add_line(r"\usepackage[scale=.84]{geometry}")
+    add_line(r"\setlength{\hintscolumnwidth}{2.5cm}")
     add_line()
 
-# Education
-if education:
-    add_line(r"\section{Education}")
+    name_parts = profile.get("name", "").split()
+    firstname = name_parts[0] if name_parts else ""
+    lastname = " ".join(name_parts[1:]) if len(name_parts) > 1 else ""
 
-    for deg in education:
+    add_line(f"\\firstname{{{escape_latex(firstname)}}}")
+    add_line(f"\\familyname{{{escape_latex(lastname)}}}")
+    profile_links = build_profile_links(profile)
+    if profile_links:
+        links_separator = r"\enspace\textbar\enspace"
+        add_line(f"\\newcommand*{{\\cvheaderlinks}}{{{links_separator.join(profile_links)}}}")
+        add_line(r"\makeatletter")
+        add_line(r"\renewcommand*{\makecvhead}{%")
+        add_line(r"  \recomputecvlengths%")
+        add_line(r"  \@initializebox{\makecvheadpicturebox}%")
+        add_line(r"  \savebox{\makecvheadpicturebox}{%")
+        add_line(r"    \ifthenelse{\isundefined{\@photo}}%")
+        add_line(r"      {}%")
+        add_line(r"      {%")
+        add_line(r"       \setlength\fboxrule{\@photoframewidth}%")
+        add_line(r"       \ifdim\@photoframewidth=0pt%")
+        add_line(r"         \setlength{\fboxsep}{0pt}\fi%")
+        add_line(
+            r"       {\color{color1}\framebox{\includegraphics[width=\@photowidth]{\@photo}}}}}%"
+        )
+        add_line(r"  \@initializelength{\makecvheadpicturewidth}%")
+        add_line(r"  \settowidth{\makecvheadpicturewidth}{\usebox{\makecvheadpicturebox}}%")
+        add_line(r"  \@initializebox{\makecvheadnamebox}%")
+        add_line(r"  \savebox{\makecvheadnamebox}{%")
+        add_line(r"    \parbox[b]{\textwidth-\makecvheadpicturewidth}{%")
+        add_line(r"      \if@left\raggedright\fi%")
+        add_line(r"      \if@right\raggedleft\fi%")
+        add_line(r"      {\namefont%")
+        add_line(r"      \if@alternate%")
+        add_line(
+            r"        {\color{color2!50}\MakeLowercase\@firstname}{\color{color2}\MakeLowercase\@lastname}%"
+        )
+        add_line(r"      \else%")
+        add_line(r"        {\color{color2!50}\@firstname} {\color{color2}\@lastname}\fi}%")
+        add_line(r"      \\[1em]%")
+        add_line(r"      {\addressfont\color{color2}\cvheaderlinks}}}%")
+        add_line(r"  \if@left%")
+        add_line(r"    \usebox{\makecvheadnamebox}%")
+        add_line(r"    \usebox{\makecvheadpicturebox}\fi")
+        add_line(r"  \if@right%")
+        add_line(r"    \usebox{\makecvheadpicturebox}%")
+        add_line(r"    \usebox{\makecvheadnamebox}\fi\\[-.35em]%")
+        add_line(r"  {\color{color2!50}\rule{\textwidth}{.25ex}}%")
+        add_line(r"  \ifthenelse{\equal{\@title}{}}{}{%")
+        add_line(r"    \\[1.25em]\null%")
+        add_line(r"    \if@right\hfill\fi%")
+        add_line(r"    \if@alternate%")
+        add_line(r"      \titlestyle{\MakeLowercase\@title}%")
+        add_line(r"    \else%")
+        add_line(r"      \titlestyle{\@title}\fi%")
+        add_line(r"    }\\[2.5em]%")
+        add_line(r"  \ifthenelse{\isundefined{\@quote}}%")
+        add_line(r"    {}%")
+        add_line(r"    {{\null\hfill%")
+        add_line(r"      \begin{minipage}{\quotewidth}%")
+        add_line(r"        \centering%")
+        add_line(r"        \quotestyle{\@quote}%")
+        add_line(r"      \end{minipage}\hfill\null\\[2.5em]}}%")
+        add_line(r"  \par}")
+        add_line(r"\makeatother")
+
+    footer_links = build_footer_links(profile)
+    if footer_links:
+        footer_separator = r"\enspace"
+        add_line(
+            f"\\newcommand*{{\\cvfooterlinks}}{{{join_latex_fragments(footer_links, separator=footer_separator)}}}"
+        )
+        add_line(r"\makeatletter")
+        add_line(r"\renewcommand*{\makecvfoot}{%")
+        add_line(r"  \recomputecvfootlengths{}%")
+        add_line(r"  \fancypagestyle{plain}{%")
+        add_line(r"    \fancyfoot[c]{%")
+        add_line(r"      \parbox[b]{\footwidth}{%")
+        add_line(r"        \centering%")
+        add_line(r"        \color{color2}\addressfont%")
+        add_line(r"        \vspace{\baselineskip}%")
+        add_line(r"        {\small \cvfooterlinks}%")
+        add_line(r"      }}}%")
+        add_line(r"  \pagestyle{plain}}")
+        add_line(r"\makeatother")
+
+    if PHOTO_FILE.exists():
+        add_line(f"\\photo[64pt][0.4pt]{{{PHOTO_LATEX_PATH}}}")
+    else:
+        add_line(f"% \\photo[64pt][0.4pt]{{{PHOTO_LATEX_PATH}}}")
+
+    add_line()
+    add_line(r"\begin{document}")
+    add_line(r"\makecvtitle")
+
+
+def add_profile_block(add_line, compact_spacing=False):
+    """Add the combined profile summary and interests block."""
+    if not compact_spacing:
+        add_line()
+
+    summary = normalize_spaces(profile.get("summary", ""))
+    interests = format_research_interests(profile.get("research_interests"))
+
+    if summary and interests:
+        add_line(f"{escape_latex(summary)}\\\\")
+        add_line(f"{{\\small {interests}}}")
+    elif summary:
+        add_line(escape_latex(summary))
+    elif interests:
+        add_line(f"{{\\small {interests}}}")
+
+    if summary or interests:
+        add_line()
+
+
+def add_education_section(add_line, degrees, title="Education"):
+    """Add the education section for the provided degree entries."""
+    if not degrees:
+        return
+
+    add_line(f"\\section{{{title}}}")
+
+    for deg in degrees:
         if deg.get("start") and deg.get("end"):
             dates = f"{deg['start']} -- {deg['end']}"
         else:
@@ -860,7 +900,6 @@ if education:
 
         add_line(f"\\cventry{{{dates}}}{{{degree}}}{{{institution}}}{{}}{{}}{{")
 
-        # Order: Honors, Supervisor, Title (each with period)
         details = []
 
         if deg.get("honours"):
@@ -879,11 +918,14 @@ if education:
 
     add_line()
 
-# Professional Experience / Employment
-if employment:
+
+def add_employment_section(add_line):
+    """Add the professional experience section."""
+    if not employment:
+        return
+
     add_line(r"\section{Professional Experience}")
 
-    # Group by category if available
     by_category = {}
     for pos in employment:
         cat = pos.get("category", "Research")
@@ -908,7 +950,6 @@ if employment:
 
             add_line(f"\\cventry{{{{\\small {dates}}}}}{{{position}}}{{{institution}}}{{}}{{}}{{")
 
-            # Supervisor and Team on same line with bold labels and bullet separator
             details = []
 
             if pos.get("supervisor"):
@@ -924,8 +965,12 @@ if employment:
 
     add_line()
 
-# Funding
-if grants:
+
+def add_funding_section(add_line):
+    """Add the funding section."""
+    if not grants:
+        return
+
     add_line(r"\section{Funding}")
 
     for grant in grants:
@@ -969,8 +1014,12 @@ if grants:
 
     add_line()
 
-# Teaching
-if teaching:
+
+def add_teaching_section(add_line):
+    """Add the teaching section."""
+    if not teaching:
+        return
+
     add_line(r"\section{Teaching}")
 
     for course in teaching:
@@ -1016,8 +1065,12 @@ if teaching:
 
     add_line()
 
-# Supervision
-if supervision:
+
+def add_supervision_section(add_line):
+    """Add the supervision section."""
+    if not supervision:
+        return
+
     add_line(r"\section{Supervision}")
 
     for student in supervision:
@@ -1031,7 +1084,9 @@ if supervision:
             period = start or end
 
         level = escape_latex(student.get("level", "")) if student.get("level") else ""
-        institution = escape_latex(student.get("institution", "")) if student.get("institution") else ""
+        institution = (
+            escape_latex(student.get("institution", "")) if student.get("institution") else ""
+        )
         role = normalize_spaces(student.get("role", ""))
         topic = student.get("topic", "")
 
@@ -1050,38 +1105,39 @@ if supervision:
 
     add_line()
 
-# Publications - plain paragraphs at full text width (no ModernCV hint column, no bullet)
-pubs = categorize_publications(publications)
-total_pubs = sum(len(v) for v in pubs.values())
 
-if total_pubs > 0:
+def add_publications_section(add_line, publication_groups):
+    """Add the full publications section."""
+    total_publications = sum(len(items) for items in publication_groups.values())
+    if total_publications <= 0:
+        return
+
     add_line(r"\section{Publications}")
     add_line()
 
-    # Journal Articles
-    if pubs["journal_articles"]:
-        add_line(f"\\subsection{{Journal Articles ({len(pubs['journal_articles'])})}}")
+    if publication_groups["journal_articles"]:
+        add_line(
+            f"\\subsection{{Journal Articles ({len(publication_groups['journal_articles'])})}}"
+        )
         add_line()
-        for pub in pubs["journal_articles"]:
+        for pub in publication_groups["journal_articles"]:
             ref = format_journal_reference(pub)
             add_line(f"{ref}\\par\\medskip")
         add_line()
 
-    # Book Chapters
-    if pubs["book_chapters"]:
-        add_line(f"\\subsection{{Book Chapters ({len(pubs['book_chapters'])})}}")
+    if publication_groups["book_chapters"]:
+        add_line(f"\\subsection{{Book Chapters ({len(publication_groups['book_chapters'])})}}")
         add_line()
-        for pub in pubs["book_chapters"]:
+        for pub in publication_groups["book_chapters"]:
             ref = format_book_chapter_reference(pub)
             add_line(f"{ref}\\par\\medskip")
         add_line()
 
-    # Preprints
-    if pubs["preprints"]:
+    if publication_groups["preprints"]:
         add_line()
-        add_line(f"\\subsection{{Preprints ({len(pubs['preprints'])})}}")
+        add_line(f"\\subsection{{Preprints ({len(publication_groups['preprints'])})}}")
         add_line()
-        for pub in pubs["preprints"]:
+        for pub in publication_groups["preprints"]:
             authors = format_author_list(pub.get("authors", []))
             title = escape_latex(pub.get("title", ""))
             year = pub.get("year", "")
@@ -1090,62 +1146,128 @@ if total_pubs > 0:
             add_line(f"{ref}\\par\\medskip")
         add_line()
 
-    # Conference Presentations
-    conf_total = len(pubs['invited_talks']) + len(pubs['oral_presentations']) + len(pubs['posters'])
-    if conf_total > 0:
-        add_line(f"\\subsection{{Conference Presentations ({conf_total})}}")
+    conference_total = (
+        len(publication_groups["invited_talks"])
+        + len(publication_groups["oral_presentations"])
+        + len(publication_groups["posters"])
+    )
+    if conference_total > 0:
+        add_line(f"\\subsection{{Conference Presentations ({conference_total})}}")
         add_line()
 
-        if pubs["invited_talks"]:
+        if publication_groups["invited_talks"]:
             add_line()
-            add_line(f"\\textbf{{Invited Talks ({len(pubs['invited_talks'])})}}")
+            add_line(f"\\textbf{{Invited Talks ({len(publication_groups['invited_talks'])})}}")
             add_line()
-            for pub in pubs["invited_talks"]:
+            for pub in publication_groups["invited_talks"]:
                 ref = format_conference_reference(pub)
                 add_line(f"{ref}\\par\\medskip")
 
-        if pubs["oral_presentations"]:
+        if publication_groups["oral_presentations"]:
             add_line()
-            add_line(f"\\textbf{{Oral Presentations ({len(pubs['oral_presentations'])})}}")
+            add_line(
+                f"\\textbf{{Oral Presentations ({len(publication_groups['oral_presentations'])})}}"
+            )
             add_line()
-            for pub in pubs["oral_presentations"]:
+            for pub in publication_groups["oral_presentations"]:
                 ref = format_conference_reference(pub)
                 add_line(f"{ref}\\par\\medskip")
 
-        if pubs["posters"]:
+        if publication_groups["posters"]:
             add_line()
-            add_line(f"\\textbf{{Posters ({len(pubs['posters'])})}}")
+            add_line(f"\\textbf{{Posters ({len(publication_groups['posters'])})}}")
             add_line()
-            for pub in pubs["posters"]:
+            for pub in publication_groups["posters"]:
                 ref = format_conference_reference(pub)
                 add_line(f"{ref}\\par\\medskip")
 
         add_line()
 
-    # Other
-    if pubs["other"]:
+    if publication_groups["other"]:
         add_line()
-        add_line(f"\\subsection{{Other Scientific Contributions ({len(pubs['other'])})}}")
+        add_line(
+            f"\\subsection{{Other Scientific Contributions ({len(publication_groups['other'])})}}"
+        )
         add_line()
-        for pub in pubs["other"]:
+        for pub in publication_groups["other"]:
             ref = format_other_scientific_contribution_reference(pub)
             add_line(f"{ref}\\par\\medskip")
         add_line()
 
-# Document end
-add_line(r"\end{document}")
 
-# Write to file
-with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-    f.write("\n".join(latex_lines))
+def add_recent_articles_section(add_line, publication_groups):
+    """Add the short-CV recent peer-reviewed articles section."""
+    recent_articles = select_recent_peer_reviewed_articles(publication_groups)
+    if not recent_articles:
+        return 0
+
+    add_line(r"\section{5 most recent articles}")
+    add_line()
+    for pub in recent_articles:
+        ref = format_journal_reference(pub)
+        add_line(f"{ref}\\par\\medskip")
+    add_line()
+    return len(recent_articles)
+
+
+def render_full_cv(publication_groups):
+    """Render the full CV document."""
+    latex_lines = []
+    add_line = make_add_line(latex_lines)
+
+    add_document_preamble(add_line)
+    add_profile_block(add_line)
+    add_education_section(add_line, education)
+    add_employment_section(add_line)
+    add_funding_section(add_line)
+    add_teaching_section(add_line)
+    add_supervision_section(add_line)
+    add_publications_section(add_line, publication_groups)
+    add_line(r"\end{document}")
+    return latex_lines
+
+
+def render_short_cv(publication_groups):
+    """Render the abbreviated CV document."""
+    latex_lines = []
+    add_line = make_add_line(latex_lines)
+
+    add_document_preamble(add_line)
+    add_profile_block(add_line, compact_spacing=True)
+    add_education_section(add_line, education[:1], title="Highest Degree")
+    add_employment_section(add_line)
+    recent_article_count = add_recent_articles_section(add_line, publication_groups)
+    add_line(r"\end{document}")
+    return latex_lines, recent_article_count
+
+
+def write_latex_file(path, lines):
+    """Write rendered LaTeX lines to disk."""
+    with open(path, "w", encoding="utf-8") as file_obj:
+        file_obj.write("\n".join(lines))
+
+
+pubs = categorize_publications(publications)
+total_pubs = sum(len(v) for v in pubs.values())
+
+full_latex_lines = render_full_cv(pubs)
+short_latex_lines, short_article_count = render_short_cv(pubs)
+
+write_latex_file(OUTPUT_FILE, full_latex_lines)
+write_latex_file(SHORT_OUTPUT_FILE, short_latex_lines)
 
 print(f"Generated {OUTPUT_FILE}")
-print(f"  - Style: casual (blue)")
+print(f"Generated {SHORT_OUTPUT_FILE}")
+print("  - Style: casual (blue)")
 print(f"  - Profile: {profile.get('name')}")
 print(f"  - Photo: {'Present' if PHOTO_FILE.exists() else 'Not found (placeholder commented out)'}")
 print(f"  - Publications: {total_pubs} total")
 print(f"    - Journal articles: {len(pubs['journal_articles'])}")
 print(f"    - Book chapters: {len(pubs['book_chapters'])}")
-print(f"    - Conference presentations: {len(pubs['invited_talks']) + len(pubs['oral_presentations']) + len(pubs['posters'])}")
+print(
+    f"    - Conference presentations: "
+    f"{len(pubs['invited_talks']) + len(pubs['oral_presentations']) + len(pubs['posters'])}"
+)
 print(f"    - Other: {len(pubs['other'])}")
 print(f"    - Preprints: {len(pubs['preprints'])}")
+print(f"  - Short CV recent peer-reviewed articles: {short_article_count}")

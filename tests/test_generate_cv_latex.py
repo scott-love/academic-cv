@@ -6,8 +6,9 @@ from urllib.parse import quote
 
 import yaml
 
-
 ROOT = Path(__file__).resolve().parents[1]
+FULL_OUTPUT_FILE = ROOT / "cv" / "cv.tex"
+SHORT_OUTPUT_FILE = ROOT / "cv" / "cv_short.tex"
 HAL_PROFILE_BASE_URL = "https://cv.hal.science/"
 
 
@@ -47,16 +48,19 @@ def escape_latex_url(url):
     )
 
 
-def test_generator_emits_expected_header_profile_links():
-    output_file = ROOT / "cv" / "cv.tex"
-    original_content = output_file.read_text(encoding="utf-8") if output_file.exists() else None
+def test_generator_emits_expected_header_profile_links_for_full_and_short_cv():
+    original_full_content = (
+        FULL_OUTPUT_FILE.read_text(encoding="utf-8") if FULL_OUTPUT_FILE.exists() else None
+    )
+    original_short_content = (
+        SHORT_OUTPUT_FILE.read_text(encoding="utf-8") if SHORT_OUTPUT_FILE.exists() else None
+    )
     try:
         subprocess.run(
             [sys.executable, str(ROOT / "scripts" / "generate_cv_latex.py")],
             check=True,
             cwd=ROOT,
         )
-        latex = output_file.read_text(encoding="utf-8")
         profile = yaml.safe_load((ROOT / "data" / "profile.yml").read_text(encoding="utf-8")) or {}
 
         expected_parts = []
@@ -76,43 +80,59 @@ def test_generator_emits_expected_header_profile_links():
             homepage_url = (
                 homepage if homepage.startswith(("http://", "https://")) else f"https://{homepage}"
             )
-            expected_parts.append(f"\\href{{{escape_latex_url(homepage_url)}}}{{\\faGlobe\\enspace {escape_latex(homepage)}}}")
+            expected_parts.append(
+                f"\\href{{{escape_latex_url(homepage_url)}}}{{\\faGlobe\\enspace {escape_latex(homepage)}}}"
+            )
 
-        if expected_parts:
-            expected_extrainfo = r"\enspace\textbar\enspace".join(expected_parts)
-            assert f"\\newcommand*{{\\cvheaderlinks}}{{{expected_extrainfo}}}" in latex
-            makecvhead_start = latex.index(r"\renewcommand*{\makecvhead}{%")
-            rule_index = latex.index(r"  {\color{color2!50}\rule{\textwidth}{.25ex}}%", makecvhead_start)
-            header_links_index = latex.index(r"      {\addressfont\color{color2}\cvheaderlinks}}}%", makecvhead_start)
-            assert r"      \\[1em]%" in latex[makecvhead_start:rule_index]
-            assert header_links_index < rule_index
-            assert r"{\raggedleft\addressfont\color{color2}\cvheaderlinks\par}" not in latex
-            assert "\\extrainfo{" not in latex
-            assert "github.com" not in expected_extrainfo
-            assert r"\aiGoogleScholar" not in expected_extrainfo
-        else:
-            assert r"\newcommand*{\cvheaderlinks}{" not in latex
+        expected_header_links = r"\enspace\textbar\enspace".join(expected_parts)
+
+        for output_file in (FULL_OUTPUT_FILE, SHORT_OUTPUT_FILE):
+            latex = output_file.read_text(encoding="utf-8")
+
+            if expected_parts:
+                assert f"\\newcommand*{{\\cvheaderlinks}}{{{expected_header_links}}}" in latex
+                makecvhead_start = latex.index(r"\renewcommand*{\makecvhead}{%")
+                rule_index = latex.index(
+                    r"  {\color{color2!50}\rule{\textwidth}{.25ex}}%", makecvhead_start
+                )
+                header_links_index = latex.index(
+                    r"      {\addressfont\color{color2}\cvheaderlinks}}}%",
+                    makecvhead_start,
+                )
+                assert r"      \\[1em]%" in latex[makecvhead_start:rule_index]
+                assert header_links_index < rule_index
+                assert r"{\raggedleft\addressfont\color{color2}\cvheaderlinks\par}" not in latex
+                assert "\\extrainfo{" not in latex
+                assert "github.com" not in expected_header_links
+                assert r"\aiGoogleScholar" not in expected_header_links
+            else:
+                assert r"\newcommand*{\cvheaderlinks}{" not in latex
     finally:
-        if original_content is None:
-            output_file.unlink(missing_ok=True)
+        if original_full_content is None:
+            FULL_OUTPUT_FILE.unlink(missing_ok=True)
         else:
-            output_file.write_text(original_content, encoding="utf-8")
+            FULL_OUTPUT_FILE.write_text(original_full_content, encoding="utf-8")
+
+        if original_short_content is None:
+            SHORT_OUTPUT_FILE.unlink(missing_ok=True)
+        else:
+            SHORT_OUTPUT_FILE.write_text(original_short_content, encoding="utf-8")
 
 
-def test_generator_emits_icon_only_footer_profile_links():
-    output_file = ROOT / "cv" / "cv.tex"
-    original_content = output_file.read_text(encoding="utf-8") if output_file.exists() else None
+def test_generator_emits_icon_only_footer_profile_links_for_full_and_short_cv():
+    original_full_content = (
+        FULL_OUTPUT_FILE.read_text(encoding="utf-8") if FULL_OUTPUT_FILE.exists() else None
+    )
+    original_short_content = (
+        SHORT_OUTPUT_FILE.read_text(encoding="utf-8") if SHORT_OUTPUT_FILE.exists() else None
+    )
     try:
         subprocess.run(
             [sys.executable, str(ROOT / "scripts" / "generate_cv_latex.py")],
             check=True,
             cwd=ROOT,
         )
-        latex = output_file.read_text(encoding="utf-8")
         profile = yaml.safe_load((ROOT / "data" / "profile.yml").read_text(encoding="utf-8")) or {}
-        footer_links_line = next(
-            line for line in latex.splitlines() if line.startswith(r"\newcommand*{\cvfooterlinks}{")
-        )
 
         expected_parts = []
 
@@ -144,19 +164,35 @@ def test_generator_emits_icon_only_footer_profile_links():
             )
             expected_parts.append(f"\\href{{{escape_latex_url(homepage_url)}}}{{\\faGlobe}}")
 
-        assert r"\usepackage{academicons}" in latex
-        assert r"\usepackage{fontawesome5}" in latex
         expected_footer_links = r" \enspace ".join(expected_parts)
-        assert footer_links_line == f"\\newcommand*{{\\cvfooterlinks}}{{{expected_footer_links}}}"
+
+        for output_file in (FULL_OUTPUT_FILE, SHORT_OUTPUT_FILE):
+            latex = output_file.read_text(encoding="utf-8")
+            footer_links_line = next(
+                line
+                for line in latex.splitlines()
+                if line.startswith(r"\newcommand*{\cvfooterlinks}{")
+            )
+
+            assert r"\usepackage{academicons}" in latex
+            assert r"\usepackage{fontawesome5}" in latex
+            assert (
+                footer_links_line == f"\\newcommand*{{\\cvfooterlinks}}{{{expected_footer_links}}}"
+            )
     finally:
-        if original_content is None:
-            output_file.unlink(missing_ok=True)
+        if original_full_content is None:
+            FULL_OUTPUT_FILE.unlink(missing_ok=True)
         else:
-            output_file.write_text(original_content, encoding="utf-8")
+            FULL_OUTPUT_FILE.write_text(original_full_content, encoding="utf-8")
+
+        if original_short_content is None:
+            SHORT_OUTPUT_FILE.unlink(missing_ok=True)
+        else:
+            SHORT_OUTPUT_FILE.write_text(original_short_content, encoding="utf-8")
 
 
 def test_profile_and_research_interests_render_as_single_heading_free_block():
-    output_file = ROOT / "cv" / "cv.tex"
+    output_file = FULL_OUTPUT_FILE
     profile_file = ROOT / "data" / "profile.yml"
 
     original_output = output_file.read_text(encoding="utf-8") if output_file.exists() else None
@@ -207,7 +243,7 @@ def test_profile_and_research_interests_render_as_single_heading_free_block():
 
 
 def test_publications_abbreviate_and_bold_scott_name():
-    output_file = ROOT / "cv" / "cv.tex"
+    output_file = FULL_OUTPUT_FILE
     original_output = output_file.read_text(encoding="utf-8") if output_file.exists() else None
 
     try:
@@ -229,7 +265,7 @@ def test_publications_abbreviate_and_bold_scott_name():
 
 
 def test_publications_render_other_and_preprints_with_dedup_doi_and_italics():
-    output_file = ROOT / "cv" / "cv.tex"
+    output_file = FULL_OUTPUT_FILE
     publications_file = ROOT / "data" / "publications.json"
     original_output = output_file.read_text(encoding="utf-8") if output_file.exists() else None
     original_publications = publications_file.read_text(encoding="utf-8")
@@ -381,7 +417,7 @@ def test_publications_render_other_and_preprints_with_dedup_doi_and_italics():
 
 
 def test_funding_omit_coordinator_line_when_role_is_coordinator():
-    output_file = ROOT / "cv" / "cv.tex"
+    output_file = FULL_OUTPUT_FILE
     funding_file = ROOT / "data" / "funding.yml"
 
     original_output = output_file.read_text(encoding="utf-8") if output_file.exists() else None
@@ -441,7 +477,7 @@ def test_funding_omit_coordinator_line_when_role_is_coordinator():
 
 
 def test_employment_dates_use_readable_mixed_precision_formatting():
-    output_file = ROOT / "cv" / "cv.tex"
+    output_file = FULL_OUTPUT_FILE
     original_output = output_file.read_text(encoding="utf-8") if output_file.exists() else None
 
     try:
@@ -470,7 +506,7 @@ def test_employment_dates_use_readable_mixed_precision_formatting():
 
 
 def test_supervision_uses_structured_layout_and_optional_fields():
-    output_file = ROOT / "cv" / "cv.tex"
+    output_file = FULL_OUTPUT_FILE
     supervision_file = ROOT / "data" / "supervision.yml"
 
     original_output = output_file.read_text(encoding="utf-8") if output_file.exists() else None
@@ -521,3 +557,202 @@ def test_supervision_uses_structured_layout_and_optional_fields():
             output_file.unlink(missing_ok=True)
         else:
             output_file.write_text(original_output, encoding="utf-8")
+
+
+def test_short_cv_keeps_header_and_employment_but_only_highest_degree_and_recent_articles():
+    full_output = FULL_OUTPUT_FILE
+    short_output = SHORT_OUTPUT_FILE
+    original_full_output = full_output.read_text(encoding="utf-8") if full_output.exists() else None
+    original_short_output = (
+        short_output.read_text(encoding="utf-8") if short_output.exists() else None
+    )
+
+    try:
+        subprocess.run(
+            [sys.executable, str(ROOT / "scripts" / "generate_cv_latex.py")],
+            check=True,
+            cwd=ROOT,
+        )
+        full_latex = full_output.read_text(encoding="utf-8")
+        short_latex = short_output.read_text(encoding="utf-8")
+
+        assert "\\firstname{Scott}" in full_latex
+        assert "\\firstname{Scott}" in short_latex
+        assert "\\familyname{Love}" in full_latex
+        assert "\\familyname{Love}" in short_latex
+        assert "\\makecvtitle" in full_latex
+        assert "\\makecvtitle" in short_latex
+
+        assert "\\section{Education}" in full_latex
+        assert "\\section{Highest Degree}" not in full_latex
+        assert "\\section{Highest Degree}" in short_latex
+        assert "\\section{Education}" not in short_latex
+        assert "PhD in Psychology" in short_latex
+        assert "MSc Research Methods of Psychological Science" not in short_latex
+        assert "MA Social Sciences: Psychology \\& Philosophy" not in short_latex
+
+        full_employment_block = full_latex[
+            full_latex.index("\\section{Professional Experience}") : full_latex.index(
+                "\\section{Funding}"
+            )
+        ]
+        short_employment_block = short_latex[
+            short_latex.index("\\section{Professional Experience}") : short_latex.index(
+                "\\section{5 most recent articles}"
+            )
+        ]
+        assert short_employment_block == full_employment_block
+
+        assert "\\section{Funding}" not in short_latex
+        assert "\\section{Teaching}" not in short_latex
+        assert "\\section{Supervision}" not in short_latex
+        assert "\\section{Publications}" not in short_latex
+        assert "\\section{5 most recent articles}" in short_latex
+        assert short_latex.rstrip().endswith("\\end{document}")
+        assert full_latex.rstrip().endswith("\\end{document}")
+    finally:
+        if original_full_output is None:
+            full_output.unlink(missing_ok=True)
+        else:
+            full_output.write_text(original_full_output, encoding="utf-8")
+
+        if original_short_output is None:
+            short_output.unlink(missing_ok=True)
+        else:
+            short_output.write_text(original_short_output, encoding="utf-8")
+
+
+def test_short_cv_selects_five_newest_peer_reviewed_articles_and_compacts_profile_spacing():
+    full_output = FULL_OUTPUT_FILE
+    short_output = SHORT_OUTPUT_FILE
+    profile_file = ROOT / "data" / "profile.yml"
+    publications_file = ROOT / "data" / "publications.json"
+
+    original_full_output = full_output.read_text(encoding="utf-8") if full_output.exists() else None
+    original_short_output = (
+        short_output.read_text(encoding="utf-8") if short_output.exists() else None
+    )
+    original_profile = profile_file.read_text(encoding="utf-8")
+    original_publications = publications_file.read_text(encoding="utf-8")
+
+    test_profile = yaml.safe_load(original_profile)
+    test_profile["summary"] = "Short summary block."
+
+    test_publications = [
+        {
+            "hal_id": "journal-a",
+            "category": "Journal article",
+            "authors": ["Scott A. Love"],
+            "title": "Newest article",
+            "year": 2026,
+            "journal": "Journal A",
+            "publication_date": "2026-12-31",
+        },
+        {
+            "hal_id": "journal-b",
+            "category": "Journal article",
+            "authors": ["Scott A. Love"],
+            "title": "Second newest article",
+            "year": 2026,
+            "journal": "Journal B",
+            "issued": "2026-01-15",
+        },
+        {
+            "hal_id": "journal-c",
+            "category": "Journal article",
+            "authors": ["Scott A. Love"],
+            "title": "Third newest article",
+            "year": 2025,
+            "journal": "Journal C",
+            "date": "2025-07",
+        },
+        {
+            "hal_id": "journal-d",
+            "category": "Journal article",
+            "authors": ["Scott A. Love"],
+            "title": "Fourth newest article",
+            "year": 2025,
+            "journal": "Journal D",
+        },
+        {
+            "hal_id": "journal-e",
+            "category": "Journal article",
+            "authors": ["Scott A. Love"],
+            "title": "Fifth newest article",
+            "year": 2024,
+            "journal": "Journal E",
+            "publication_date": "2024-11-01",
+        },
+        {
+            "hal_id": "journal-f",
+            "category": "Journal article",
+            "authors": ["Scott A. Love"],
+            "title": "Older article",
+            "year": 2023,
+            "journal": "Journal F",
+            "publication_date": "2023-05-01",
+        },
+        {
+            "hal_id": "book-a",
+            "category": "Book chapter",
+            "authors": ["Scott A. Love"],
+            "title": "Not a journal article",
+            "year": 2027,
+            "book_title": "Collected Volume",
+        },
+    ]
+
+    try:
+        profile_file.write_text(
+            yaml.safe_dump(test_profile, allow_unicode=True, sort_keys=False),
+            encoding="utf-8",
+        )
+        publications_file.write_text(
+            json.dumps(test_publications, indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
+
+        subprocess.run(
+            [sys.executable, str(ROOT / "scripts" / "generate_cv_latex.py")],
+            check=True,
+            cwd=ROOT,
+        )
+
+        full_latex = full_output.read_text(encoding="utf-8")
+        short_latex = short_output.read_text(encoding="utf-8")
+        short_articles_block = short_latex.split("\\section{5 most recent articles}", 1)[1]
+
+        escaped_summary = escape_latex(test_profile["summary"])
+        assert f"\\makecvtitle\n\n{escaped_summary}" in full_latex
+        assert f"\\makecvtitle\n{escaped_summary}" in short_latex
+        assert f"\\makecvtitle\n\n{escaped_summary}" not in short_latex
+
+        expected_titles = [
+            "Newest article",
+            "Second newest article",
+            "Third newest article",
+            "Fourth newest article",
+            "Fifth newest article",
+        ]
+        for title in expected_titles:
+            assert title in short_articles_block
+
+        assert "Older article" not in short_articles_block
+        assert "Not a journal article" not in short_articles_block
+        assert short_articles_block.count("\\par\\medskip") == 5
+
+        title_positions = [short_articles_block.index(title) for title in expected_titles]
+        assert title_positions == sorted(title_positions)
+    finally:
+        profile_file.write_text(original_profile, encoding="utf-8")
+        publications_file.write_text(original_publications, encoding="utf-8")
+
+        if original_full_output is None:
+            full_output.unlink(missing_ok=True)
+        else:
+            full_output.write_text(original_full_output, encoding="utf-8")
+
+        if original_short_output is None:
+            short_output.unlink(missing_ok=True)
+        else:
+            short_output.write_text(original_short_output, encoding="utf-8")

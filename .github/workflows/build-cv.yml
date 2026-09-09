@@ -55,15 +55,17 @@ jobs:
       run: |
         uv run python scripts/fetch_hal.py
     
-    - name: Generate LaTeX CV
+    - name: Generate LaTeX CVs
       run: |
         uv run python scripts/generate_cv_latex.py
     
-    - name: Compile LaTeX to PDF
+    - name: Compile LaTeX to PDFs
       run: |
         cd cv
         xelatex -interaction=nonstopmode -halt-on-error -output-directory=. cv.tex
         xelatex -interaction=nonstopmode -halt-on-error -output-directory=. cv.tex
+        xelatex -interaction=nonstopmode -halt-on-error -output-directory=. cv_short.tex
+        xelatex -interaction=nonstopmode -halt-on-error -output-directory=. cv_short.tex
         cd ..
 
     - name: Commit refreshed publications cache
@@ -82,19 +84,23 @@ jobs:
         git commit -m "Refresh publications cache"
         git push origin "HEAD:${BRANCH_NAME}"
      
-    - name: Upload CV artifact
+    - name: Upload CV artifacts
       uses: actions/upload-artifact@v4
       with:
         name: cv
-        path: cv/cv.pdf
+        path: |
+          cv/cv.pdf
+          cv/cv_short.pdf
         retention-days: 2
 
-    - name: Upload LaTeX log on failure
+    - name: Upload LaTeX logs on failure
       if: failure()
       uses: actions/upload-artifact@v4
       with:
-        name: cv-log
-        path: cv/cv.log
+        name: cv-logs
+        path: |
+          cv/cv.log
+          cv/cv_short.log
         retention-days: 10
 
   release:
@@ -144,10 +150,12 @@ jobs:
         git tag "${TAG}"
         git push origin "refs/tags/${TAG}"
 
-    - name: Create GitHub Release and upload CV asset
+    - name: Create GitHub Release and upload CV assets
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ steps.tag.outputs.tag }}
         name: CV ${{ steps.tag.outputs.tag }}
-        files: cv/cv.pdf
+        files: |
+          cv/cv.pdf
+          cv/cv_short.pdf
         generate_release_notes: true
