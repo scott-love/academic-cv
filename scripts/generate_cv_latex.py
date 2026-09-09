@@ -87,6 +87,7 @@ def escape_latex(text):
     return result
 
 
+
 def escape_latex_url(url):
     """Escape URL characters that can break LaTeX command arguments."""
     if not url:
@@ -101,6 +102,7 @@ def escape_latex_url(url):
     )
 
 
+
 def normalize_homepage_url(homepage):
     """Normalize homepage to an absolute URL."""
     if not homepage:
@@ -110,6 +112,7 @@ def normalize_homepage_url(homepage):
     if homepage.startswith(("http://", "https://")):
         return homepage
     return f"https://{homepage}"
+
 
 
 def normalize_spaces(text):
@@ -135,10 +138,12 @@ MONTH_ABBREVIATIONS = {
 }
 
 
+
 def join_latex_fragments(parts, separator=LATEX_MIDPOINT):
     """Join pre-escaped LaTeX fragments with a LaTeX-safe separator."""
     fragments = [part for part in parts if part]
     return f" {separator} ".join(fragments)
+
 
 
 def format_research_interests(interests):
@@ -151,10 +156,12 @@ def format_research_interests(interests):
     return join_latex_fragments(escaped_interests)
 
 
+
 def role_implies_coordinator(role):
     """Return True when role indicates the person is the coordinator."""
     normalized_role = normalize_spaces(str(role).replace("-", " ").replace("_", " ")).casefold()
     return normalized_role in {"coordinator", "local coordinator"}
+
 
 
 def build_profile_links(profile_data):
@@ -188,6 +195,7 @@ def build_profile_links(profile_data):
     return links
 
 
+
 def is_scott(author):
     """Check if author is Scott A. Love."""
     return author.strip().lower() in {
@@ -195,6 +203,7 @@ def is_scott(author):
         "scott a. love",
         "scott a love",
     }
+
 
 
 def abbreviate_author(author):
@@ -238,6 +247,7 @@ def abbreviate_author(author):
     return f"{surname} {initials}"
 
 
+
 def format_author_list(authors, max_authors=6):
     """
     Format author list with Scott highlighted.
@@ -268,6 +278,7 @@ def format_author_list(authors, max_authors=6):
     return ", ".join(formatted)
 
 
+
 def format_date(date_string):
     """Format YYYY-MM-DD as '19 November 2025'."""
     if not date_string:
@@ -278,6 +289,7 @@ def format_date(date_string):
         return date.strftime("%-d %B %Y")
     except (ValueError, AttributeError):
         return str(date_string)
+
 
 
 def format_conference_dates(pub):
@@ -313,6 +325,7 @@ def format_conference_dates(pub):
         return f"{start}–{end}"
 
 
+
 def format_employment_period_endpoint(value):
     """Format employment period endpoints for the ModernCV hint column."""
     if value is None:
@@ -340,6 +353,7 @@ def format_employment_period_endpoint(value):
     return raw_value
 
 
+
 def format_employment_period(start, end):
     """Format employment date ranges with compact separators."""
     formatted_start = format_employment_period_endpoint(start)
@@ -349,6 +363,7 @@ def format_employment_period(start, end):
         return f"{formatted_start}--{formatted_end}"
 
     return formatted_start or formatted_end
+
 
 
 def format_country(code):
@@ -366,6 +381,7 @@ def format_country(code):
         return None
 
     return countries.get(code.lower(), code.upper())
+
 
 
 def normalize_pages(value):
@@ -397,6 +413,7 @@ def normalize_pages(value):
     return pages
 
 
+
 def sort_publications(items):
     """Sort publications by year (newest first), then by HAL ID."""
     return sorted(
@@ -404,6 +421,7 @@ def sort_publications(items):
         key=lambda p: (p.get("year") or 0, p.get("hal_id") or ""),
         reverse=True,
     )
+
 
 
 def publication_dedup_key(pub):
@@ -417,6 +435,7 @@ def publication_dedup_key(pub):
     return title, authors
 
 
+
 def normalize_person_for_dedup(name):
     """Normalize author names for robust deduplication across HAL variants."""
     normalized_name = normalize_spaces(name)
@@ -428,6 +447,7 @@ def normalize_person_for_dedup(name):
     normalized_name = normalized_name.casefold()
     tokens = re.findall(r"[a-z0-9]+", normalized_name)
     return " ".join(sorted(tokens))
+
 
 
 def normalize_title_for_dedup(title):
@@ -444,6 +464,7 @@ def normalize_title_for_dedup(title):
     return normalize_spaces(normalized_title)
 
 
+
 def is_preprint_publication(pub):
     """Detect explicit and legacy preprint-like HAL records."""
     if pub.get("category") == "Preprint":
@@ -458,12 +479,14 @@ def is_preprint_publication(pub):
     return hal_type == "UNDEFINED" and doi.startswith("10.5281/zenodo.") and not has_structured_venue
 
 
+
 def append_doi(ref, pub):
     """Append DOI hyperlink when a DOI is available."""
     doi_raw = pub.get("doi")
     if doi_raw:
         return f"{ref} \\href{{https://doi.org/{doi_raw}}}{{doi:\\nolinkurl{{{doi_raw}}}}}"
     return ref
+
 
 
 def categorize_publications(publications):
@@ -526,6 +549,7 @@ def categorize_publications(publications):
     }
 
 
+
 def format_journal_reference(pub):
     """Format a journal article reference."""
     authors = format_author_list(pub.get("authors", []))
@@ -539,6 +563,7 @@ def format_journal_reference(pub):
         ref += f" \\textbf{{{journal}}}."
 
     return append_doi(ref, pub)
+
 
 
 def format_book_chapter_reference(pub):
@@ -576,6 +601,7 @@ def format_book_chapter_reference(pub):
     return append_doi(ref, pub)
 
 
+
 def format_conference_reference(pub):
     """Format a conference presentation reference."""
     authors = format_author_list(pub.get("authors", []))
@@ -602,6 +628,22 @@ def format_conference_reference(pub):
 
     if location_parts:
         ref += f" {', '.join(location_parts)}."
+
+    return append_doi(ref, pub)
+
+
+
+def format_other_scientific_contribution_reference(pub):
+    """Format an other scientific contribution reference."""
+    authors = format_author_list(pub.get("authors", []))
+    title = escape_latex(pub.get("title", ""))
+    year = pub.get("year", "")
+
+    ref = f"{authors} ({year}). \\textit{{{title}}}."
+
+    venue = escape_latex(pub.get("journal") or pub.get("source") or pub.get("conference") or "")
+    if venue:
+        ref += f" \\textbf{{{venue}}}."
 
     return append_doi(ref, pub)
 
@@ -951,11 +993,7 @@ if total_pubs > 0:
         add_line(f"\\subsection{{Other Scientific Contributions ({len(pubs['other'])})}}")
         add_line()
         for pub in pubs["other"]:
-            authors = format_author_list(pub.get("authors", []))
-            title = escape_latex(pub.get("title", ""))
-            year = pub.get("year", "")
-            ref = f"{authors} ({year}). \\textit{{{title}}}."
-            ref = append_doi(ref, pub)
+            ref = format_other_scientific_contribution_reference(pub)
             add_line(f"{ref}\\par\\medskip")
         add_line()
 
