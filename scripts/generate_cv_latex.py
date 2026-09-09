@@ -29,6 +29,7 @@ OUTPUT_FILE = CV_DIR / "cv.tex"
 SHORT_OUTPUT_FILE = CV_DIR / "cv_short.tex"
 PHOTO_FILE = CV_DIR / "pictures" / "scott.jpg"
 PHOTO_LATEX_PATH = "pictures/scott"
+HAL_PROFILE_BASE_URL = "https://cv.hal.science/"
 
 # Ensure output directory exists
 CV_DIR.mkdir(parents=True, exist_ok=True)
@@ -96,7 +97,16 @@ def escape_latex_url(url):
 
     normalized = str(url).replace(" ", "%20")
     return (
-        normalized.replace("%", r"\%").replace("#", r"\#").replace("{", r"\{").replace("}", r"\}")
+        normalized.replace("\\", r"\textbackslash{}")
+        .replace("&", r"\&")
+        .replace("%", r"\%")
+        .replace("$", r"\$")
+        .replace("#", r"\#")
+        .replace("_", r"\_")
+        .replace("{", r"\{")
+        .replace("}", r"\}")
+        .replace("~", r"\textasciitilde{}")
+        .replace("^", r"\textasciicircum{}")
     )
 
 
@@ -114,6 +124,26 @@ def normalize_homepage_url(homepage):
 def normalize_spaces(text):
     """Collapse repeated whitespace into single spaces."""
     return " ".join(str(text).split()).strip()
+
+
+def build_identifier_url(base_url, identifier):
+    """Build an escaped profile URL from a base URL and identifier."""
+    if not identifier:
+        return ""
+
+    return f"{base_url}{quote(str(identifier).strip(), safe='')}"
+
+
+def format_profile_link(url, icon_command, label=None):
+    """Format a clickable LaTeX profile link with an icon and optional label."""
+    if not url:
+        return ""
+
+    link_text = icon_command
+    if label:
+        link_text = f"{link_text}\\enspace {escape_latex(label)}"
+
+    return f"\\href{{{escape_latex_url(url)}}}{{{link_text}}}"
 
 
 LATEX_MIDPOINT = r"\textperiodcentered{}"
@@ -162,27 +192,66 @@ def build_profile_links(profile_data):
 
     orcid = str(profile_data.get("orcid", "")).strip()
     if orcid:
-        url = escape_latex_url(f"https://orcid.org/{quote(orcid, safe='')}")
-        label = escape_latex(f"ORCID: {orcid}")
-        links.append(f"\\href{{{url}}}{{{label}}}")
+        links.append(
+            format_profile_link(
+                build_identifier_url("https://orcid.org/", orcid),
+                r"\aiOrcid",
+                orcid,
+            )
+        )
 
     hal = str(profile_data.get("hal", "")).strip()
     if hal:
-        url = escape_latex_url(f"https://hal.science/{quote(hal, safe='')}")
-        label = escape_latex(f"HAL: {hal}")
-        links.append(f"\\href{{{url}}}{{{label}}}")
-
-    github = str(profile_data.get("github", "")).strip()
-    if github:
-        url = escape_latex_url(f"https://github.com/{quote(github, safe='')}")
-        label = escape_latex(f"GitHub: {github}")
-        links.append(f"\\href{{{url}}}{{{label}}}")
+        links.append(
+            format_profile_link(
+                build_identifier_url(HAL_PROFILE_BASE_URL, hal),
+                r"\aiHAL",
+                hal,
+            )
+        )
 
     homepage_raw = str(profile_data.get("homepage", "")).strip()
     if homepage_raw:
-        url = escape_latex_url(normalize_homepage_url(homepage_raw))
-        label = escape_latex(homepage_raw)
-        links.append(f"\\href{{{url}}}{{{label}}}")
+        links.append(
+            format_profile_link(
+                normalize_homepage_url(homepage_raw),
+                r"\faGlobe",
+                homepage_raw,
+            )
+        )
+
+    return links
+
+
+def build_footer_links(profile_data):
+    """Build clickable icon-only profile links for the ModernCV footer."""
+    links = []
+
+    orcid = str(profile_data.get("orcid", "")).strip()
+    if orcid:
+        links.append(
+            format_profile_link(build_identifier_url("https://orcid.org/", orcid), r"\aiOrcid")
+        )
+
+    hal = str(profile_data.get("hal", "")).strip()
+    if hal:
+        links.append(
+            format_profile_link(build_identifier_url(HAL_PROFILE_BASE_URL, hal), r"\aiHAL")
+        )
+
+    google_scholar = str(profile_data.get("google_scholar", "")).strip()
+    if google_scholar:
+        links.append(format_profile_link(google_scholar, r"\aiGoogleScholar"))
+
+    github = str(profile_data.get("github", "")).strip()
+    if github:
+        links.append(
+            format_profile_link(build_identifier_url("https://github.com/", github), r"\faGithub")
+        )
+
+    homepage_raw = str(profile_data.get("homepage", "")).strip()
+    if homepage_raw:
+        links.append(format_profile_link(normalize_homepage_url(homepage_raw), r"\faGlobe"))
 
     return links
 
@@ -689,6 +758,8 @@ def add_document_preamble(add_line):
     add_line(r"\moderncvcolor{blue}")
     add_line(r"\usepackage[utf8]{inputenc}")
     add_line(r"\usepackage[T1]{fontenc}")
+    add_line(r"\usepackage{academicons}")
+    add_line(r"\usepackage{fontawesome5}")
     add_line(r"\usepackage[scale=.84]{geometry}")
     add_line(r"\setlength{\hintscolumnwidth}{2.5cm}")
     add_line()
@@ -702,7 +773,81 @@ def add_document_preamble(add_line):
     profile_links = build_profile_links(profile)
     if profile_links:
         links_separator = r"\enspace\textbar\enspace"
-        add_line(f"\\extrainfo{{{links_separator.join(profile_links)}}}")
+        add_line(f"\\newcommand*{{\\cvheaderlinks}}{{{links_separator.join(profile_links)}}}")
+        add_line(r"\makeatletter")
+        add_line(r"\renewcommand*{\makecvhead}{%")
+        add_line(r"  \recomputecvlengths%")
+        add_line(r"  \@initializebox{\makecvheadpicturebox}%")
+        add_line(r"  \savebox{\makecvheadpicturebox}{%")
+        add_line(r"    \ifthenelse{\isundefined{\@photo}}%")
+        add_line(r"      {}%")
+        add_line(r"      {%")
+        add_line(r"       \setlength\fboxrule{\@photoframewidth}%")
+        add_line(r"       \ifdim\@photoframewidth=0pt%")
+        add_line(r"         \setlength{\fboxsep}{0pt}\fi%")
+        add_line(
+            r"       {\color{color1}\framebox{\includegraphics[width=\@photowidth]{\@photo}}}}}%"
+        )
+        add_line(r"  \@initializelength{\makecvheadpicturewidth}%")
+        add_line(r"  \settowidth{\makecvheadpicturewidth}{\usebox{\makecvheadpicturebox}}%")
+        add_line(r"  \@initializebox{\makecvheadnamebox}%")
+        add_line(r"  \savebox{\makecvheadnamebox}{%")
+        add_line(r"    \parbox[b]{\textwidth-\makecvheadpicturewidth}{%")
+        add_line(r"      \if@left\raggedright\fi%")
+        add_line(r"      \if@right\raggedleft\fi%")
+        add_line(r"      {\namefont%")
+        add_line(r"      \if@alternate%")
+        add_line(
+            r"        {\color{color2!50}\MakeLowercase\@firstname}{\color{color2}\MakeLowercase\@lastname}%"
+        )
+        add_line(r"      \else%")
+        add_line(r"        {\color{color2!50}\@firstname} {\color{color2}\@lastname}\fi}%")
+        add_line(r"      \\[1em]%")
+        add_line(r"      {\addressfont\color{color2}\cvheaderlinks}}}%")
+        add_line(r"  \if@left%")
+        add_line(r"    \usebox{\makecvheadnamebox}%")
+        add_line(r"    \usebox{\makecvheadpicturebox}\fi")
+        add_line(r"  \if@right%")
+        add_line(r"    \usebox{\makecvheadpicturebox}%")
+        add_line(r"    \usebox{\makecvheadnamebox}\fi\\[-.35em]%")
+        add_line(r"  {\color{color2!50}\rule{\textwidth}{.25ex}}%")
+        add_line(r"  \ifthenelse{\equal{\@title}{}}{}{%")
+        add_line(r"    \\[1.25em]\null%")
+        add_line(r"    \if@right\hfill\fi%")
+        add_line(r"    \if@alternate%")
+        add_line(r"      \titlestyle{\MakeLowercase\@title}%")
+        add_line(r"    \else%")
+        add_line(r"      \titlestyle{\@title}\fi%")
+        add_line(r"    }\\[2.5em]%")
+        add_line(r"  \ifthenelse{\isundefined{\@quote}}%")
+        add_line(r"    {}%")
+        add_line(r"    {{\null\hfill%")
+        add_line(r"      \begin{minipage}{\quotewidth}%")
+        add_line(r"        \centering%")
+        add_line(r"        \quotestyle{\@quote}%")
+        add_line(r"      \end{minipage}\hfill\null\\[2.5em]}}%")
+        add_line(r"  \par}")
+        add_line(r"\makeatother")
+
+    footer_links = build_footer_links(profile)
+    if footer_links:
+        footer_separator = r"\enspace"
+        add_line(
+            f"\\newcommand*{{\\cvfooterlinks}}{{{join_latex_fragments(footer_links, separator=footer_separator)}}}"
+        )
+        add_line(r"\makeatletter")
+        add_line(r"\renewcommand*{\makecvfoot}{%")
+        add_line(r"  \recomputecvfootlengths{}%")
+        add_line(r"  \fancypagestyle{plain}{%")
+        add_line(r"    \fancyfoot[c]{%")
+        add_line(r"      \parbox[b]{\footwidth}{%")
+        add_line(r"        \centering%")
+        add_line(r"        \color{color2}\addressfont%")
+        add_line(r"        \vspace{\baselineskip}%")
+        add_line(r"        {\small \cvfooterlinks}%")
+        add_line(r"      }}}%")
+        add_line(r"  \pagestyle{plain}}")
+        add_line(r"\makeatother")
 
     if PHOTO_FILE.exists():
         add_line(f"\\photo[64pt][0.4pt]{{{PHOTO_LATEX_PATH}}}")

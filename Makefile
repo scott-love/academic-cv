@@ -7,7 +7,7 @@ help:
 	@echo "  make sync                - Install Python dependencies"
 	@echo "  make fetch-publications  - Fetch publications from HAL"
 	@echo "  make generate-latex      - Generate LaTeX CV from data"
-	@echo "  make render              - Compile LaTeX to PDF"
+	@echo "  make render              - Compile LaTeX to PDF with xelatex"
 	@echo "  make render-short        - Compile the short LaTeX CV to PDF"
 	@echo "  make render-all          - Compile both LaTeX CV PDFs"
 	@echo "  make build               - Full pipeline: sync, fetch, generate, render"
@@ -28,15 +28,15 @@ generate-latex: sync
 
 render: generate-latex
 	@echo "Compiling LaTeX to PDF..."
-	cd cv && pdflatex -interaction=nonstopmode cv.tex && cd ..
+	cd cv && xelatex -interaction=nonstopmode cv.tex && cd ..
 
 render-short: generate-latex
 	@echo "Compiling short LaTeX CV to PDF..."
-	cd cv && pdflatex -interaction=nonstopmode cv_short.tex && cd ..
+	cd cv && xelatex -interaction=nonstopmode cv_short.tex && cd ..
 
 render-all: generate-latex
 	@echo "Compiling both LaTeX CV PDFs..."
-	cd cv && pdflatex -interaction=nonstopmode cv.tex && pdflatex -interaction=nonstopmode cv_short.tex && cd ..
+	cd cv && xelatex -interaction=nonstopmode cv.tex && xelatex -interaction=nonstopmode cv_short.tex && cd ..
 
 build: sync fetch-publications render
 	@echo "\n✓ CV build complete!"

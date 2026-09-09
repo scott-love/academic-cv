@@ -28,9 +28,9 @@ echo ""
 echo "[4/4] Compiling LaTeX to PDFs..."
 cd "$CD_DIR"
 
-# Run pdflatex with nonstopmode to compile even if there are errors
-pdflatex -interaction=nonstopmode -output-directory=. cv.tex
-pdflatex -interaction=nonstopmode -output-directory=. cv_short.tex
+# Run xelatex with nonstopmode to compile even if there are errors
+xelatex -interaction=nonstopmode -output-directory=. cv.tex
+xelatex -interaction=nonstopmode -output-directory=. cv_short.tex
 
 echo ""
 echo "================================================"

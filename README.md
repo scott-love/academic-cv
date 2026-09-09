@@ -17,11 +17,12 @@ Publications are refreshed from HAL, the CV content is assembled into ModernCV-f
 
 - Python 3.10+
 - [`uv`](https://docs.astral.sh/uv/)
-- TeX Live with `pdflatex` available on `PATH`
+- TeX Live with `xelatex` available on `PATH`
   - On Debian/Ubuntu, the GitHub workflow installs:
     - `texlive-latex-base`
     - `texlive-latex-extra`
     - `texlive-fonts-extra`
+    - `texlive-xetex`
 
 ## Local build
 
@@ -42,7 +43,7 @@ Available Makefile targets:
 - `make sync` — install Python dependencies with `uv sync`
 - `make fetch-publications` — refresh `data/publications.json` from HAL
 - `make generate-latex` — regenerate `cv/cv.tex` and `cv/cv_short.tex`
-- `make render` — compile `cv/cv.tex` to `cv/cv.pdf`
+- `make render` — compile `cv/cv.tex` to `cv/cv.pdf` with `xelatex`
 - `make render-short` — compile `cv/cv_short.tex` to `cv/cv_short.pdf`
 - `make render-all` — compile both LaTeX outputs to PDFs
 - `make build` — run the full pipeline
@@ -92,7 +93,7 @@ The workflow:
 1. Checks out the repository
 2. Sets up Python 3.10
 3. Installs `uv`
-4. Installs TeX Live / `pdflatex`
+4. Installs TeX Live / `xelatex`
 5. Runs `uv sync`
 6. Refreshes HAL publications
 7. Regenerates `cv/cv.tex` and `cv/cv_short.tex`
@@ -179,14 +180,14 @@ Compile locally and inspect the logs:
 
 ```bash
 cd cv
-pdflatex -interaction=nonstopmode -halt-on-error -output-directory=. cv.tex
-pdflatex -interaction=nonstopmode -halt-on-error -output-directory=. cv_short.tex
+xelatex -interaction=nonstopmode -halt-on-error -output-directory=. cv.tex
+xelatex -interaction=nonstopmode -halt-on-error -output-directory=. cv_short.tex
 ```
 
 Common checks:
 
 - Review `cv/cv.log` for the first LaTeX error.
-- Confirm `pdflatex` is installed and on `PATH`.
+- Confirm `xelatex` is installed and on `PATH`.
 - Re-run `make fetch-publications` if `data/publications.json` is stale.
 - Check the GitHub Actions log for the `Fetch publications from HAL` step if the
   cache is not refreshing; the build currently talks to the official HAL API at

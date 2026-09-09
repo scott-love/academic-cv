@@ -20,8 +20,8 @@ uv run python scripts/generate_cv_latex.py
 echo ""
 echo "[3/3] Compiling PDFs..."
 cd "$CD_DIR"
-pdflatex -interaction=nonstopmode -output-directory=. cv.tex
-pdflatex -interaction=nonstopmode -output-directory=. cv_short.tex
+xelatex -interaction=nonstopmode -output-directory=. cv.tex
+xelatex -interaction=nonstopmode -output-directory=. cv_short.tex
 
 echo ""
 echo "✓ CVs updated!"
