@@ -44,7 +44,8 @@ jobs:
         sudo apt-get install -y \
           texlive-latex-base \
           texlive-latex-extra \
-          texlive-fonts-extra
+          texlive-fonts-extra \
+          texlive-xetex
     
     - name: Install Python dependencies
       run: |
@@ -61,8 +62,8 @@ jobs:
     - name: Compile LaTeX to PDF
       run: |
         cd cv
-        pdflatex -interaction=nonstopmode -halt-on-error -output-directory=. cv.tex
-        pdflatex -interaction=nonstopmode -halt-on-error -output-directory=. cv.tex
+        xelatex -interaction=nonstopmode -halt-on-error -output-directory=. cv.tex
+        xelatex -interaction=nonstopmode -halt-on-error -output-directory=. cv.tex
         cd ..
 
     - name: Commit refreshed publications cache

@@ -8,6 +8,7 @@ import yaml
 
 
 ROOT = Path(__file__).resolve().parents[1]
+HAL_PROFILE_BASE_URL = "https://cv.hal.science/"
 
 
 def escape_latex(text):
@@ -33,14 +34,20 @@ def escape_latex_url(url):
     return (
         str(url)
         .replace(" ", "%20")
+        .replace("\\", r"\textbackslash{}")
+        .replace("&", r"\&")
         .replace("%", r"\%")
+        .replace("$", r"\$")
         .replace("#", r"\#")
+        .replace("_", r"\_")
         .replace("{", r"\{")
         .replace("}", r"\}")
+        .replace("~", r"\textasciitilde{}")
+        .replace("^", r"\textasciicircum{}")
     )
 
 
-def test_generator_emits_clickable_profile_links_in_extrainfo():
+def test_generator_emits_expected_header_profile_links():
     output_file = ROOT / "cv" / "cv.tex"
     original_content = output_file.read_text(encoding="utf-8") if output_file.exists() else None
     try:
@@ -57,33 +64,90 @@ def test_generator_emits_clickable_profile_links_in_extrainfo():
         orcid = str(profile.get("orcid", "")).strip()
         if orcid:
             url = escape_latex_url(f"https://orcid.org/{quote(orcid, safe='')}")
-            expected_parts.append(f"\\href{{{url}}}{{{escape_latex(f'ORCID: {orcid}')}}}")
+            expected_parts.append(f"\\href{{{url}}}{{\\aiOrcid\\enspace {escape_latex(orcid)}}}")
 
         hal = str(profile.get("hal", "")).strip()
         if hal:
-            url = escape_latex_url(f"https://hal.science/{quote(hal, safe='')}")
-            expected_parts.append(f"\\href{{{url}}}{{{escape_latex(f'HAL: {hal}')}}}")
-
-        github = str(profile.get("github", "")).strip()
-        if github:
-            url = escape_latex_url(f"https://github.com/{quote(github, safe='')}")
-            expected_parts.append(f"\\href{{{url}}}{{{escape_latex(f'GitHub: {github}')}}}")
+            url = escape_latex_url(f"{HAL_PROFILE_BASE_URL}{quote(hal, safe='')}")
+            expected_parts.append(f"\\href{{{url}}}{{\\aiHAL\\enspace {escape_latex(hal)}}}")
 
         homepage = str(profile.get("homepage", "")).strip()
         if homepage:
             homepage_url = (
                 homepage if homepage.startswith(("http://", "https://")) else f"https://{homepage}"
             )
-            expected_parts.append(
-                f"\\href{{{escape_latex_url(homepage_url)}}}{{{escape_latex(homepage)}}}"
-            )
+            expected_parts.append(f"\\href{{{escape_latex_url(homepage_url)}}}{{\\faGlobe\\enspace {escape_latex(homepage)}}}")
 
         if expected_parts:
-            assert "\\extrainfo{" in latex
-            for part in expected_parts:
-                assert part in latex
-        else:
+            expected_extrainfo = r"\enspace\textbar\enspace".join(expected_parts)
+            assert f"\\newcommand*{{\\cvheaderlinks}}{{{expected_extrainfo}}}" in latex
+            makecvhead_start = latex.index(r"\renewcommand*{\makecvhead}{%")
+            rule_index = latex.index(r"  {\color{color2!50}\rule{\textwidth}{.25ex}}%", makecvhead_start)
+            header_links_index = latex.index(r"      {\addressfont\color{color2}\cvheaderlinks}}}%", makecvhead_start)
+            assert r"      \\[1em]%" in latex[makecvhead_start:rule_index]
+            assert header_links_index < rule_index
+            assert r"{\raggedleft\addressfont\color{color2}\cvheaderlinks\par}" not in latex
             assert "\\extrainfo{" not in latex
+            assert "github.com" not in expected_extrainfo
+            assert r"\aiGoogleScholar" not in expected_extrainfo
+        else:
+            assert r"\newcommand*{\cvheaderlinks}{" not in latex
+    finally:
+        if original_content is None:
+            output_file.unlink(missing_ok=True)
+        else:
+            output_file.write_text(original_content, encoding="utf-8")
+
+
+def test_generator_emits_icon_only_footer_profile_links():
+    output_file = ROOT / "cv" / "cv.tex"
+    original_content = output_file.read_text(encoding="utf-8") if output_file.exists() else None
+    try:
+        subprocess.run(
+            [sys.executable, str(ROOT / "scripts" / "generate_cv_latex.py")],
+            check=True,
+            cwd=ROOT,
+        )
+        latex = output_file.read_text(encoding="utf-8")
+        profile = yaml.safe_load((ROOT / "data" / "profile.yml").read_text(encoding="utf-8")) or {}
+        footer_links_line = next(
+            line for line in latex.splitlines() if line.startswith(r"\newcommand*{\cvfooterlinks}{")
+        )
+
+        expected_parts = []
+
+        orcid = str(profile.get("orcid", "")).strip()
+        if orcid:
+            orcid_url = escape_latex_url(f"https://orcid.org/{quote(orcid, safe='')}")
+            expected_parts.append(f"\\href{{{orcid_url}}}{{\\aiOrcid}}")
+
+        hal = str(profile.get("hal", "")).strip()
+        if hal:
+            hal_url = escape_latex_url(f"{HAL_PROFILE_BASE_URL}{quote(hal, safe='')}")
+            expected_parts.append(f"\\href{{{hal_url}}}{{\\aiHAL}}")
+
+        google_scholar = str(profile.get("google_scholar", "")).strip()
+        if google_scholar:
+            expected_parts.append(
+                f"\\href{{{escape_latex_url(google_scholar)}}}{{\\aiGoogleScholar}}"
+            )
+
+        github = str(profile.get("github", "")).strip()
+        if github:
+            github_url = escape_latex_url(f"https://github.com/{quote(github, safe='')}")
+            expected_parts.append(f"\\href{{{github_url}}}{{\\faGithub}}")
+
+        homepage = str(profile.get("homepage", "")).strip()
+        if homepage:
+            homepage_url = (
+                homepage if homepage.startswith(("http://", "https://")) else f"https://{homepage}"
+            )
+            expected_parts.append(f"\\href{{{escape_latex_url(homepage_url)}}}{{\\faGlobe}}")
+
+        assert r"\usepackage{academicons}" in latex
+        assert r"\usepackage{fontawesome5}" in latex
+        expected_footer_links = r" \enspace ".join(expected_parts)
+        assert footer_links_line == f"\\newcommand*{{\\cvfooterlinks}}{{{expected_footer_links}}}"
     finally:
         if original_content is None:
             output_file.unlink(missing_ok=True)
