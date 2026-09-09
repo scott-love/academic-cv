@@ -95,10 +95,16 @@ def escape_latex_url(url):
 
     normalized = str(url).replace(" ", "%20")
     return (
-        normalized.replace("%", r"\%")
+        normalized.replace("\\", r"\textbackslash{}")
+        .replace("&", r"\&")
+        .replace("%", r"\%")
+        .replace("$", r"\$")
         .replace("#", r"\#")
+        .replace("_", r"\_")
         .replace("{", r"\{")
         .replace("}", r"\}")
+        .replace("~", r"\textasciitilde{}")
+        .replace("^", r"\textasciicircum{}")
     )
 
 
@@ -118,6 +124,29 @@ def normalize_homepage_url(homepage):
 def normalize_spaces(text):
     """Collapse repeated whitespace into single spaces."""
     return " ".join(str(text).split()).strip()
+
+
+
+def build_identifier_url(base_url, identifier):
+    """Build an escaped profile URL from a base URL and identifier."""
+    if not identifier:
+        return ""
+
+    return f"{base_url}{quote(str(identifier).strip(), safe='')}"
+
+
+
+def format_profile_link(url, icon_command, label=None):
+    """Format a clickable LaTeX profile link with an icon and optional label."""
+    if not url:
+        return ""
+
+    link_text = icon_command
+    if label:
+        link_text = f"{link_text}\\enspace {escape_latex(label)}"
+
+    return f"\\href{{{escape_latex_url(url)}}}{{{link_text}}}"
+
 
 
 LATEX_MIDPOINT = r"\textperiodcentered{}"
@@ -170,27 +199,63 @@ def build_profile_links(profile_data):
 
     orcid = str(profile_data.get("orcid", "")).strip()
     if orcid:
-        url = escape_latex_url(f"https://orcid.org/{quote(orcid, safe='')}")
-        label = escape_latex(f"ORCID: {orcid}")
-        links.append(f"\\href{{{url}}}{{{label}}}")
+        links.append(
+            format_profile_link(
+                build_identifier_url("https://orcid.org/", orcid),
+                r"\aiOrcid",
+                orcid,
+            )
+        )
 
     hal = str(profile_data.get("hal", "")).strip()
     if hal:
-        url = escape_latex_url(f"https://hal.science/{quote(hal, safe='')}")
-        label = escape_latex(f"HAL: {hal}")
-        links.append(f"\\href{{{url}}}{{{label}}}")
-
-    github = str(profile_data.get("github", "")).strip()
-    if github:
-        url = escape_latex_url(f"https://github.com/{quote(github, safe='')}")
-        label = escape_latex(f"GitHub: {github}")
-        links.append(f"\\href{{{url}}}{{{label}}}")
+        links.append(
+            format_profile_link(
+                build_identifier_url("https://hal.science/", hal),
+                r"\aiHAL",
+                hal,
+            )
+        )
 
     homepage_raw = str(profile_data.get("homepage", "")).strip()
     if homepage_raw:
-        url = escape_latex_url(normalize_homepage_url(homepage_raw))
-        label = escape_latex(homepage_raw)
-        links.append(f"\\href{{{url}}}{{{label}}}")
+        links.append(
+            format_profile_link(
+                normalize_homepage_url(homepage_raw),
+                r"\faGlobe",
+                homepage_raw,
+            )
+        )
+
+    return links
+
+
+
+def build_footer_links(profile_data):
+    """Build clickable icon-only profile links for the ModernCV footer."""
+    links = []
+
+    orcid = str(profile_data.get("orcid", "")).strip()
+    if orcid:
+        links.append(format_profile_link(build_identifier_url("https://orcid.org/", orcid), r"\aiOrcid"))
+
+    hal = str(profile_data.get("hal", "")).strip()
+    if hal:
+        links.append(format_profile_link(build_identifier_url("https://hal.science/", hal), r"\aiHAL"))
+
+    google_scholar = str(profile_data.get("google_scholar", "")).strip()
+    if google_scholar:
+        links.append(format_profile_link(google_scholar, r"\aiGoogleScholar"))
+
+    github = str(profile_data.get("github", "")).strip()
+    if github:
+        links.append(
+            format_profile_link(build_identifier_url("https://github.com/", github), r"\faGithub")
+        )
+
+    homepage_raw = str(profile_data.get("homepage", "")).strip()
+    if homepage_raw:
+        links.append(format_profile_link(normalize_homepage_url(homepage_raw), r"\faGlobe"))
 
     return links
 
@@ -666,6 +731,8 @@ add_line(r"\moderncvstyle{casual}")
 add_line(r"\moderncvcolor{blue}")
 add_line(r"\usepackage[utf8]{inputenc}")
 add_line(r"\usepackage[T1]{fontenc}")
+add_line(r"\usepackage{academicons}")
+add_line(r"\usepackage{fontawesome5}")
 add_line(r"\usepackage[scale=.84]{geometry}")
 add_line(r"\setlength{\hintscolumnwidth}{2.5cm}")
 add_line()
@@ -680,6 +747,23 @@ add_line(f"\\familyname{{{escape_latex(lastname)}}}")
 profile_links = build_profile_links(profile)
 if profile_links:
     add_line(f"\\extrainfo{{{r'\enspace\textbar\enspace'.join(profile_links)}}}")
+
+footer_links = build_footer_links(profile)
+if footer_links:
+    add_line(f"\\newcommand*{{\\cvfooterlinks}}{{{join_latex_fragments(footer_links, separator=r'\enspace')}}}")
+    add_line(r"\makeatletter")
+    add_line(r"\renewcommand*{\makecvfoot}{%")
+    add_line(r"  \recomputecvfootlengths{}%")
+    add_line(r"  \fancypagestyle{plain}{%")
+    add_line(r"    \fancyfoot[c]{%")
+    add_line(r"      \parbox[b]{\footwidth}{%")
+    add_line(r"        \centering%")
+    add_line(r"        \color{color2}\addressfont%")
+    add_line(r"        \vspace{\baselineskip}%")
+    add_line(r"        {\small \cvfooterlinks}%")
+    add_line(r"      }}}%")
+    add_line(r"  \pagestyle{plain}}")
+    add_line(r"\makeatother")
 
 # Optional: photo
 if PHOTO_FILE.exists():
