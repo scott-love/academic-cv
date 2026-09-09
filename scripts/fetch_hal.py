@@ -87,7 +87,16 @@ def is_peer_reviewed(value):
     return str(value).strip().lower() in {"1", "true", "yes"}
 
 
-def classify_document(doc_type, invited, peer_reviewed):
+def classify_document(
+    doc_type,
+    invited,
+    peer_reviewed,
+    *,
+    doi=None,
+    journal=None,
+    conference=None,
+    book_title=None,
+):
     """
     Map HAL document types onto CV categories.
 
@@ -135,6 +144,18 @@ def classify_document(doc_type, invited, peer_reviewed):
             "category": "Preprint",
             "presentation_type": None,
         }
+
+    if doc_type == "UNDEFINED":
+        doi_value = str(doi or "").strip().lower()
+        has_structured_venue = any(
+            str(value or "").strip()
+            for value in (journal, conference, book_title)
+        )
+        if doi_value.startswith("10.5281/zenodo.") and not has_structured_venue:
+            return {
+                "category": "Preprint",
+                "presentation_type": None,
+            }
 
     return {
         "category": "Other scientific contribution",
@@ -264,6 +285,10 @@ def main(
             doc_type,
             invited,
             peer_reviewed,
+            doi=first_value(doc.get("doiId_s")),
+            journal=first_value(doc.get("journalTitle_s")),
+            conference=first_value(doc.get("conferenceTitle_s")),
+            book_title=first_value(doc.get("bookTitle_s")),
         )
         if classification is None:
             continue

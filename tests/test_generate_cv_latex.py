@@ -188,6 +188,14 @@ def test_publications_render_other_and_preprints_with_dedup_doi_and_italics():
             "year": 2025,
         },
         {
+            "hal_id": "hal-book",
+            "category": "Book chapter",
+            "authors": ["Scott A. Love"],
+            "title": "Book chapter entry",
+            "year": 2025,
+            "book_title": "Collected Works",
+        },
+        {
             "hal_id": "hal-other",
             "category": "Other scientific contribution",
             "authors": ["Scott A. Love", "Marie Curie"],
@@ -198,7 +206,7 @@ def test_publications_render_other_and_preprints_with_dedup_doi_and_italics():
         {
             "hal_id": "hal-preprint-duplicate",
             "category": "Preprint",
-            "authors": ["Scott A. Love", "Marie Curie"],
+            "authors": ["Scott A Love", "Marie Curie"],
             "title": "Published contribution",
             "year": 2027,
             "doi": "10.1000/preprint-duplicate",
@@ -210,6 +218,24 @@ def test_publications_render_other_and_preprints_with_dedup_doi_and_italics():
             "title": "Standalone preprint",
             "year": 2027,
             "doi": "10.1000/preprint-unique",
+        },
+        {
+            "hal_id": "hal-legacy-preprint-duplicate",
+            "hal_type": "UNDEFINED",
+            "category": "Other scientific contribution",
+            "authors": ["Scott A Love", "Marie Curie"],
+            "title": "Published contribution",
+            "year": 2022,
+            "doi": "10.5281/zenodo.10000001",
+        },
+        {
+            "hal_id": "hal-legacy-preprint-unique",
+            "hal_type": "UNDEFINED",
+            "category": "Other scientific contribution",
+            "authors": ["Scott A. Love", "Jane Roe"],
+            "title": "Legacy standalone preprint",
+            "year": 2021,
+            "doi": "10.5281/zenodo.10000002",
         },
     ]
 
@@ -228,8 +254,9 @@ def test_publications_render_other_and_preprints_with_dedup_doi_and_italics():
         latex = output_file.read_text(encoding="utf-8")
 
         assert "\\subsection{Journal Articles (1)}" in latex
+        assert "\\subsection{Book Chapters (1)}" in latex
         assert "\\subsection{Other Scientific Contributions (1)}" in latex
-        assert "\\subsection{Preprints (1)}" in latex
+        assert "\\subsection{Preprints (2)}" in latex
         assert "\\subsection{Reports" not in latex
         assert "Report entry" not in latex
         assert "Published contribution" in latex
@@ -240,7 +267,13 @@ def test_publications_render_other_and_preprints_with_dedup_doi_and_italics():
         assert "\\textit{Standalone preprint}" in latex
         assert "\\textbf{Standalone preprint}" not in latex
         assert "10.1000/preprint-unique" in latex
+        assert "Legacy standalone preprint" in latex
+        assert "10.5281/zenodo.10000002" in latex
         assert "10.1000/preprint-duplicate" not in latex
+        assert "10.5281/zenodo.10000001" not in latex
+        assert latex.index("\\subsection{Book Chapters (1)}") < latex.index(
+            "\\subsection{Preprints (2)}"
+        )
         assert "Reports:" not in result.stdout
     finally:
         publications_file.write_text(original_publications, encoding="utf-8")

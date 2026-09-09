@@ -11,6 +11,7 @@ This script:
 
 import json
 import re
+import unicodedata
 from pathlib import Path
 from datetime import datetime
 from urllib.parse import quote
@@ -409,11 +410,38 @@ def publication_dedup_key(pub):
     """Build deduplication key from title + ordered author list."""
     title = normalize_spaces(pub.get("title", "")).casefold()
     authors = tuple(
-        normalize_spaces(author).casefold()
+        normalize_person_for_dedup(author)
         for author in pub.get("authors", [])
-        if normalize_spaces(author)
+        if normalize_person_for_dedup(author)
     )
     return title, authors
+
+
+def normalize_person_for_dedup(name):
+    """Normalize author names for robust deduplication across HAL variants."""
+    normalized_name = normalize_spaces(name)
+    if not normalized_name:
+        return ""
+
+    normalized_name = unicodedata.normalize("NFKD", normalized_name)
+    normalized_name = normalized_name.encode("ascii", "ignore").decode("ascii")
+    normalized_name = normalized_name.casefold()
+    tokens = re.findall(r"[a-z0-9]+", normalized_name)
+    return " ".join(sorted(tokens))
+
+
+def is_preprint_publication(pub):
+    """Detect explicit and legacy preprint-like HAL records."""
+    if pub.get("category") == "Preprint":
+        return True
+
+    hal_type = (pub.get("hal_type") or "").strip().upper()
+    doi = normalize_spaces(pub.get("doi", "")).casefold()
+    has_structured_venue = any(
+        normalize_spaces(pub.get(field) or "")
+        for field in ("journal", "conference", "book_title")
+    )
+    return hal_type == "UNDEFINED" and doi.startswith("10.5281/zenodo.") and not has_structured_venue
 
 
 def append_doi(ref, pub):
@@ -457,18 +485,19 @@ def categorize_publications(publications):
     ]
 
     other = [
-        p for p in publications
-        if p.get("category") == "Other scientific contribution"
+        p
+        for p in publications
+        if p.get("category") == "Other scientific contribution" and not is_preprint_publication(p)
     ]
 
     non_preprint_keys = {
         publication_dedup_key(p)
         for p in publications
-        if p.get("category") != "Preprint"
+        if not is_preprint_publication(p)
     }
     preprints = [
         p for p in publications
-        if p.get("category") == "Preprint"
+        if is_preprint_publication(p)
         and publication_dedup_key(p) not in non_preprint_keys
     ]
 
@@ -856,6 +885,20 @@ if total_pubs > 0:
             add_line(f"{ref}\\par\\medskip")
         add_line()
 
+    # Preprints
+    if pubs["preprints"]:
+        add_line()
+        add_line(f"\\subsection{{Preprints ({len(pubs['preprints'])})}}")
+        add_line()
+        for pub in pubs["preprints"]:
+            authors = format_author_list(pub.get("authors", []))
+            title = escape_latex(pub.get("title", ""))
+            year = pub.get("year", "")
+            ref = f"{authors} ({year}). \\textit{{{title}}}."
+            ref = append_doi(ref, pub)
+            add_line(f"{ref}\\par\\medskip")
+        add_line()
+
     # Conference Presentations
     conf_total = len(pubs['invited_talks']) + len(pubs['oral_presentations']) + len(pubs['posters'])
     if conf_total > 0:
@@ -894,20 +937,6 @@ if total_pubs > 0:
         add_line(f"\\subsection{{Other Scientific Contributions ({len(pubs['other'])})}}")
         add_line()
         for pub in pubs["other"]:
-            authors = format_author_list(pub.get("authors", []))
-            title = escape_latex(pub.get("title", ""))
-            year = pub.get("year", "")
-            ref = f"{authors} ({year}). \\textit{{{title}}}."
-            ref = append_doi(ref, pub)
-            add_line(f"{ref}\\par\\medskip")
-        add_line()
-
-    # Preprints
-    if pubs["preprints"]:
-        add_line()
-        add_line(f"\\subsection{{Preprints ({len(pubs['preprints'])})}}")
-        add_line()
-        for pub in pubs["preprints"]:
             authors = format_author_list(pub.get("authors", []))
             title = escape_latex(pub.get("title", ""))
             year = pub.get("year", "")

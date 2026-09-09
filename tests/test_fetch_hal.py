@@ -150,6 +150,58 @@ def test_fetch_hal_main_classifies_non_peer_reviewed_art_preprints_and_omits_rep
     ]
 
 
+def test_fetch_hal_main_classifies_undefined_zenodo_without_venue_as_preprint(tmp_path):
+    fetch_hal = load_fetch_hal_module()
+
+    profile_file = tmp_path / "profile.yml"
+    output_file = tmp_path / "publications.json"
+    profile_file.write_text(yaml.safe_dump({"hal": "test-id"}), encoding="utf-8")
+
+    def fake_get(url, params, timeout):
+        return FakeResponse(
+            {
+                "response": {
+                    "numFound": 2,
+                    "docs": [
+                        {
+                            "docid": 201,
+                            "halId_s": ["hal-undefined-preprint"],
+                            "uri_s": ["https://hal.science/hal-undefined-preprint"],
+                            "docType_s": ["UNDEFINED"],
+                            "title_s": ["Undefined Zenodo preprint"],
+                            "authFullName_s": ["Scott Love"],
+                            "doiId_s": ["10.5281/zenodo.1234567"],
+                            "producedDateY_i": 2023,
+                        },
+                        {
+                            "docid": 202,
+                            "halId_s": ["hal-undefined-other"],
+                            "uri_s": ["https://hal.science/hal-undefined-other"],
+                            "docType_s": ["UNDEFINED"],
+                            "title_s": ["Undefined non-preprint with journal"],
+                            "authFullName_s": ["Scott Love"],
+                            "doiId_s": ["10.5281/zenodo.7654321"],
+                            "journalTitle_s": ["Some Journal"],
+                            "producedDateY_i": 2022,
+                        },
+                    ],
+                }
+            }
+        )
+
+    exit_code = fetch_hal.main(
+        get=fake_get,
+        sleep=lambda _: None,
+        output_file=output_file,
+        profile_file=profile_file,
+    )
+
+    assert exit_code == 0
+    saved = json.loads(output_file.read_text(encoding="utf-8"))
+    assert [pub["hal_id"] for pub in saved] == ["hal-undefined-preprint", "hal-undefined-other"]
+    assert [pub["category"] for pub in saved] == ["Preprint", "Other scientific contribution"]
+
+
 def test_fetch_hal_main_uses_cache_on_retryable_failure(tmp_path, capsys):
     fetch_hal = load_fetch_hal_module()
 
