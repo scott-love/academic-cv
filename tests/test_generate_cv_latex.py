@@ -13,7 +13,11 @@ HAL_PROFILE_BASE_URL = "https://cv.hal.science/"
 
 
 def escape_latex(text):
+    if not text:
+        return ""
+
     replacements = {
+        "\\": r"\textbackslash{}",
         "&": r"\&",
         "%": r"\%",
         "$": r"\$",
@@ -24,28 +28,23 @@ def escape_latex(text):
         "~": r"\textasciitilde{}",
         "^": r"\textasciicircum{}",
     }
-
-    result = str(text).replace("\\", r"\textbackslash{}")
-    for char, replacement in replacements.items():
-        result = result.replace(char, replacement)
-    return result
+    return "".join(replacements.get(char, char) for char in str(text))
 
 
 def escape_latex_url(url):
-    return (
-        str(url)
-        .replace(" ", "%20")
-        .replace("\\", r"\textbackslash{}")
-        .replace("&", r"\&")
-        .replace("%", r"\%")
-        .replace("$", r"\$")
-        .replace("#", r"\#")
-        .replace("_", r"\_")
-        .replace("{", r"\{")
-        .replace("}", r"\}")
-        .replace("~", r"\textasciitilde{}")
-        .replace("^", r"\textasciicircum{}")
-    )
+    replacements = {
+        "\\": r"\textbackslash{}",
+        "&": r"\&",
+        "%": r"\%",
+        "$": r"\$",
+        "#": r"\#",
+        "_": r"\_",
+        "{": r"\{",
+        "}": r"\}",
+        "~": r"\textasciitilde{}",
+        "^": r"\textasciicircum{}",
+    }
+    return "".join(replacements.get(char, char) for char in str(url).replace(" ", "%20"))
 
 
 def test_generator_emits_expected_header_profile_links_for_full_and_short_cv():
@@ -199,12 +198,13 @@ def test_profile_and_research_interests_render_as_single_heading_free_block():
     original_profile = profile_file.read_text(encoding="utf-8")
     test_profile = yaml.safe_load(original_profile)
 
-    test_profile["summary"] = "Summary with R&D, 50% focus on C# and {MRI}."
+    test_profile["summary"] = "Summary with R&D, 50% focus on C# and {MRI} \\ methods."
     test_profile["research_interests"] = [
         "Social & affective neuroscience",
         "50% methods",
         "C# pipelines",
         "{MRI}",
+        "C:\\data",
     ]
 
     try:
@@ -224,7 +224,8 @@ def test_profile_and_research_interests_render_as_single_heading_free_block():
         escaped_interests = (
             r"{\small Social \& affective neuroscience \textperiodcentered{} "
             r"50\% methods \textperiodcentered{} C\# pipelines "
-            r"\textperiodcentered{} \{MRI\}}"
+            r"\textperiodcentered{} \{MRI\} \textperiodcentered{} "
+            r"C:\textbackslash{}data}"
         )
 
         assert "\\section{Profile}" not in latex
@@ -232,6 +233,7 @@ def test_profile_and_research_interests_render_as_single_heading_free_block():
         assert f"{escaped_summary}\\\\" in profile_block
         assert escaped_interests in profile_block
         assert profile_block.index(escaped_summary) < profile_block.index(escaped_interests)
+        assert r"\textbackslash\{\}" not in profile_block
         assert "·" not in profile_block
         assert "��" not in latex
     finally:
@@ -258,6 +260,96 @@ def test_publications_abbreviate_and_bold_scott_name():
         assert "\\textbf{Scott A. Love}" not in latex
         assert "\\textbf{Scott A Love}" not in latex
     finally:
+        if original_output is None:
+            output_file.unlink(missing_ok=True)
+        else:
+            output_file.write_text(original_output, encoding="utf-8")
+
+
+def test_generator_escapes_author_and_country_text():
+    output_file = FULL_OUTPUT_FILE
+    publications_file = ROOT / "data" / "publications.json"
+    education_file = ROOT / "data" / "education.yml"
+    employment_file = ROOT / "data" / "employment.yml"
+    teaching_file = ROOT / "data" / "teaching.yml"
+    original_output = output_file.read_text(encoding="utf-8") if output_file.exists() else None
+    original_publications = publications_file.read_text(encoding="utf-8")
+    original_education = education_file.read_text(encoding="utf-8")
+    original_employment = employment_file.read_text(encoding="utf-8")
+    original_teaching = teaching_file.read_text(encoding="utf-8")
+
+    test_publications = [
+        {
+            "hal_id": "hal-author-escape",
+            "category": "Journal article",
+            "authors": ["Scott A. Love", "Smith & Wesson_A"],
+            "title": "Escaping author text",
+            "year": 2026,
+            "journal": "Test Journal",
+        }
+    ]
+    test_education = [
+        {
+            "year": "2026",
+            "degree": "PhD",
+            "institution": "Example University",
+            "country": "Bosnia & Herzegovina",
+        }
+    ]
+    test_employment = [
+        {
+            "position": "Researcher",
+            "institution": "Example Lab",
+            "country": "Trinidad & Tobago",
+            "start": "2025",
+            "end": "present",
+        }
+    ]
+    test_teaching = [
+        {
+            "role": "Lecturer",
+            "course": "Neuroscience",
+            "institution": "Example Campus",
+            "country": "Saint Pierre & Miquelon",
+            "start": "2025",
+            "end": "2025",
+        }
+    ]
+
+    try:
+        publications_file.write_text(
+            json.dumps(test_publications, indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
+        education_file.write_text(
+            yaml.safe_dump(test_education, allow_unicode=True, sort_keys=False),
+            encoding="utf-8",
+        )
+        employment_file.write_text(
+            yaml.safe_dump(test_employment, allow_unicode=True, sort_keys=False),
+            encoding="utf-8",
+        )
+        teaching_file.write_text(
+            yaml.safe_dump(test_teaching, allow_unicode=True, sort_keys=False),
+            encoding="utf-8",
+        )
+
+        subprocess.run(
+            [sys.executable, str(ROOT / "scripts" / "generate_cv_latex.py")],
+            check=True,
+            cwd=ROOT,
+        )
+        latex = output_file.read_text(encoding="utf-8")
+
+        assert "Smith \\& Wesson\\_A" in latex
+        assert "Bosnia \\& Herzegovina" in latex
+        assert "Trinidad \\& Tobago" in latex
+        assert "Saint Pierre \\& Miquelon" in latex
+    finally:
+        publications_file.write_text(original_publications, encoding="utf-8")
+        education_file.write_text(original_education, encoding="utf-8")
+        employment_file.write_text(original_employment, encoding="utf-8")
+        teaching_file.write_text(original_teaching, encoding="utf-8")
         if original_output is None:
             output_file.unlink(missing_ok=True)
         else:
