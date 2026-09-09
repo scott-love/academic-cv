@@ -49,4 +49,4 @@ build-all: sync fetch-publications render-all
 clean:
 	@echo "Cleaning up generated files..."
 	cd cv && rm -f *.aux *.log *.out *.pdf && cd ..
-	@echo "Done.
+	@echo "Done."

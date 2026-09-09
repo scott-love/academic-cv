@@ -79,15 +79,7 @@ def escape_latex(text):
         "~": r"\textasciitilde{}",
         "^": r"\textasciicircum{}",
     }
-
-    # Handle backslash first
-    result = text.replace("\\", r"\textbackslash{}")
-
-    # Handle others
-    for char, replacement in list(replacements.items())[1:]:
-        result = result.replace(char, replacement)
-
-    return result
+    return "".join(replacements.get(char, char) for char in str(text))
 
 
 def escape_latex_url(url):
@@ -96,18 +88,19 @@ def escape_latex_url(url):
         return ""
 
     normalized = str(url).replace(" ", "%20")
-    return (
-        normalized.replace("\\", r"\textbackslash{}")
-        .replace("&", r"\&")
-        .replace("%", r"\%")
-        .replace("$", r"\$")
-        .replace("#", r"\#")
-        .replace("_", r"\_")
-        .replace("{", r"\{")
-        .replace("}", r"\}")
-        .replace("~", r"\textasciitilde{}")
-        .replace("^", r"\textasciicircum{}")
-    )
+    replacements = {
+        "\\": r"\textbackslash{}",
+        "&": r"\&",
+        "%": r"\%",
+        "$": r"\$",
+        "#": r"\#",
+        "_": r"\_",
+        "{": r"\{",
+        "}": r"\}",
+        "~": r"\textasciitilde{}",
+        "^": r"\textasciicircum{}",
+    }
+    return "".join(replacements.get(char, char) for char in normalized)
 
 
 def normalize_homepage_url(homepage):
@@ -328,10 +321,11 @@ def format_author_list(authors, max_authors=6):
     formatted = []
 
     for author in authors:
+        formatted_author = escape_latex(abbreviate_author(author))
         if is_scott(author):
-            formatted.append(f"\\textbf{{{abbreviate_author(author)}}}")
+            formatted.append(f"\\textbf{{{formatted_author}}}")
         else:
-            formatted.append(abbreviate_author(author))
+            formatted.append(formatted_author)
 
     if len(formatted) > max_authors:
         visible = formatted[:max_authors]
@@ -902,7 +896,7 @@ def add_education_section(add_line, degrees, title="Education"):
         institution = escape_latex(deg.get("institution", ""))
 
         if deg.get("country"):
-            institution += f", {deg['country']}"
+            institution += f", {escape_latex(deg['country'])}"
 
         add_line(f"\\cventry{{{dates}}}{{{degree}}}{{{institution}}}{{}}{{}}{{")
 
@@ -952,7 +946,7 @@ def add_employment_section(add_line):
             institution = escape_latex(pos.get("institution", ""))
 
             if pos.get("country"):
-                institution += f", {pos['country']}"
+                institution += f", {escape_latex(pos['country'])}"
 
             add_line(f"\\cventry{{{{\\small {dates}}}}}{{{position}}}{{{institution}}}{{}}{{}}{{")
 
@@ -1042,7 +1036,7 @@ def add_teaching_section(add_line):
         institution = escape_latex(course.get("institution", ""))
 
         if course.get("country"):
-            institution += f", {course['country']}"
+            institution += f", {escape_latex(course['country'])}"
 
         add_line(f"\\cventry{{{dates}}}{{{role}}}{{{course_name}}}{{{institution}}}{{}}{{")
 
