@@ -408,7 +408,7 @@ def sort_publications(items):
 
 def publication_dedup_key(pub):
     """Build deduplication key from title + ordered author list."""
-    title = normalize_spaces(pub.get("title", "")).casefold()
+    title = normalize_title_for_dedup(pub.get("title", ""))
     authors = tuple(
         normalize_person_for_dedup(author)
         for author in pub.get("authors", [])
@@ -428,6 +428,20 @@ def normalize_person_for_dedup(name):
     normalized_name = normalized_name.casefold()
     tokens = re.findall(r"[a-z0-9]+", normalized_name)
     return " ".join(sorted(tokens))
+
+
+def normalize_title_for_dedup(title):
+    """Normalize title variants for deduplication across HAL records."""
+    normalized_title = normalize_spaces(title)
+    if not normalized_title:
+        return ""
+
+    normalized_title = unicodedata.normalize("NFKD", normalized_title)
+    normalized_title = normalized_title.encode("ascii", "ignore").decode("ascii")
+    normalized_title = re.sub(r"\([^)]*\)", " ", normalized_title)
+    normalized_title = normalized_title.casefold()
+    normalized_title = re.sub(r"[^a-z0-9]+", " ", normalized_title)
+    return normalize_spaces(normalized_title)
 
 
 def is_preprint_publication(pub):

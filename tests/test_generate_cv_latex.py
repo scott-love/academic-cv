@@ -220,6 +220,22 @@ def test_publications_render_other_and_preprints_with_dedup_doi_and_italics():
             "doi": "10.1000/preprint-unique",
         },
         {
+            "hal_id": "hal-journal-cyto",
+            "category": "Journal article",
+            "authors": [
+                "Camille Pluchot",
+                "Mélody Morisse",
+                "Maryse Meurisse",
+                "Jean-Marie Graïc",
+                "Elodie Chaillou",
+                "Scott A. Love",
+            ],
+            "title": "Cytoarchitecture and myeloarchitecture of the sheep auditory cortex",
+            "year": 2025,
+            "journal": "Journal of Anatomy",
+            "doi": "10.1111/joa.70072",
+        },
+        {
             "hal_id": "hal-legacy-preprint-duplicate",
             "hal_type": "UNDEFINED",
             "category": "Other scientific contribution",
@@ -227,6 +243,22 @@ def test_publications_render_other_and_preprints_with_dedup_doi_and_italics():
             "title": "Published contribution",
             "year": 2022,
             "doi": "10.5281/zenodo.10000001",
+        },
+        {
+            "hal_id": "hal-legacy-preprint-cyto-duplicate",
+            "hal_type": "UNDEFINED",
+            "category": "Other scientific contribution",
+            "authors": [
+                "Camille Pluchot",
+                "Mélody Morisse",
+                "Maryse Meurisse",
+                "Jean-Marie Graïc",
+                "Elodie Chaillou",
+                "Scott A. Love",
+            ],
+            "title": "Cytoarchitecture and Myeloarchitecture of the sheep (Ovis aries) auditory cortex",
+            "year": 2025,
+            "doi": "10.5281/zenodo.14824490",
         },
         {
             "hal_id": "hal-legacy-preprint-unique",
@@ -253,7 +285,7 @@ def test_publications_render_other_and_preprints_with_dedup_doi_and_italics():
         )
         latex = output_file.read_text(encoding="utf-8")
 
-        assert "\\subsection{Journal Articles (1)}" in latex
+        assert "\\subsection{Journal Articles (2)}" in latex
         assert "\\subsection{Book Chapters (1)}" in latex
         assert "\\subsection{Other Scientific Contributions (1)}" in latex
         assert "\\subsection{Preprints (2)}" in latex
@@ -271,6 +303,7 @@ def test_publications_render_other_and_preprints_with_dedup_doi_and_italics():
         assert "10.5281/zenodo.10000002" in latex
         assert "10.1000/preprint-duplicate" not in latex
         assert "10.5281/zenodo.10000001" not in latex
+        assert "10.5281/zenodo.14824490" not in latex
         assert latex.index("\\subsection{Book Chapters (1)}") < latex.index(
             "\\subsection{Preprints (2)}"
         )
