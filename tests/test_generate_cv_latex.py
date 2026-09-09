@@ -282,7 +282,7 @@ def test_generator_escapes_author_and_country_text():
         {
             "hal_id": "hal-author-escape",
             "category": "Journal article",
-            "authors": ["Scott A. Love", "Smith & Wesson_A"],
+            "authors": ["Scott A. Love", "Smith Wesson&A", "Taylor Wesson_A"],
             "title": "Escaping author text",
             "year": 2026,
             "journal": "Test Journal",
@@ -341,7 +341,8 @@ def test_generator_escapes_author_and_country_text():
         )
         latex = output_file.read_text(encoding="utf-8")
 
-        assert "Smith \\& Wesson\\_A" in latex
+        assert "Wesson\\&A S" in latex
+        assert "Wesson\\_A T" in latex
         assert "Bosnia \\& Herzegovina" in latex
         assert "Trinidad \\& Tobago" in latex
         assert "Saint Pierre \\& Miquelon" in latex
@@ -583,11 +584,11 @@ def test_employment_dates_use_readable_mixed_precision_formatting():
         funding_start = latex.index("\\section{Funding}")
         employment_block = latex[employment_start:funding_start]
 
-        assert "\\cventry{Nov~2017~--~Present}" in employment_block
-        assert "\\cventry{Nov~2015~--~Aug~2017}" in employment_block
-        assert "\\cventry{Apr~2015~--~Oct~2015}" in employment_block
-        assert "\\cventry{2013~--~2015}" in employment_block
-        assert "\\cventry{2011~--~2013}" in employment_block
+        assert "\\cventry{{\\small Nov~’17--Present}}" in employment_block
+        assert "\\cventry{{\\small Nov~’15--Aug~’17}}" in employment_block
+        assert "\\cventry{{\\small Apr~’15--Oct~’15}}" in employment_block
+        assert "\\cventry{{\\small 2013--2015}}" in employment_block
+        assert "\\cventry{{\\small 2011--2013}}" in employment_block
         assert "2015-11 -- 2017-08" not in employment_block
         assert "2017-11 -- present" not in employment_block
     finally:
@@ -635,14 +636,15 @@ def test_supervision_uses_structured_layout_and_optional_fields():
         latex = output_file.read_text(encoding="utf-8")
 
         assert "\\cventry{2024 -- present}{Alice Example}{PhD}{University of Tours}{}{" in latex
-        assert "\\item \\textbf{Role:} Main supervisor" in latex
-        assert "\\item \\textbf{Topic:} Brain \\& behavior" in latex
+        assert "\\textbf{Role:} Main supervisor" in latex
+        assert "\\textbf{Topic:} Brain \\& behavior" in latex
         assert "\\cventry{2025}{Bob Example}{Master 2}{University of Tours}{}{" in latex
         supervision_start = latex.index("\\section{Supervision}")
         publications_start = latex.index("\\section{Publications}")
         supervision_block = latex[supervision_start:publications_start]
         assert supervision_block.count("\\textbf{Role:}") == 1
         assert supervision_block.count("\\textbf{Topic:}") == 1
+        assert "\\item" not in supervision_block
     finally:
         supervision_file.write_text(original_supervision, encoding="utf-8")
         if original_output is None:
