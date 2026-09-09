@@ -273,6 +273,7 @@ def abbreviate_author(author):
         Katherine L Bryant -> Bryant KL
         Arnaud Le Troter -> Le Troter A
         Scott A. Love -> Love SA
+        Jean-Marie Graïc -> Graïc JM
     """
     author = author.strip()
 
@@ -307,7 +308,12 @@ def abbreviate_author(author):
     surname = " ".join(parts[surname_start:])
     given_names = parts[:surname_start]
 
-    initials = "".join(p[0].upper() for p in given_names if p and p[0].isalpha())
+    initials = "".join(
+        part[0].upper()
+        for name in given_names
+        for part in name.split("-")
+        if part and part[0].isalpha()
+    )
 
     return f"{surname} {initials}"
 

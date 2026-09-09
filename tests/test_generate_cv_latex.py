@@ -264,6 +264,26 @@ def test_publications_abbreviate_and_bold_scott_name():
             output_file.write_text(original_output, encoding="utf-8")
 
 
+def test_publications_abbreviate_hyphenated_given_names():
+    output_file = FULL_OUTPUT_FILE
+    original_output = output_file.read_text(encoding="utf-8") if output_file.exists() else None
+
+    try:
+        subprocess.run(
+            [sys.executable, str(ROOT / "scripts" / "generate_cv_latex.py")],
+            check=True,
+            cwd=ROOT,
+        )
+        latex = output_file.read_text(encoding="utf-8")
+
+        assert "Graïc JM" in latex
+    finally:
+        if original_output is None:
+            output_file.unlink(missing_ok=True)
+        else:
+            output_file.write_text(original_output, encoding="utf-8")
+
+
 def test_publications_render_other_and_preprints_with_dedup_doi_and_italics():
     output_file = FULL_OUTPUT_FILE
     publications_file = ROOT / "data" / "publications.json"
