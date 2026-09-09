@@ -8,6 +8,7 @@ import yaml
 
 
 ROOT = Path(__file__).resolve().parents[1]
+HAL_PROFILE_BASE_URL = "https://cv.hal.science/"
 
 
 def escape_latex(text):
@@ -46,7 +47,7 @@ def escape_latex_url(url):
     )
 
 
-def test_generator_emits_expected_header_profile_links_in_extrainfo():
+def test_generator_emits_expected_header_profile_links():
     output_file = ROOT / "cv" / "cv.tex"
     original_content = output_file.read_text(encoding="utf-8") if output_file.exists() else None
     try:
@@ -57,7 +58,6 @@ def test_generator_emits_expected_header_profile_links_in_extrainfo():
         )
         latex = output_file.read_text(encoding="utf-8")
         profile = yaml.safe_load((ROOT / "data" / "profile.yml").read_text(encoding="utf-8")) or {}
-        extrainfo_line = next(line for line in latex.splitlines() if line.startswith(r"\extrainfo{"))
 
         expected_parts = []
 
@@ -68,7 +68,7 @@ def test_generator_emits_expected_header_profile_links_in_extrainfo():
 
         hal = str(profile.get("hal", "")).strip()
         if hal:
-            url = escape_latex_url(f"https://hal.science/{quote(hal, safe='')}")
+            url = escape_latex_url(f"{HAL_PROFILE_BASE_URL}{quote(hal, safe='')}")
             expected_parts.append(f"\\href{{{url}}}{{\\aiHAL\\enspace {escape_latex(hal)}}}")
 
         homepage = str(profile.get("homepage", "")).strip()
@@ -80,11 +80,13 @@ def test_generator_emits_expected_header_profile_links_in_extrainfo():
 
         if expected_parts:
             expected_extrainfo = r"\enspace\textbar\enspace".join(expected_parts)
-            assert extrainfo_line == f"\\extrainfo{{{expected_extrainfo}}}"
-            assert "github.com" not in extrainfo_line
-            assert r"\aiGoogleScholar" not in extrainfo_line
-        else:
+            assert f"\\newcommand*{{\\cvheaderlinks}}{{{expected_extrainfo}}}" in latex
+            assert r"{\raggedleft\addressfont\color{color2}\cvheaderlinks\par}" in latex
             assert "\\extrainfo{" not in latex
+            assert "github.com" not in expected_extrainfo
+            assert r"\aiGoogleScholar" not in expected_extrainfo
+        else:
+            assert r"\newcommand*{\cvheaderlinks}{" not in latex
     finally:
         if original_content is None:
             output_file.unlink(missing_ok=True)
@@ -116,7 +118,7 @@ def test_generator_emits_icon_only_footer_profile_links():
 
         hal = str(profile.get("hal", "")).strip()
         if hal:
-            hal_url = escape_latex_url(f"https://hal.science/{quote(hal, safe='')}")
+            hal_url = escape_latex_url(f"{HAL_PROFILE_BASE_URL}{quote(hal, safe='')}")
             expected_parts.append(f"\\href{{{hal_url}}}{{\\aiHAL}}")
 
         google_scholar = str(profile.get("google_scholar", "")).strip()

@@ -29,6 +29,7 @@ CV_DIR = ROOT / "cv"
 OUTPUT_FILE = CV_DIR / "cv.tex"
 PHOTO_FILE = CV_DIR / "pictures" / "scott.jpg"
 PHOTO_LATEX_PATH = "pictures/scott"
+HAL_PROFILE_BASE_URL = "https://cv.hal.science/"
 
 # Ensure output directory exists
 CV_DIR.mkdir(parents=True, exist_ok=True)
@@ -211,7 +212,7 @@ def build_profile_links(profile_data):
     if hal:
         links.append(
             format_profile_link(
-                build_identifier_url("https://hal.science/", hal),
+                build_identifier_url(HAL_PROFILE_BASE_URL, hal),
                 r"\aiHAL",
                 hal,
             )
@@ -241,7 +242,7 @@ def build_footer_links(profile_data):
 
     hal = str(profile_data.get("hal", "")).strip()
     if hal:
-        links.append(format_profile_link(build_identifier_url("https://hal.science/", hal), r"\aiHAL"))
+        links.append(format_profile_link(build_identifier_url(HAL_PROFILE_BASE_URL, hal), r"\aiHAL"))
 
     google_scholar = str(profile_data.get("google_scholar", "")).strip()
     if google_scholar:
@@ -746,7 +747,7 @@ add_line(f"\\firstname{{{escape_latex(firstname)}}}")
 add_line(f"\\familyname{{{escape_latex(lastname)}}}")
 profile_links = build_profile_links(profile)
 if profile_links:
-    add_line(f"\\extrainfo{{{r'\enspace\textbar\enspace'.join(profile_links)}}}")
+    add_line(f"\\newcommand*{{\\cvheaderlinks}}{{{r'\enspace\textbar\enspace'.join(profile_links)}}}")
 
 footer_links = build_footer_links(profile)
 if footer_links:
@@ -774,6 +775,8 @@ else:
 add_line()
 add_line(r"\begin{document}")
 add_line(r"\makecvtitle")
+if profile_links:
+    add_line(r"{\raggedleft\addressfont\color{color2}\cvheaderlinks\par}")
 add_line()
 
 # Combined summary and research interests (no heading)
