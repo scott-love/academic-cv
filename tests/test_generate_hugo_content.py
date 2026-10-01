@@ -245,3 +245,25 @@ def test_generated_front_matter_validates_against_schema_v1(tmp_path, type_map, 
     validator = Draft202012Validator(schema)
     errors = sorted(validator.iter_errors(schema_payload), key=lambda e: list(e.path))
     assert not errors, "\n".join(f"{list(e.path)}: {e.message}" for e in errors)
+
+def test_export_is_repeatable(tmp_path, type_map, publication_factory):
+    exporter = load_exporter_module()
+
+    records = [
+        publication_factory(hal_id="hal-1", title="One"),
+        publication_factory(hal_id="hal-2", title="Two"),
+    ]
+
+    out1 = tmp_path / "run1"
+    out2 = tmp_path / "run2"
+
+    exporter.generate_hugo_content(records, out1, type_map)
+    exporter.generate_hugo_content(records, out2, type_map)
+
+    file1_a = (out1 / "hal-1" / "index.md").read_text(encoding="utf-8")
+    file1_b = (out2 / "hal-1" / "index.md").read_text(encoding="utf-8")
+    file2_a = (out1 / "hal-2" / "index.md").read_text(encoding="utf-8")
+    file2_b = (out2 / "hal-2" / "index.md").read_text(encoding="utf-8")
+
+    assert file1_a == file1_b
+    assert file2_a == file2_b
