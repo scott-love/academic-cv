@@ -118,9 +118,10 @@ def _front_matter(
     if category in type_map:
         front_matter["publication_types"] = type_map[category]
     else:
-        report.warnings.append(
-            f"{label}: unknown publication category {category!r}; using ['misc']."
+        report.errors.append(
+            f"{label}: unknown publication category {category!r}."
         )
+        valid = False
         front_matter["publication_types"] = ["misc"]
 
     publication = next(
