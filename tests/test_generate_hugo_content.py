@@ -72,6 +72,8 @@ def test_generates_publication_bundles_and_collects_validation_results(
         publication_factory(
             hal_id="hal-poster",
             category="Poster",
+            title=" ",
+            authors=None,
         ),
         publication_factory(hal_id="hal-no-title", title=" "),
         publication_factory(hal_id=None),
@@ -87,12 +89,16 @@ def test_generates_publication_bundles_and_collects_validation_results(
     report = exporter.generate_hugo_content(records, tmp_path, type_map)
 
     assert report.processed == 9
-    assert report.written == 6
+    assert report.written == 4
+    assert report.excluded == 2
+    assert report.excluded_by_category == {
+        "Conference presentation": 1,
+        "Poster": 1,
+    }
     assert len(report.errors) == 3
     assert any("missing non-empty title" in error for error in report.errors)
     assert any("missing non-empty hal_id" in error for error in report.errors)
     assert any("duplicate hal_id" in error for error in report.errors)
-    assert any("unknown publication category 'Poster'" in warning for warning in report.warnings)
     assert any("date fallback for year 2019" in warning for warning in report.warnings)
 
     article = read_front_matter(tmp_path / "hal-123" / "index.md")
@@ -108,13 +114,8 @@ def test_generates_publication_bundles_and_collects_validation_results(
     assert no_doi["hugoblox"]["ids"] == {"hal": "hal-no-doi"}
     assert "links" not in no_doi
 
-    conference = read_front_matter(tmp_path / "hal-conference" / "index.md")
-    assert conference["date"] == "2023-05-23T00:00:00Z"
-    assert conference["publication_types"] == ["paper-conference"]
-    assert conference["publication"] == "Example Conference"
-
-    poster = read_front_matter(tmp_path / "hal-poster" / "index.md")
-    assert poster["publication_types"] == ["misc"]
+    assert not (tmp_path / "hal-conference" / "index.md").exists()
+    assert not (tmp_path / "hal-poster" / "index.md").exists()
     assert read_front_matter(tmp_path / "hal-year-only" / "index.md")["date"] == (
         "2019-01-01T00:00:00Z"
     )
@@ -151,6 +152,28 @@ def test_dry_run_reports_planned_files_without_writing(tmp_path, type_map, publi
     assert report.written == 0
     assert len(report.planned_files) == 1
     assert not list(tmp_path.rglob("index.md"))
+
+
+@pytest.mark.parametrize("dry_run", [False, True])
+def test_cli_reports_excluded_categories_in_all_run_modes(tmp_path, capsys, dry_run):
+    exporter = load_exporter_module()
+    input_path = tmp_path / "publications.json"
+    input_path.write_text(
+        '[{"hal_id":"hal-article","title":"Article","category":"Journal article"},'
+        '{"category":"Conference presentation"},{"category":"Poster"}]',
+        encoding="utf-8",
+    )
+    args = ["--input", str(input_path), "--output", str(tmp_path / "out")]
+    if dry_run:
+        args.append("--dry-run")
+
+    exit_code = exporter.main(args)
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert "Records excluded: 2" in output
+    assert "Excluded by category:\n  Conference presentation: 1\n  Poster: 1" in output
+    assert (tmp_path / "out" / "hal-article" / "index.md").exists() is not dry_run
 
 
 def test_malformed_json_is_fatal(tmp_path, capsys):
