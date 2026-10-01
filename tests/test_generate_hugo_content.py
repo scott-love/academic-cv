@@ -203,3 +203,45 @@ def test_validation_errors_return_nonzero(tmp_path, capsys):
     assert "Errors: 1" in output
     assert "Records excluded: 0" in output
     assert not (tmp_path / "out").exists()
+
+import json
+from jsonschema import Draft202012Validator
+
+
+def test_generated_front_matter_validates_against_schema_v1(tmp_path, type_map, publication_factory):
+    exporter = load_exporter_module()
+
+    report = exporter.generate_hugo_content(
+        [publication_factory(hal_id="hal-schema-1", year=2024)],
+        tmp_path,
+        type_map,
+    )
+    assert report.written == 1
+    assert not report.errors
+
+    front_matter = read_front_matter(tmp_path / "hal-schema-1" / "index.md")
+
+    # Map exporter output fields to schema-v1 contract fields where names differ.
+    schema_payload = {
+        "hugo_export_schema_version": "v1",
+        "hal_id": front_matter["hugoblox"]["ids"]["hal"],
+        "title": front_matter["title"],
+        "authors": front_matter.get("authors", []),
+        "publication_type": (
+            front_matter.get("publication_types", [""])[0]
+            if isinstance(front_matter.get("publication_types"), list)
+            and front_matter.get("publication_types")
+            else ""
+        ),
+        "date": front_matter.get("date"),
+        "links": front_matter.get("links"),
+        "hugoblox": front_matter.get("hugoblox"),
+        "publication": front_matter.get("publication"),
+    }
+
+    schema_path = ROOT / "schemas" / "hugo-export.schema.v1.json"
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+
+    validator = Draft202012Validator(schema)
+    errors = sorted(validator.iter_errors(schema_payload), key=lambda e: list(e.path))
+    assert not errors, "\n".join(f"{list(e.path)}: {e.message}" for e in errors)
