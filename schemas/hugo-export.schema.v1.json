@@ -40,19 +40,39 @@
         ]
       }
     },
-    "publication_type": {
-      "type": "string",
-      "m      "m      "m      "m      "m      "m      "m      "m   g"      "m      "m      "m      "m      "m      "m      "m      "m   g"     rm      "m      "m      "m ear": {
-      "type": ["integer", "null"],
-      "minimum": 1900,
-      "maximum": 2100
-    }    }    }  ":    }    } yp    }    }  ,
-                     ert   ":                ":                     ert   ":                          oi":                   st     ,             },
-                       "type": ["string", "null"]
-               kti               kti    ["               kti          "volume": {
-                          nu                   sue": {
-      "type      "type      ll      "ty
+    "pu    "pu    "pu    "pu    "pu    "pu    "pu    "  "m    "pu    "pu    "pu    "pu    "pu    "pu    "pu    "  "m g", "null"]
+    },
+    "date": {
+      "type": ["string", "null"],
+      "form      "form      "form      "form      "form type": ["integer", "nul      "form  ini      "form      "form      "fo    },
+    "links": {
+      "type": "array",
+      "type": "array     "type": "object",
+        "required": ["type", "url"],
+                    : {
+          "type": { "type": "         "minLen          "type": {  "url": { "type": "string", "min          "ty            "type": { "tti          "type": {ue
+                   "hug                 type": "object",
+      "pro      "pro{
+                                                                     hal                                                                  ", "                                                        "minLength": 1 }
+                               nalP                               nalP            ired": ["ids"],
+      "addition      "addition      "addition      "addition      "addition      "addition      "addition      "addition      "addition      "null"]
+            journal": {
+      "type": ["string", "null"]
+    },
+    "booktitle": {
+      "type": ["string", "null"]
+    },
+    "volume": {
+      "type": ["string", "null"]
+    },
+                                        "null"]
+    },
     "pages": {
-      "type": ["string"      "typ        "type": ["string"      "      "type": ["string" ]
-                                                                        "additionalProperties": true
+      "type": [      "type": [      "type": [    rac      "type": [     ["string", "null"]
+    },
+    "publisher": {
+      "type": ["string", "null"]
+    }
+  },
+  "additionalProperties": true
 }
