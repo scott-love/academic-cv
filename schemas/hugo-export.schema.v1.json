@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scott-love.github.io/schemas/hugo-export.schema.v1.json",
+  "title": "Hugo Publication Export Schema v1",
+  "type": "object",
+  "required": [
+    "hugo_export_schema_version",
+    "hal_id",
+    "title",
+    "authors",
+    "publication_type"
+  ],
+  "properties": {
+    "hugo_export_schema_version": {
+      "type": "string",
+      "const": "v1"
+    },
+    "hal_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "authors": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "anyOf": [
+          { "type": "string", "minLength": 1 },
+          {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string", "minLength": 1 }
+            },
+            "required": ["name"],
+            "additionalProperties": true
+          }
+        ]
+      }
+    },
+    "publication_type": {
+      "type": "string",
+      "m      "m      "m      "m      "m      "m      "m      "m   g"      "m      "m      "m      "m      "m      "m      "m      "m   g"     rm      "m      "m      "m ear": {
+      "type": ["integer", "null"],
+      "minimum": 1900,
+      "maximum": 2100
+    }    }    }  ":    }    } yp    }    }  ,
+                     ert   ":                ":                     ert   ":                          oi":                   st     ,             },
+                       "type": ["string", "null"]
+               kti               kti    ["               kti          "volume": {
+                          nu                   sue": {
+      "type      "type      ll      "ty
+    "pages": {
+      "type": ["string"      "typ        "type": ["string"      "      "type": ["string" ]
+                                                                        "additionalProperties": true
+}
