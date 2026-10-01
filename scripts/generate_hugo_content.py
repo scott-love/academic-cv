@@ -164,19 +164,6 @@ def generate_hugo_content(
             report.errors.append(f"Record {index}: expected an object; skipped.")
             continue
 
-        category = record.get("category")
-        if category != "Journal article":
-            report.excluded += 1
-            category_label = (
-                category.strip()
-                if isinstance(category, str) and category.strip()
-                else "(missing)"
-            )
-            report.excluded_by_category[category_label] = (
-                report.excluded_by_category.get(category_label, 0) + 1
-            )
-            continue
-
         title = _non_empty_string(record.get("title"))
         hal_id = _non_empty_string(record.get("hal_id"))
         valid = True
@@ -197,6 +184,17 @@ def generate_hugo_content(
             valid = False
 
         if not valid:
+            continue
+
+        category = record.get("category")
+        if category != "Journal article":
+            report.excluded += 1
+            category_label = (
+                category.strip() if isinstance(category, str) and category.strip() else "(missing)"
+            )
+            report.excluded_by_category[category_label] = (
+                report.excluded_by_category.get(category_label, 0) + 1
+            )
             continue
 
         record = {**record, "title": title}
