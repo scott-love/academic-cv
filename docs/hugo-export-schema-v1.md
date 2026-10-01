@@ -28,26 +28,19 @@ These are managed in website content and should not be overwritten by exporter o
 - `title` (string)
 - `authors` (non-empty array)
 - `publication_type` (string)
-- date/year handling fields (s- date/year handling fields (s- date/year n - date/year handling 
-## ## ## ## ## ## #- `doi`
-## ## rnal`
-- `booktitle`
-- `volume`
-- `issue`
-- `pages`
-- `abstract`
-- `publisher`
-- other bibliographic fields supported by exporter
+- date/year handling fields (s- date/year handling fields (s- date/year n - date/year handling f## - date/year handling i`
+- date/yal`- date/yal`- date/yal`- date/yal`- date/yal`- date/yal`- date/yal`- date/yal`- date/yal`- date/yal`- date/yal`- date/yal`- d
+## N## N## N## N## N#g
+-------------------------------refe-------------------------------refe-------------------------------refe----------------ts.
+- Empty strings should not be emit- Empty strings should not be`n- Empty strings should thors` must be non-empt- Empty strings should not be emit- Empty strings should not be`n- Empty strings scts:
+  - `links` may be omitted if no links are available.
 
-## Null/empty handling
-- Optional scalar fields:
-  - Prefe  - Prefe  - Prefe  - Prefe  - Prefe  - Prefe  - Prefe  - Prefe  - Prefe  - Prefe  - Pref
----------tri--------ld not be emitted; normalize to omitted or `n---------tri--------ld noors---------tri----pt---------tri--------ld not be emitted; normalize to omitted or `n---------tri--------:
-                              no lin                              no lin                              no lin           DD`.                           but year is known, emit `year` as integer.
-- If - If - If - If - If - If - If - If - If - If - If - If - If - If - If - Ifsing/partial date inputs.
+## Date policy
+- If full date is known, emit `date` as `YYYY-MM-DD` - If full date is known, emit `dafor- If full date is known, emit `datt yea- If full date is known, emit `date` as `YYYY-MM-DD` - If full date is xport - If full datebe de- If full date is known, emit `date` as `YY.
 
-## Publication type/category mapping
-The The The The Thmap sThe The The The Thmap sTh to stable output values in `publication_type` (and `category` if used).  
-Any mapping changes are considered contract changes and Any mapping changes arVersiAny maphis cAny mappin froAny mapp1:
-Any mgo-exAny mgchemAny mg
-- mach- mach- able s- mach- mach- able s- mach- mach- able s- macion = "- mach- mach- able s-reaking changes require a new schema version.
+## Publication type## Publication type## Publiter## Publication type## Publicegories to stable output values in `publication_type`.
+Mapping changes are contract changes and must be reviewed.
+
+## Version## Version## Version## Version## Version## Version## Version## Version## Version## Version## Version## Version## Version## Version = "v1"` when emitted.
+
+Breaking changes require a new schema version.
