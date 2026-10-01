@@ -1,4 +1,4 @@
-.PHONY: help sync fetch-publications generate-latex render render-short render-all build build-all clean
+.PHONY: help sync fetch-publications generate-latex export-hugo render render-short render-all build build-all clean
 
 .DEFAULT_GOAL := help
 
@@ -7,6 +7,7 @@ help:
 	@echo "  make sync                - Install Python dependencies"
 	@echo "  make fetch-publications  - Fetch publications from HAL"
 	@echo "  make generate-latex      - Generate LaTeX CV from data"
+	@echo "  make export-hugo         - Export publications as Hugo content bundles"
 	@echo "  make render              - Compile LaTeX to PDF with xelatex"
 	@echo "  make render-short        - Compile the short LaTeX CV to PDF"
 	@echo "  make render-all          - Compile both LaTeX CV PDFs"
@@ -25,6 +26,10 @@ fetch-publications: sync
 generate-latex: sync
 	@echo "Generating LaTeX CV..."
 	uv run python scripts/generate_cv_latex.py
+
+export-hugo: sync
+	@echo "Exporting publications for Hugo..."
+	uv run python scripts/generate_hugo_content.py
 
 render: generate-latex
 	@echo "Compiling LaTeX to PDF..."

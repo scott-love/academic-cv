@@ -11,6 +11,7 @@ Publications are refreshed from HAL, the CV content is assembled into ModernCV-f
 - `data/` stores structured CV content in YAML and JSON.
 - `scripts/fetch_hal.py` refreshes publications from HAL into `data/publications.json`.
 - `scripts/generate_cv_latex.py` reads the data files and generates `cv/cv.tex` and `cv/cv_short.tex` (build artifacts, not tracked in git).
+- `scripts/generate_hugo_content.py` exports publications as HugoBlox content bundles; `scripts/publication_type_map.json` maps source categories to HugoBlox publication types.
 - `cv/moderncv/` provides the ModernCV LaTeX class assets used to compile `cv/cv.pdf` and `cv/cv_short.pdf`.
 
 ## Prerequisites
@@ -43,6 +44,7 @@ Available Makefile targets:
 - `make sync` — install Python dependencies with `uv sync`
 - `make fetch-publications` — refresh `data/publications.json` from HAL
 - `make generate-latex` — regenerate `cv/cv.tex` and `cv/cv_short.tex`
+- `make export-hugo` — export publications to `build/hugo/content/en/publication`
 - `make render` — compile `cv/cv.tex` to `cv/cv.pdf` with `xelatex`
 - `make render-short` — compile `cv/cv_short.tex` to `cv/cv_short.pdf`
 - `make render-all` — compile both LaTeX outputs to PDFs
@@ -67,6 +69,43 @@ Or run the underlying command directly:
 ```bash
 uv run python scripts/fetch_hal.py
 ```
+
+## Export Hugo publications
+
+The exporter creates one HugoBlox publication content bundle per valid record in
+`data/publications.json`. It is a one-way export from this repository for the
+companion website repository, [`scott-love/scott-love.github.io`](https://github.com/scott-love/scott-love.github.io);
+it writes only to a local output directory and does not write directly into the
+website repository.
+
+Use the Make target for the default output directory:
+
+```bash
+make export-hugo
+```
+
+Or specify the input, output, mapping file, or run validation without writing:
+
+```bash
+uv run python scripts/generate_hugo_content.py \
+  --input data/publications.json \
+  --output build/hugo/content/en/publication
+
+uv run python scripts/generate_hugo_content.py \
+  --input data/publications.json \
+  --output /tmp/hugo-out \
+  --type-map scripts/publication_type_map.json \
+  --dry-run
+```
+
+The default category mapping is in `scripts/publication_type_map.json` and can
+be overridden with `--type-map`. Unknown categories are exported as `misc` and
+reported as warnings. If a conference record has `conference_start`, that date
+is used. Otherwise, the exporter uses January 1 at 00:00:00 UTC for the
+publication year (`YYYY-01-01T00:00:00Z`), since HAL generally supplies only a
+year. When neither a conference start date nor a valid year is available, it
+uses the documented placeholder `1970-01-01T00:00:00Z` and reports a warning.
+Validation errors are summarized after processing and cause a non-zero exit.
 
 For CI resilience, `scripts/fetch_hal.py` retries transient HAL request failures
 with exponential backoff. If HAL remains unavailable but an existing
@@ -155,7 +194,9 @@ automatically.
 ├── scripts/
 │   ├── build_cv.sh
 │   ├── fetch_hal.py
+│   ├── generate_hugo_content.py
 │   ├── generate_cv_latex.py
+│   ├── publication_type_map.json
 │   └── update_cv.sh
 ├── Makefile
 ├── pyproject.toml
