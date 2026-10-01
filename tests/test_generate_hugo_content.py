@@ -72,7 +72,6 @@ def test_generates_publication_bundles_and_collects_validation_results(
         publication_factory(
             hal_id="hal-poster",
             category="Poster",
-            title=" ",
             authors=None,
         ),
         publication_factory(hal_id="hal-no-title", title=" "),
@@ -160,7 +159,8 @@ def test_cli_reports_excluded_categories_in_all_run_modes(tmp_path, capsys, dry_
     input_path = tmp_path / "publications.json"
     input_path.write_text(
         '[{"hal_id":"hal-article","title":"Article","category":"Journal article"},'
-        '{"category":"Conference presentation"},{"category":"Poster"}]',
+        '{"hal_id":"hal-conference","title":"Conference","category":"Conference presentation"},'
+        '{"hal_id":"hal-poster","title":"Poster","category":"Poster"}]',
         encoding="utf-8",
     )
     args = ["--input", str(input_path), "--output", str(tmp_path / "out")]
@@ -191,10 +191,15 @@ def test_malformed_json_is_fatal(tmp_path, capsys):
 def test_validation_errors_return_nonzero(tmp_path, capsys):
     exporter = load_exporter_module()
     input_path = tmp_path / "invalid.json"
-    input_path.write_text('[{"hal_id": "hal-missing-title"}]', encoding="utf-8")
+    input_path.write_text(
+        '[{"hal_id": "hal-missing-title", "category": "Conference presentation"}]',
+        encoding="utf-8",
+    )
 
     exit_code = exporter.main(["--input", str(input_path), "--output", str(tmp_path / "out")])
 
     assert exit_code == 1
-    assert "Errors: 1" in capsys.readouterr().out
+    output = capsys.readouterr().out
+    assert "Errors: 1" in output
+    assert "Records excluded: 0" in output
     assert not (tmp_path / "out").exists()
