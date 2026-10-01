@@ -21,6 +21,8 @@ MISSING_DATE = "1970-01-01T00:00:00Z"
 class ExportReport:
     processed: int = 0
     written: int = 0
+    excluded: int = 0
+    excluded_by_category: dict[str, int] = field(default_factory=dict)
     warnings: list[str] = field(default_factory=list)
     errors: list[str] = field(default_factory=list)
     planned_files: list[Path] = field(default_factory=list)
@@ -162,6 +164,19 @@ def generate_hugo_content(
             report.errors.append(f"Record {index}: expected an object; skipped.")
             continue
 
+        category = record.get("category")
+        if category != "Journal article":
+            report.excluded += 1
+            category_label = (
+                category.strip()
+                if isinstance(category, str) and category.strip()
+                else "(missing)"
+            )
+            report.excluded_by_category[category_label] = (
+                report.excluded_by_category.get(category_label, 0) + 1
+            )
+            continue
+
         title = _non_empty_string(record.get("title"))
         hal_id = _non_empty_string(record.get("hal_id"))
         valid = True
@@ -209,6 +224,13 @@ def generate_hugo_content(
 def _print_report(report: ExportReport, *, dry_run: bool) -> None:
     print(f"Records processed: {report.processed}")
     print(f"Bundles written: {report.written}")
+    print(f"Records excluded: {report.excluded}")
+    print("Excluded by category:")
+    if report.excluded_by_category:
+        for category, count in sorted(report.excluded_by_category.items()):
+            print(f"  {category}: {count}")
+    else:
+        print("  (none)")
     if dry_run:
         print(f"Bundles that would be written: {len(report.planned_files)}")
         for path in report.planned_files:

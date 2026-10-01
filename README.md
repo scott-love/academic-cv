@@ -72,8 +72,11 @@ uv run python scripts/fetch_hal.py
 
 ## Export Hugo publications
 
-The exporter creates one HugoBlox publication content bundle per valid record in
-`data/publications.json`. It is a one-way export from this repository for the
+The exporter creates one HugoBlox publication content bundle per valid journal
+article in `data/publications.json`. The current policy exports only records
+whose category is exactly `Journal article`; all other categories are
+intentionally excluded for now and reported in the summary. It is a one-way
+export from this repository for the
 companion website repository, [`scott-love/scott-love.github.io`](https://github.com/scott-love/scott-love.github.io);
 it writes only to a local output directory and does not write directly into the
 website repository.
@@ -99,13 +102,14 @@ uv run python scripts/generate_hugo_content.py \
 ```
 
 The default category mapping is in `scripts/publication_type_map.json` and can
-be overridden with `--type-map`. Unknown categories are exported as `misc` and
-reported as warnings. If a conference record has `conference_start`, that date
-is used. Otherwise, the exporter uses January 1 at 00:00:00 UTC for the
+be overridden with `--type-map`. Included journal articles are mapped to the
+configured HugoBlox publication types. If a record has `conference_start`, that
+date is used. Otherwise, the exporter uses January 1 at 00:00:00 UTC for the
 publication year (`YYYY-01-01T00:00:00Z`), since HAL generally supplies only a
 year. When neither a conference start date nor a valid year is available, it
 uses the documented placeholder `1970-01-01T00:00:00Z` and reports a warning.
-Validation errors are summarized after processing and cause a non-zero exit.
+Validation errors for included records are summarized after processing and
+cause a non-zero exit. Excluded records are listed by category in the summary.
 
 For CI resilience, `scripts/fetch_hal.py` retries transient HAL request failures
 with exponential backoff. If HAL remains unavailable but an existing
