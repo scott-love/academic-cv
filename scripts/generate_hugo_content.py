@@ -80,6 +80,22 @@ def _publication_date(record: dict[str, Any], label: str, report: ExportReport) 
                 f"{label}: malformed conference_start {conference_start!r}; using year fallback."
             )
 
+    year_month_day = _non_empty_string(record.get("year_month_day"))
+    if year_month_day:
+        try:
+            parsed_date = date_class.fromisoformat(year_month_day)
+            if parsed_date.isoformat() != year_month_day:
+                raise ValueError
+            date = datetime.combine(parsed_date, datetime.min.time(), tzinfo=timezone.utc)
+            return (
+                f"{date.year:04d}-{date.month:02d}-{date.day:02d}T"
+                f"{date.hour:02d}:{date.minute:02d}:{date.second:02d}Z"
+            )
+        except ValueError:
+            report.warnings.append(
+                f"{label}: malformed year_month_day {year_month_day!r}; using year fallback."
+            )
+
     year = record.get("year")
     try:
         year_number = int(year)
