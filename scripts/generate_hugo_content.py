@@ -4,7 +4,7 @@
 import argparse
 import json
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date as date_class
 from pathlib import Path
 from typing import Any
 
@@ -61,11 +61,16 @@ def _publication_date(record: dict[str, Any], label: str, report: ExportReport) 
             if len(conference_start) == 4 and conference_start.isdigit():
                 date = datetime(int(conference_start), 1, 1, tzinfo=timezone.utc)
             else:
-                date = datetime.fromisoformat(conference_start.replace("Z", "+00:00"))
-                if date.tzinfo is None:
-                    date = date.replace(tzinfo=timezone.utc)
+                parsed = datetime.fromisoformat(conference_start.replace("Z", "+00:00"))
+                # Handle both date and datetime objects
+                if isinstance(parsed, date_class) and not isinstance(parsed, datetime):
+                    date = datetime.combine(parsed, datetime.min.time(), tzinfo=timezone.utc)
                 else:
-                    date = date.astimezone(timezone.utc)
+                    date = parsed
+                    if date.tzinfo is None:
+                        date = date.replace(tzinfo=timezone.utc)
+                    else:
+                        date = date.astimezone(timezone.utc)
             return (
                 f"{date.year:04d}-{date.month:02d}-{date.day:02d}T"
                 f"{date.hour:02d}:{date.minute:02d}:{date.second:02d}Z"
