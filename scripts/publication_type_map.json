@@ -1,0 +1,7 @@
+{
+  "Journal article": ["article-journal"],
+  "Conference presentation": ["paper-conference"],
+  "Preprint": ["article"],
+  "Book chapter": ["chapter"],
+  "Other scientific contribution": ["misc"]
+}
