@@ -139,6 +139,32 @@ def test_missing_year_uses_documented_placeholder_and_warning(
     )
 
 
+@pytest.mark.parametrize(
+    ("conference_start", "expected_date"),
+    [
+        (None, "2024-06-15T00:00:00Z"),
+        ("2024-05-03", "2024-05-03T00:00:00Z"),
+    ],
+)
+def test_year_month_day_date_precision_and_priority(
+    tmp_path, type_map, publication_factory, conference_start, expected_date
+):
+    exporter = load_exporter_module()
+    report = exporter.generate_hugo_content(
+        [
+            publication_factory(
+                year_month_day="2024-06-15",
+                conference_start=conference_start,
+            )
+        ],
+        tmp_path,
+        type_map,
+    )
+
+    assert report.written == 1
+    assert read_front_matter(tmp_path / "hal-123" / "index.md")["date"] == expected_date
+
+
 def test_dry_run_reports_planned_files_without_writing(tmp_path, type_map, publication_factory):
     exporter = load_exporter_module()
     report = exporter.generate_hugo_content(
