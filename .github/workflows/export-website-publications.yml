@@ -1,0 +1,26 @@
+name: Export Website Publications
+
+on:
+  workflow_dispatch:
+
+jobs:
+  export-publications:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout academic-cv
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run publication exporter
+        run: |
+          # TODO replace with real command in next step
+          echo "exporter command placeholder"
