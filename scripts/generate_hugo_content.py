@@ -55,6 +55,40 @@ def _non_empty_string(value: Any) -> str | None:
 
 
 def _publication_date(record: dict[str, Any], label: str, report: ExportReport) -> str:
+    """Extract publication date from record using tiered precision fallback.
+
+    Implements a date precision policy that prioritizes sources with higher temporal precision.
+    When multiple date fields are available, the first non-empty field in the priority chain
+    is used; invalid values are logged as warnings and the next priority level is tried.
+
+    Priority Chain (highest to lowest precision):
+    1. conference_start: Full datetime or date with optional time component
+       - Formats: YYYY, YYYY-MM-DD, YYYY-MM-DDTHH:MM:SS, YYYY-MM-DDTHH:MM:SSZ, RFC3339 with timezone
+       - Examples: "2023", "2023-05-15", "2023-05-15T14:30:00Z"
+    2. year_month_day: Date in YYYY-MM-DD format only
+       - Examples: "2023-05-15"
+       - Assumes midnight UTC when converted to datetime
+    3. year: Year integer fallback (lowest precision)
+       - Examples: 2023
+       - Assumes January 1 at midnight UTC
+
+    Output Format:
+    - All returned dates are ISO8601 format with UTC timezone: YYYY-MM-DDTHH:MM:SSZ
+    - Intermediate dates without explicit times default to midnight (00:00:00Z)
+    - Malformed values at any level trigger a warning and cascade to the next priority
+
+    Placeholder Fallback:
+    - If no valid date can be extracted, returns MISSING_DATE (1970-01-01T00:00:00Z)
+    - This is a sentinel value to mark records with genuinely missing date information
+
+    Args:
+        record: Publication record dict from input JSON
+        label: Human-readable record identifier for warning messages (e.g., "Record 42 (hal-12345)")
+        report: ExportReport instance to collect warnings/errors
+
+    Returns:
+        ISO8601 datetime string with UTC timezone (YYYY-MM-DDTHH:MM:SSZ)
+    """
     conference_start = _non_empty_string(record.get("conference_start"))
     if conference_start:
         try:
