@@ -233,3 +233,38 @@ Common checks:
   `https://api.archives-ouvertes.fr/search/` and will reuse the existing cache on
   repeated connection failures.
 - Verify edits in `data/` remain valid YAML/JSON before regenerating the LaTeX file.
+
+
+## Website publication artifact export (Phase 2)
+
+This repository can export website-ready publication content for `scott-love/scott-love.github.io`.
+
+### Run export workflow
+
+1. Go to **Actions** in this repository.
+2. Select **Export Website Publications**.
+3. Click **Run workflow** on `main`.
+
+### Download artifact
+
+After the run completes:
+
+1. Open the workflow run summary.
+2. Download artifact `website-publications-<run_id>`.
+
+The artifact contains:
+
+- `build/hugo/content/en/publication/hal-*/index.md`
+- `publication-artifact-manifest.json`
+
+### Manifest fields
+
+`publication-artifact-manifest.json` includes:
+
+- `schema_version`
+- `generated_at_utc`
+- `source_repo`
+- `source_commit_sha`
+- `publication_dir`
+- `publication_count`
+- `hal_ids`
