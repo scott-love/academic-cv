@@ -18,9 +18,43 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          python -m pip install -e .
+          python -m pip install pyyaml
 
       - name: Run publication exporter
         run: |
-          # TODO replace with real command in next step
-          echo "exporter command placeholder"
+          python scripts/generate_hugo_content.py
+
+      - name: Verify publication output exists
+        run: |
+          test -d content/en/publication
+          count=$(find content/en/publication -maxdepth 1 -type d -name "hal-*" | wc -l)
+          echo "Found $count hal-* publication directories"
+          test "$count" -gt 0
+
+      - name: Generate publication artifact manifest
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          from datetime import datetime, timezone
+
+          pub_root = Path("content/en/publication")
+          hal_dirs = sorted([p for p in pub_root.glob("hal-*") if p.is_dir()])
+          hal_ids = [p.name for p in hal_dirs]
+
+          manifest = {
+              "schema_version": "1",
+              "generated_at_utc": datetime.now(timezone.utc).isoformat(),
+              "source_repo": os.getenv("GITHUB_REPOSITORY"),
+              "source_commit_sha": os.getenv("GITHUB_SHA"),
+              "publication_dir": str(pub_root),
+              "publication_count": len(hal_ids),
+              "hal_ids": hal_ids,
+          }
+
+          out = Path("publication-artifact-manifest.json")
+          out.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+          print(f"Wrote {out} with {len(hal_ids)} publications")
+          PY
