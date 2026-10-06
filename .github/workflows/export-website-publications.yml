@@ -25,16 +25,12 @@ jobs:
         run: |
           python scripts/generate_hugo_content.py
 
-      - name: Debug exported files
+      - name: Verify publication output exists
         run: |
-          echo "Repo root:"
-          pwd
-          echo "Top-level dirs:"
-          find . -maxdepth 2 -type d | sort
-          echo "Looking for publication dirs/files:"
-          find . -type d -name "publication" | sort
-          find . -type d -name "hal-*" | sort
-          find . -type f -name "index.md" | grep -E "publication|hal-" || true
+          test -d build/hugo/content/en/publication
+          count=$(find build/hugo/content/en/publication -maxdepth 1 -type d -name "hal-*" | wc -l)
+          echo "Found $count hal-* publication directories"
+          test "$count" -gt 0
 
       - name: Generate publication artifact manifest
         run: |
@@ -44,7 +40,7 @@ jobs:
           from pathlib import Path
           from datetime import datetime, timezone
 
-          pub_root = Path("content/en/publication")
+          pub_root = Path("build/hugo/content/en/publication")
           hal_dirs = sorted([p for p in pub_root.glob("hal-*") if p.is_dir()])
           hal_ids = [p.name for p in hal_dirs]
 
