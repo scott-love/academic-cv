@@ -58,3 +58,13 @@ jobs:
           out.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
           print(f"Wrote {out} with {len(hal_ids)} publications")
           PY
+
+      - name: Upload website publication artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: website-publications-${{ github.run_id }}
+          path: |
+            build/hugo/content/en/publication/hal-*/index.md
+            publication-artifact-manifest.json
+          if-no-files-found: error
+          retention-days: 14
